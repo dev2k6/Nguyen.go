@@ -64,7 +64,7 @@ export const geo = {
                 <pre class="terminal-body text-[#c9d1d9]"><span style="color:#ff7b72">FROM</span> golang:1.22-alpine <span style="color:#ff7b72">AS</span> build
 <span style="color:#ff7b72">WORKDIR</span> /app
 <span style="color:#ff7b72">COPY</span> . .
-<span style="color:#ff7b72">RUN</span> go install github.com/dev2k6/Nguyen.go@latest
+<span style="color:#ff7b72">RUN</span> go install github.com/dev2k6/Nguyen.go/cmd/nguyen@latest
 <span style="color:#ff7b72">RUN</span> nguyen build
 
 <span style="color:#ff7b72">FROM</span> alpine:3.19

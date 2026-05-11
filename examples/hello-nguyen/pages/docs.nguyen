@@ -99,7 +99,7 @@ export const geo = {
     <div class="space-y-3 max-w-2xl">
         <div class="cmd-block">
             <span class="cmd-prompt">$</span>
-            <span class="cmd-text">go install github.com/dev2k6/Nguyen.go@latest</span>
+            <span class="cmd-text">go install github.com/dev2k6/Nguyen.go/cmd/nguyen@latest</span>
         </div>
         <div class="cmd-block">
             <span class="cmd-prompt">$</span>

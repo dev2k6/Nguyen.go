@@ -56,7 +56,7 @@ go version go1.22.3 linux/amd64</pre>
                     <span class="terminal-dot"></span><span class="terminal-dot"></span><span class="terminal-dot"></span>
                     <span class="ml-3 text-[12px] font-mono text-muted">terminal</span>
                 </div>
-                <pre class="terminal-body text-[#c9d1d9]"><span style="color:#79c0ff">$</span> go install github.com/dev2k6/Nguyen.go@latest</pre>
+                <pre class="terminal-body text-[#c9d1d9]"><span style="color:#79c0ff">$</span> go install github.com/dev2k6/Nguyen.go/cmd/nguyen@latest</pre>
             </div>
             <p class="text-[16px] text-muted leading-[1.75]">
                 This installs the <code class="text-blue font-mono text-[14px]">nguyen</code> binary into your <code class="text-blue font-mono text-[14px]">$GOPATH/bin</code>. Make sure it's in your PATH.

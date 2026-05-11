@@ -12,7 +12,7 @@ This guide walks you through creating your first Nguyen.go application from scra
 ### From Go Install
 
 ```bash
-go install github.com/dev2k6/Nguyen.go@latest
+go install github.com/dev2k6/Nguyen.go/cmd/nguyen@latest
 ```
 
 ### From Source

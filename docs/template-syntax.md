@@ -194,7 +194,7 @@ export const geo = {
         {question: "Does it need Node.js?", answer: "No, it's pure Go."},
     ],
     howToSteps: [
-        {name: "Install", text: "Run go install github.com/dev2k6/Nguyen.go@latest"},
+        {name: "Install", text: "Run go install github.com/dev2k6/Nguyen.go/cmd/nguyen@latest"},
         {name: "Create", text: "Run nguyen create my-app"},
         {name: "Develop", text: "Run nguyen dev"},
     ],

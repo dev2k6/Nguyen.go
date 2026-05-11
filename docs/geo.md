@@ -208,7 +208,7 @@ Define FAQ pairs for Google Rich Results:
 export const geo = {
     pageType: "FAQPage",
     faqs: [
-        {question: "How do I install?", answer: "Run go install github.com/dev2k6/Nguyen.go@latest"},
+        {question: "How do I install?", answer: "Run go install github.com/dev2k6/Nguyen.go/cmd/nguyen@latest"},
         {question: "Does it need Node.js?", answer: "No, Nguyen.go is pure Go."},
         {question: "What rendering modes are supported?", answer: "SSR, ISR, and CSR."},
     ],
@@ -225,7 +225,7 @@ Define step-by-step instructions:
 export const geo = {
     pageType: "HowTo",
     howToSteps: [
-        {name: "Install the CLI", text: "Run go install github.com/dev2k6/Nguyen.go@latest"},
+        {name: "Install the CLI", text: "Run go install github.com/dev2k6/Nguyen.go/cmd/nguyen@latest"},
         {name: "Create a project", text: "Run nguyen create my-app"},
         {name: "Start developing", text: "Run nguyen dev to start the dev server"},
     ],

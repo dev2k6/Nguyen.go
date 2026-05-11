@@ -63,7 +63,7 @@ A full-stack Go web framework for building modern web applications. Nguyen.go co
 ## Installation
 
 ```bash
-go install github.com/dev2k6/Nguyen.go@latest
+go install github.com/dev2k6/Nguyen.go/cmd/nguyen@latest
 ```
 
 Or build from source:
