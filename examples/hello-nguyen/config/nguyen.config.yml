@@ -1,0 +1,69 @@
+# Nguyen.go Configuration
+# https://nguyen.go/docs/config
+
+name: hello-nguyen
+version: 1.0.0
+
+server:
+  host: localhost
+  port: 3000
+
+render:
+  mode: ssr
+
+wasm:
+  entry: app/main.go
+  output: .nguyen/app.wasm
+  target: wasm
+  optimize: true
+
+hmr:
+  enabled: true
+  websocket: /_nguyen/ws
+  watch:
+    - pages/
+    - components/
+    - styles/
+
+images:
+  formats: [webp, avif]
+  sizes: [640, 750, 1080, 1920]
+  quality: 80
+  cache_ttl: 86400
+
+head:
+  title_template: "%s — Nguyen.go"
+  default_title: "Nguyen.go — Full-stack Go Framework"
+  meta:
+    viewport: "width=device-width, initial-scale=1"
+    charset: "UTF-8"
+    description: "A refined example application built with Nguyen.go"
+  open_graph:
+    site_name: "Nguyen.go"
+    type: website
+    locale: en_US
+
+geo:
+  enabled: true
+
+pwa:
+  enabled: false
+  site_name: "Nguyen.go"
+  site_url: "http://localhost:3000"
+  organization_name: "Nguyen.go"
+  organization_url: "http://localhost:3000"
+  author_type: "Organization"
+  default_page_type: "Article"
+  same_as:
+    - "https://github.com/dev2k6/Nguyen.go"
+  sitemap:
+    enabled: true
+    default_changefreq: "weekly"
+    default_priority: 0.5
+  robots:
+    enabled: true
+    allow_ai_bots: true
+  llm_txt:
+    enabled: true
+    max_chars: 5000
+  cache_ttl: 3600

@@ -1,0 +1,415 @@
+---
+layout = "app/layout"
+
+import "syscall/js"
+
+func copyInstall() {
+    cmd := "go install github.com/dev2k6/Nguyen.go@latest"
+    clipboard := js.Global().Get("navigator").Get("clipboard")
+    if !clipboard.IsUndefined() {
+        clipboard.Call("writeText", cmd)
+    }
+    buttons := js.Global().Get("document").Call("querySelectorAll", ".cmd-copy")
+    length := buttons.Get("length").Int()
+    for i := 0; i < length; i++ {
+        btn := buttons.Call("item", i)
+        orig := btn.Get("innerHTML").String()
+        btn.Set("innerHTML", `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#0070f3" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>`)
+        js.Global().Call("setTimeout", js.FuncOf(func(this js.Value, args []js.Value) interface{} {
+            btn.Set("innerHTML", orig)
+            return nil
+        }), 1500)
+    }
+}
+
+export const metadata = {
+    title: "Nguyen.go — The Go Full-stack Framework",
+    description: "File-based routing, islands architecture, React-style hooks. All in Go. One binary to deploy.",
+}
+
+export const geo = {
+    pageType: "Article",
+    datePublished: "2026-01-01T00:00:00Z",
+    dateModified: "2026-05-10T00:00:00Z",
+    author: "Nguyen.go Team",
+    speakable: [".hero-text"],
+    breadcrumbs: [
+        { name: "Home", url: "/" },
+    ],
+    sameAs: [
+        "https://github.com/dev2k6/Nguyen.go",
+    ],
+    images: ["/og-image.png"],
+    tags: ["go", "webassembly", "framework", "full-stack"],
+}
+---
+<!-- ============================================
+     HERO — pattern-grid
+     ============================================ -->
+<div class="relative">
+    <div class="hero-glow"></div>
+    <div class="pattern-grid"></div>
+    <section class="max-w-5xl mx-auto px-6 pt-32 pb-24 text-center relative">
+        <a href="/blog/v1-0-0" class="pill pill-blue mb-8 group hover:border-[var(--color-primary)] transition-colors">
+            <span class="pill-dot"></span>
+            <span>Introducing Nguyen.go v1.0.0</span>
+            <svg width="10" height="10" viewBox="0 0 16 16" fill="none" class="opacity-70"><path d="M6 3L11 8L6 13" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </a>
+
+        <h1 class="hero-text heading-hero mb-7 max-w-4xl mx-auto">
+            <span class="gradient-text">The Go framework that<br/>ships at the speed of thought.</span>
+        </h1>
+
+        <p class="text-[17px] md:text-[19px] text-muted max-w-2xl mx-auto mb-11 leading-relaxed">
+            File-based routing. Islands architecture. React-style hooks.<br class="hidden md:block"/>
+            All in <span class="text-white">Go</span>, all in one binary.
+        </p>
+
+        <div class="flex items-center justify-center gap-3 flex-wrap mb-14">
+            <nguyen-link href="/docs" class="btn btn-lg btn-blue">
+                Start Building
+                <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M6 3L11 8L6 13" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </nguyen-link>
+            <nguyen-link href="/docs" class="btn btn-lg btn-secondary">
+                Read the Docs
+            </nguyen-link>
+        </div>
+
+        <div class="max-w-lg mx-auto">
+            <div class="cmd-block">
+                <span class="cmd-prompt">$</span>
+                <span class="cmd-text">go install github.com/dev2k6/Nguyen.go@latest</span>
+                <button class="cmd-copy" @click="copyInstall()" aria-label="Copy">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+                </button>
+            </div>
+        </div>
+    </section>
+</div>
+
+<!-- ============================================
+     TRUSTED BY — pattern-dots
+     ============================================ -->
+<div class="relative">
+    <div class="pattern-dots"></div>
+    <section class="max-w-6xl mx-auto px-6 pb-20 relative">
+        <p class="text-center text-[12px] uppercase tracking-widest text-muted mb-8 font-mono">Inspired by the best</p>
+        <div class="flex items-center justify-center gap-10 md:gap-14 flex-wrap opacity-60">
+            <a href="https://nextjs.org" class="hover:opacity-100 transition-opacity" aria-label="Next.js">
+                <img src="/public/logos/nextjs.svg" alt="Next.js" height="18" width="90" />
+            </a>
+            <a href="https://astro.build" class="hover:opacity-100 transition-opacity" aria-label="Astro">
+                <img src="/public/logos/astro.svg" alt="Astro" height="20" width="80" />
+            </a>
+            <a href="https://elysiajs.com" class="hover:opacity-100 transition-opacity" aria-label="Elysia">
+                <img src="/public/logos/elysia.svg" alt="Elysia" height="20" width="80" />
+            </a>
+            <a href="https://kit.svelte.dev" class="hover:opacity-100 transition-opacity" aria-label="SvelteKit">
+                <img src="/public/logos/sveltekit.svg" alt="SvelteKit" height="20" width="95" />
+            </a>
+            <a href="https://remix.run" class="hover:opacity-100 transition-opacity" aria-label="Remix">
+                <img src="/public/logos/remix.svg" alt="Remix" height="20" width="70" />
+            </a>
+        </div>
+    </section>
+</div>
+
+<!-- ============================================
+     STATS — pattern-diagonal
+     ============================================ -->
+<div class="relative">
+    <div class="pattern-diagonal"></div>
+    <section class="max-w-6xl mx-auto px-6 pb-24 relative">
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-px bg-[var(--color-border)] rounded-xl overflow-hidden border border-[var(--color-border)]">
+            <div class="px-6 py-10 text-center" style="background:var(--color-card)">
+                <div class="stat mb-2">50K+</div>
+                <div class="text-[12px] text-muted uppercase tracking-wider">req/sec · core</div>
+            </div>
+            <div class="px-6 py-10 text-center" style="background:var(--color-card)">
+                <div class="stat mb-2">&lt;100KB</div>
+                <div class="text-[12px] text-muted uppercase tracking-wider">WASM bundle</div>
+            </div>
+            <div class="px-6 py-10 text-center" style="background:var(--color-card)">
+                <div class="stat mb-2">0ms</div>
+                <div class="text-[12px] text-muted uppercase tracking-wider">cold start</div>
+            </div>
+            <div class="px-6 py-10 text-center" style="background:var(--color-card)">
+                <div class="stat mb-2">1</div>
+                <div class="text-[12px] text-muted uppercase tracking-wider">binary to deploy</div>
+            </div>
+        </div>
+    </section>
+</div>
+
+<!-- ============================================
+     FEATURES — pattern-noise + glow
+     ============================================ -->
+<div class="relative">
+    <div class="pattern-noise"></div>
+    <div class="pattern-glow"></div>
+    <section class="max-w-6xl mx-auto px-6 section-md relative">
+        <div class="mb-14 max-w-2xl">
+            <p class="text-[13px] text-blue font-mono uppercase tracking-widest mb-3">Everything included</p>
+            <h2 class="heading-lg text-white mb-4">Build production-ready apps<br/>without the boilerplate.</h2>
+            <p class="text-[16px] text-muted leading-relaxed">Pulled the best ideas from modern frameworks. Rebuilt in Go so they cost nothing at runtime.</p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            <div class="card card-blue-hover p-7">
+                <div class="feat-icon mb-5">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+                </div>
+                <h3 class="heading-md text-white mb-2">File-based Routing</h3>
+                <p class="text-[14px] text-muted leading-relaxed">Drop a file in <code class="text-blue font-mono text-[13px]">pages/</code>. It becomes a route. Dynamic segments, catch-alls, and nested layouts — all included.</p>
+            </div>
+
+            <div class="card card-blue-hover p-7">
+                <div class="feat-icon mb-5">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M2 12h20"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+                </div>
+                <h3 class="heading-md text-white mb-2">Islands Architecture</h3>
+                <p class="text-[14px] text-muted leading-relaxed">Ship zero JS by default. Opt into interactivity per component with <code class="text-blue font-mono text-[13px]">client:load</code>, <code class="text-blue font-mono text-[13px]">visible</code>, or <code class="text-blue font-mono text-[13px]">idle</code>.</p>
+            </div>
+
+            <div class="card card-blue-hover p-7">
+                <div class="feat-icon mb-5">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                </div>
+                <h3 class="heading-md text-white mb-2">Hybrid Rendering</h3>
+                <p class="text-[14px] text-muted leading-relaxed">SSR, SSG, ISR, or CSR — decide per page. Same syntax compiles to any mode. Stream HTML as it renders.</p>
+            </div>
+
+            <div class="card card-blue-hover p-7">
+                <div class="feat-icon mb-5">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+                </div>
+                <h3 class="heading-md text-white mb-2">React-style Hooks</h3>
+                <p class="text-[14px] text-muted leading-relaxed">Familiar <code class="text-blue font-mono text-[13px]">UseState</code>, <code class="text-blue font-mono text-[13px]">UseEffect</code>, <code class="text-blue font-mono text-[13px]">UseMemo</code>. Lane-based scheduler keeps the main thread snappy.</p>
+            </div>
+
+            <div class="card card-blue-hover p-7">
+                <div class="feat-icon mb-5">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
+                </div>
+                <h3 class="heading-md text-white mb-2">Fiber-powered API</h3>
+                <p class="text-[14px] text-muted leading-relaxed">Bun-class throughput. One server serves your SSR pages, REST endpoints, and static assets — no adapters, no proxies.</p>
+            </div>
+
+            <div class="card card-blue-hover p-7">
+                <div class="feat-icon mb-5">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                </div>
+                <h3 class="heading-md text-white mb-2">One Binary Deploy</h3>
+                <p class="text-[14px] text-muted leading-relaxed"><code class="text-blue font-mono text-[13px]">go build</code> → single executable. Copy to any server, run. No Node, no Docker, no DevOps toil.</p>
+            </div>
+        </div>
+    </section>
+</div>
+
+<!-- ============================================
+     COMPARISON — pattern-dots
+     ============================================ -->
+<div class="relative">
+    <div class="pattern-dots"></div>
+    <section class="max-w-6xl mx-auto px-6 section-md relative">
+        <div class="mb-12 max-w-2xl">
+            <p class="text-[13px] text-blue font-mono uppercase tracking-widest mb-3">Comparison</p>
+            <h2 class="heading-lg text-white mb-4">Side-by-side with the best.</h2>
+            <p class="text-[16px] text-muted leading-relaxed">How Nguyen.go stacks up against the frameworks it draws inspiration from.</p>
+        </div>
+
+        <div class="card overflow-hidden">
+            <div class="x-scroll">
+                <table class="cmp-table">
+                    <thead>
+                        <tr>
+                            <th class="!text-left" style="min-width:200px">Feature</th>
+                            <th class="cmp-col-highlight !text-left">
+                                <span class="inline-flex items-center gap-1.5 text-white">
+                                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none"><path d="M12 2L21.66 7.5V16.5L12 22L2.34 16.5V7.5L12 2Z" fill="url(#cg)"/><defs><linearGradient id="cg" x1="12" y1="2" x2="12" y2="22" gradientUnits="userSpaceOnUse"><stop stop-color="#ffffff"/><stop offset="1" stop-color="#0070f3"/></linearGradient></defs></svg>
+                                    Nguyen.go
+                                </span>
+                            </th>
+                            <th>Next.js</th>
+                            <th>Astro</th>
+                            <th>Elysia</th>
+                        </tr>
+                    </thead>
+                    <tbody class="text-muted-stronger">
+                        <tr>
+                            <td>Language</td>
+                            <td class="cmp-col-highlight"><span class="pill pill-blue !h-5 !text-[11px]">Go</span></td>
+                            <td class="text-muted">TypeScript</td>
+                            <td class="text-muted">TypeScript</td>
+                            <td class="text-muted">TypeScript</td>
+                        </tr>
+                        <tr>
+                            <td>File-based routing</td>
+                            <td class="cmp-col-highlight"><span class="text-blue">●</span></td>
+                            <td><span class="text-blue">●</span></td>
+                            <td><span class="text-blue">●</span></td>
+                            <td class="text-muted">—</td>
+                        </tr>
+                        <tr>
+                            <td>Islands architecture</td>
+                            <td class="cmp-col-highlight"><span class="text-blue">●</span></td>
+                            <td class="text-muted">—</td>
+                            <td><span class="text-blue">●</span></td>
+                            <td class="text-muted">—</td>
+                        </tr>
+                        <tr>
+                            <td>React-style hooks</td>
+                            <td class="cmp-col-highlight"><span class="text-blue">●</span></td>
+                            <td><span class="text-blue">●</span></td>
+                            <td class="text-muted">partial</td>
+                            <td class="text-muted">—</td>
+                        </tr>
+                        <tr>
+                            <td>Streaming SSR</td>
+                            <td class="cmp-col-highlight"><span class="text-blue">●</span></td>
+                            <td><span class="text-blue">●</span></td>
+                            <td><span class="text-blue">●</span></td>
+                            <td class="text-muted">—</td>
+                        </tr>
+                        <tr>
+                            <td>Zero Node.js required</td>
+                            <td class="cmp-col-highlight"><span class="text-blue">●</span></td>
+                            <td class="text-muted">—</td>
+                            <td class="text-muted">—</td>
+                            <td class="text-muted">partial</td>
+                        </tr>
+                        <tr>
+                            <td>Single-binary deploy</td>
+                            <td class="cmp-col-highlight"><span class="text-blue">●</span></td>
+                            <td class="text-muted">—</td>
+                            <td class="text-muted">—</td>
+                            <td class="text-muted">partial</td>
+                        </tr>
+                        <tr>
+                            <td>Cold start</td>
+                            <td class="cmp-col-highlight text-white font-mono">&lt; 10ms</td>
+                            <td class="text-muted font-mono">~800ms</td>
+                            <td class="text-muted font-mono">~400ms</td>
+                            <td class="text-muted font-mono">~50ms</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </section>
+</div>
+
+<!-- ============================================
+     CODE SAMPLE — pattern-grid
+     ============================================ -->
+<div class="relative">
+    <div class="pattern-grid"></div>
+    <section class="max-w-5xl mx-auto px-6 section-md relative">
+        <div class="text-center mb-12 max-w-2xl mx-auto">
+            <p class="text-[13px] text-blue font-mono uppercase tracking-widest mb-3">The syntax</p>
+            <h2 class="heading-lg text-white mb-4">Looks familiar.<br/>Runs in Go.</h2>
+            <p class="text-[16px] text-muted leading-relaxed">If you've used Next.js or Astro, you already know Nguyen.go.</p>
+        </div>
+
+        <div class="terminal">
+            <div class="terminal-bar">
+                <span class="terminal-dot"></span>
+                <span class="terminal-dot"></span>
+                <span class="terminal-dot"></span>
+                <span class="ml-3 text-[12px] font-mono text-muted">pages/index.nguyen</span>
+                <span class="ml-auto pill !h-5 !text-[10px]">Go + HTML</span>
+            </div>
+            <pre class="terminal-body text-[#c9d1d9]"><span style="color:#6e7681">---</span>
+<span style="color:#7d8590">layout</span> = <span style="color:#a5d6ff">"app/layout"</span>
+
+<span style="color:#ff7b72">import</span> <span style="color:#a5d6ff">"nguyen.go/pkg/core"</span>
+
+<span style="color:#79c0ff">count</span>, <span style="color:#79c0ff">setCount</span> := core.<span style="color:#d2a8ff">UseState</span>(<span style="color:#ffa657">0</span>)
+
+<span style="color:#ff7b72">func</span> <span style="color:#d2a8ff">increment</span>() {
+    <span style="color:#d2a8ff">setCount</span>(<span style="color:#79c0ff">count</span> + <span style="color:#ffa657">1</span>)
+}
+
+<span style="color:#ff7b72">export const</span> <span style="color:#79c0ff">metadata</span> = {
+    <span style="color:#79c0ff">title</span>: <span style="color:#a5d6ff">"Nguyen.go"</span>,
+    <span style="color:#79c0ff">description</span>: <span style="color:#a5d6ff">"Built with Go and WASM"</span>,
+}
+<span style="color:#6e7681">---</span>
+
+<span style="color:#6e7681">&lt;!-- JSX-free template, reactive by default --&gt;</span>
+&lt;<span style="color:#7ee787">section</span> <span style="color:#d2a8ff">class</span>=<span style="color:#a5d6ff">"hero"</span>&gt;
+    &lt;<span style="color:#7ee787">h1</span>&gt;Count: {<span style="color:#79c0ff">count</span>}&lt;/<span style="color:#7ee787">h1</span>&gt;
+    &lt;<span style="color:#7ee787">button</span> <span style="color:#d2a8ff">@click</span>=<span style="color:#a5d6ff">"increment()"</span>&gt;+&lt;/<span style="color:#7ee787">button</span>&gt;
+&lt;/<span style="color:#7ee787">section</span>&gt;</pre>
+        </div>
+    </section>
+</div>
+
+<!-- ============================================
+     ARCHITECTURE — pattern-diagonal + glow
+     ============================================ -->
+<div class="relative">
+    <div class="pattern-diagonal"></div>
+    <div class="pattern-glow-bottom"></div>
+    <section class="max-w-6xl mx-auto px-6 section-md relative">
+        <div class="text-center mb-14 max-w-2xl mx-auto">
+            <p class="text-[13px] text-blue font-mono uppercase tracking-widest mb-3">How it works</p>
+            <h2 class="heading-lg text-white mb-4">Three stages. Pure Go.</h2>
+            <p class="text-[16px] text-muted leading-relaxed">From file system to browser — every layer optimized for speed.</p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-px bg-[var(--color-border)] rounded-xl overflow-hidden border border-[var(--color-border)]">
+            <div class="p-8" style="background:var(--color-card)">
+                <div class="flex items-center gap-2 mb-5">
+                    <span class="font-mono text-[11px] text-blue tracking-wider">01</span>
+                    <span class="font-mono text-[11px] text-muted uppercase tracking-wider">Route</span>
+                </div>
+                <h3 class="heading-md text-white mb-2">File-based Discovery</h3>
+                <p class="text-[14px] text-muted leading-relaxed">Pages compile to pre-built regex patterns at startup. O(1) match per request.</p>
+            </div>
+            <div class="p-8" style="background:var(--color-card)">
+                <div class="flex items-center gap-2 mb-5">
+                    <span class="font-mono text-[11px] text-blue tracking-wider">02</span>
+                    <span class="font-mono text-[11px] text-muted uppercase tracking-wider">Render</span>
+                </div>
+                <h3 class="heading-md text-white mb-2">SSR + Hydration</h3>
+                <p class="text-[14px] text-muted leading-relaxed">Fiber streams HTML with state markers. Client hydrates WASM in place — no full reload.</p>
+            </div>
+            <div class="p-8" style="background:var(--color-card)">
+                <div class="flex items-center gap-2 mb-5">
+                    <span class="font-mono text-[11px] text-blue tracking-wider">03</span>
+                    <span class="font-mono text-[11px] text-muted uppercase tracking-wider">Run</span>
+                </div>
+                <h3 class="heading-md text-white mb-2">WASM Runtime</h3>
+                <p class="text-[14px] text-muted leading-relaxed">TinyGo compiles each page to sub-100KB WASM. Lane-based scheduler keeps the thread snappy.</p>
+            </div>
+        </div>
+    </section>
+</div>
+
+<!-- ============================================
+     FINAL CTA — pattern-noise
+     ============================================ -->
+<div class="relative">
+    <div class="pattern-noise"></div>
+    <section class="max-w-4xl mx-auto px-6 section-md relative">
+        <div class="border-flow">
+            <div class="relative p-10 md:p-16 text-center rounded-xl" style="background:radial-gradient(ellipse at top,rgba(0,112,243,0.08),transparent 70%),var(--color-card)">
+                <h2 class="heading-lg text-white mb-4">Ready to ship?</h2>
+                <p class="text-[16px] text-muted mb-8 max-w-lg mx-auto leading-relaxed">One Go install. One binary deploy. Zero configuration headaches.</p>
+                <div class="flex items-center justify-center gap-3 flex-wrap">
+                    <nguyen-link href="/docs/getting-started" class="btn btn-lg btn-blue">
+                        Start Building
+                        <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M6 3L11 8L6 13" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                    </nguyen-link>
+                    <nguyen-link href="/examples" class="btn btn-lg btn-secondary">Browse Examples</nguyen-link>
+                </div>
+                <div class="flex items-center justify-center gap-2 mt-8 text-[12px] text-muted">
+                    <span>Press</span>
+                    <span class="kbd">G</span>
+                    <span>to open on GitHub</span>
+                </div>
+            </div>
+        </div>
+    </section>
+</div>

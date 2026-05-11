@@ -1,0 +1,42 @@
+# Binaries
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+
+# Build output
+bin/
+dist/
+
+# Nguyen.go build output
+.nguyen/
+
+# OS
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# IDE (user-specific, not project config)
+*.swp
+*.swo
+*~
+
+# Dependencies
+vendor/
+
+# Test
+*.test
+*.out
+coverage.html
+
+# Cloned repos (reference only)
+.clone-react/
+.clone-astro/
+
+# Claude Code
+.claude/
+
+# Env
+.env
+.env.local

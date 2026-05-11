@@ -1,0 +1,119 @@
+---
+layout = "app/layout"
+
+export const metadata = {
+    title: "State Management — Nguyen.go",
+    description: "Global and local state patterns in Nguyen.go for building reactive UIs.",
+}
+
+export const geo = {
+    pageType: "TechArticle",
+    datePublished: "2026-05-01T00:00:00Z",
+    dateModified: "2026-05-10T00:00:00Z",
+    author: "Nguyen.go Team",
+    breadcrumbs: [
+        { name: "Home", url: "/" },
+        { name: "Docs", url: "/docs" },
+        { name: "State Management", url: "/docs/state" },
+    ],
+}
+---
+<section class="max-w-4xl mx-auto px-6 pt-24 pb-16">
+    <div class="flex items-center gap-2 text-[13px] text-muted mb-6">
+        <nguyen-link href="/" class="hover:text-white transition-colors">Home</nguyen-link>
+        <svg width="10" height="10" viewBox="0 0 16 16" fill="none" class="opacity-50"><path d="M6 3L11 8L6 13" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+        <nguyen-link href="/docs" class="hover:text-white transition-colors">Docs</nguyen-link>
+        <svg width="10" height="10" viewBox="0 0 16 16" fill="none" class="opacity-50"><path d="M6 3L11 8L6 13" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+        <span class="text-muted-stronger">State Management</span>
+    </div>
+
+    <p class="text-[13px] text-blue font-mono uppercase tracking-widest mb-4">Core concepts</p>
+    <h1 class="text-[36px] font-semibold tracking-tight text-white mb-4">State Management</h1>
+    <p class="text-[17px] text-muted max-w-2xl leading-relaxed mb-12">
+        Nguyen.go provides a simple global state system. No external store libraries needed — state is reactive out of the box.
+    </p>
+
+    <div class="space-y-10">
+        <div>
+            <h2 class="text-[22px] font-semibold tracking-tight text-white mb-4">Global state</h2>
+            <p class="text-[16px] text-muted leading-[1.75] mb-4">
+                State declared with <code class="text-blue font-mono text-[14px]">UseGlobalState</code> is shared across the page. Any update triggers a re-render of all elements bound to that key.
+            </p>
+            <div class="terminal mb-4">
+                <div class="terminal-bar">
+                    <span class="terminal-dot"></span><span class="terminal-dot"></span><span class="terminal-dot"></span>
+                    <span class="ml-3 text-[12px] font-mono text-muted">frontmatter</span>
+                </div>
+                <pre class="terminal-body text-[#c9d1d9]"><span style="color:#79c0ff">theme</span> := core.<span style="color:#d2a8ff">UseGlobalState</span>(<span style="color:#a5d6ff">"theme"</span>, <span style="color:#a5d6ff">"dark"</span>)
+<span style="color:#79c0ff">count</span> := core.<span style="color:#d2a8ff">UseGlobalState</span>(<span style="color:#a5d6ff">"count"</span>, <span style="color:#79c0ff">0</span>)</pre>
+            </div>
+        </div>
+
+        <div>
+            <h2 class="text-[22px] font-semibold tracking-tight text-white mb-4">Reading and writing</h2>
+            <div class="card overflow-hidden mb-4">
+                <table class="cmp-table">
+                    <thead>
+                        <tr>
+                            <th class="!text-left">Operation</th>
+                            <th class="!text-left">API</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td class="text-muted-stronger">Declare + read</td>
+                            <td class="font-mono text-blue text-[13px]">core.UseGlobalState("key", initial)</td>
+                        </tr>
+                        <tr>
+                            <td class="text-muted-stronger">Read current value</td>
+                            <td class="font-mono text-blue text-[13px]">core.GetGlobalState("key")</td>
+                        </tr>
+                        <tr>
+                            <td class="text-muted-stronger">Update value</td>
+                            <td class="font-mono text-blue text-[13px]">core.SetGlobalState("key", newVal)</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div>
+            <h2 class="text-[22px] font-semibold tracking-tight text-white mb-4">Best practices</h2>
+            <p class="text-[16px] text-muted leading-[1.75] mb-4">
+                Keep state minimal. Use descriptive keys. Avoid storing derived data — compute it in the template or handler instead.
+            </p>
+            <div class="card p-7" style="background:rgba(234,179,8,0.04);border-color:rgba(234,179,8,0.25)">
+                <div class="flex items-start gap-4">
+                    <div class="feat-icon shrink-0" style="width:2rem;height:2rem;background:rgba(234,179,8,0.15);border-color:rgba(234,179,8,0.3)">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#facc15" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+                    </div>
+                    <div>
+                        <h4 class="text-[14px] font-medium text-white mb-2">Avoid large objects in state</h4>
+                        <p class="text-[14px] text-muted leading-relaxed">State values are serialized during SSR. Keep them as primitives (strings, numbers, booleans) for best performance.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-16">
+        <nguyen-link href="/docs/islands" class="card card-blue-hover block">
+            <div style="padding:1rem 1.25rem;">
+                <div class="text-[12px] text-muted mb-2 flex items-center gap-1">
+                    <svg width="12" height="12" viewBox="0 0 16 16" fill="none"><path d="M10 3L5 8L10 13" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+                    Previous
+                </div>
+                <div class="text-[15px] font-medium text-white">Islands</div>
+            </div>
+        </nguyen-link>
+        <nguyen-link href="/docs/api-routes" class="card card-blue-hover block">
+            <div class="text-right" style="padding:1rem 1.25rem;">
+                <div class="text-[12px] text-muted mb-2 flex items-center gap-1 justify-end">
+                    Next
+                    <svg width="12" height="12" viewBox="0 0 16 16" fill="none"><path d="M6 3L11 8L6 13" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+                </div>
+                <div class="text-[15px] font-medium text-white">API routes</div>
+            </div>
+        </nguyen-link>
+    </div>
+</section>

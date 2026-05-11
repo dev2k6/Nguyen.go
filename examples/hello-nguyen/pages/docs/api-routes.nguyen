@@ -1,0 +1,120 @@
+---
+layout = "app/layout"
+
+export const metadata = {
+    title: "API Routes — Nguyen.go",
+    description: "Define server-side API endpoints alongside your pages using file-based routing.",
+}
+
+export const geo = {
+    pageType: "TechArticle",
+    datePublished: "2026-05-01T00:00:00Z",
+    dateModified: "2026-05-10T00:00:00Z",
+    author: "Nguyen.go Team",
+    breadcrumbs: [
+        { name: "Home", url: "/" },
+        { name: "Docs", url: "/docs" },
+        { name: "API Routes", url: "/docs/api-routes" },
+    ],
+}
+---
+<section class="max-w-4xl mx-auto px-6 pt-24 pb-16">
+    <div class="flex items-center gap-2 text-[13px] text-muted mb-6">
+        <nguyen-link href="/" class="hover:text-white transition-colors">Home</nguyen-link>
+        <svg width="10" height="10" viewBox="0 0 16 16" fill="none" class="opacity-50"><path d="M6 3L11 8L6 13" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+        <nguyen-link href="/docs" class="hover:text-white transition-colors">Docs</nguyen-link>
+        <svg width="10" height="10" viewBox="0 0 16 16" fill="none" class="opacity-50"><path d="M6 3L11 8L6 13" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+        <span class="text-muted-stronger">API Routes</span>
+    </div>
+
+    <p class="text-[13px] text-blue font-mono uppercase tracking-widest mb-4">Advanced</p>
+    <h1 class="text-[36px] font-semibold tracking-tight text-white mb-4">API Routes</h1>
+    <p class="text-[17px] text-muted max-w-2xl leading-relaxed mb-12">
+        Build backend endpoints right next to your pages. No separate server needed — API routes are part of the same binary.
+    </p>
+
+    <div class="space-y-10">
+        <div>
+            <h2 class="text-[22px] font-semibold tracking-tight text-white mb-4">File convention</h2>
+            <p class="text-[16px] text-muted leading-[1.75] mb-4">
+                Place Go files in <code class="text-blue font-mono text-[14px]">api/</code> directory. Each file exports handler functions mapped to HTTP methods:
+            </p>
+            <div class="terminal mb-4">
+                <div class="terminal-bar">
+                    <span class="terminal-dot"></span><span class="terminal-dot"></span><span class="terminal-dot"></span>
+                    <span class="ml-3 text-[12px] font-mono text-muted">api/hello.go</span>
+                </div>
+                <pre class="terminal-body text-[#c9d1d9]"><span style="color:#ff7b72">package</span> api
+
+<span style="color:#ff7b72">import</span> <span style="color:#a5d6ff">"github.com/gofiber/fiber/v2"</span>
+
+<span style="color:#ff7b72">func</span> <span style="color:#d2a8ff">GET</span>(c *fiber.<span style="color:#79c0ff">Ctx</span>) <span style="color:#ff7b72">error</span> {
+    <span style="color:#ff7b72">return</span> c.<span style="color:#d2a8ff">JSON</span>(fiber.<span style="color:#79c0ff">Map</span>{
+        <span style="color:#a5d6ff">"message"</span>: <span style="color:#a5d6ff">"Hello from API"</span>,
+    })
+}</pre>
+            </div>
+            <p class="text-[16px] text-muted leading-[1.75]">
+                This creates <code class="text-blue font-mono text-[14px]">GET /api/hello</code>. The function name determines the HTTP method.
+            </p>
+        </div>
+
+        <div>
+            <h2 class="text-[22px] font-semibold tracking-tight text-white mb-4">Dynamic API routes</h2>
+            <p class="text-[16px] text-muted leading-[1.75] mb-4">
+                Use the same bracket syntax as pages:
+            </p>
+            <div class="terminal mb-4">
+                <div class="terminal-bar">
+                    <span class="terminal-dot"></span><span class="terminal-dot"></span><span class="terminal-dot"></span>
+                    <span class="ml-3 text-[12px] font-mono text-muted">file tree</span>
+                </div>
+                <pre class="terminal-body text-[#c9d1d9]"><span style="color:#79c0ff">api/</span>
+├── <span style="color:#7ee787">hello.go</span>          <span style="color:#6e7681"># GET /api/hello</span>
+├── <span style="color:#79c0ff">users/</span>
+│   ├── <span style="color:#7ee787">index.go</span>     <span style="color:#6e7681"># GET /api/users</span>
+│   └── <span style="color:#7ee787">[id].go</span>      <span style="color:#6e7681"># GET /api/users/:id</span></pre>
+            </div>
+        </div>
+
+        <div>
+            <h2 class="text-[22px] font-semibold tracking-tight text-white mb-4">Request validation</h2>
+            <p class="text-[16px] text-muted leading-[1.75]">
+                Validate at the boundary. Use Fiber's built-in body parser and return proper HTTP status codes. The framework does not add magic validation — you own the contract.
+            </p>
+        </div>
+
+        <div class="card p-7" style="background:rgba(0,112,243,0.04);border-color:rgba(0,112,243,0.25)">
+            <div class="flex items-start gap-4">
+                <div class="feat-icon shrink-0" style="width:2rem;height:2rem;background:rgba(0,112,243,0.15);border-color:rgba(0,112,243,0.3)">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#60a5fa" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+                </div>
+                <div>
+                    <h4 class="text-[14px] font-medium text-white mb-2">Same binary</h4>
+                    <p class="text-[14px] text-muted leading-relaxed">API routes compile into the same production binary as your pages. One deploy, one process, one port.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-16">
+        <nguyen-link href="/docs/state" class="card card-blue-hover block">
+            <div style="padding:1rem 1.25rem;">
+                <div class="text-[12px] text-muted mb-2 flex items-center gap-1">
+                    <svg width="12" height="12" viewBox="0 0 16 16" fill="none"><path d="M10 3L5 8L10 13" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+                    Previous
+                </div>
+                <div class="text-[15px] font-medium text-white">State management</div>
+            </div>
+        </nguyen-link>
+        <nguyen-link href="/docs/middleware" class="card card-blue-hover block">
+            <div class="text-right" style="padding:1rem 1.25rem;">
+                <div class="text-[12px] text-muted mb-2 flex items-center gap-1 justify-end">
+                    Next
+                    <svg width="12" height="12" viewBox="0 0 16 16" fill="none"><path d="M6 3L11 8L6 13" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+                </div>
+                <div class="text-[15px] font-medium text-white">Middleware</div>
+            </div>
+        </nguyen-link>
+    </div>
+</section>

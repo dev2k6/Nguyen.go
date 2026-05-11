@@ -1,0 +1,145 @@
+---
+layout = "app/layout"
+
+export const metadata = {
+    title: "Deployment — Nguyen.go",
+    description: "Deploy your Nguyen.go app as a single binary — Docker, systemd, or any cloud platform.",
+}
+
+export const geo = {
+    pageType: "TechArticle",
+    datePublished: "2026-05-01T00:00:00Z",
+    dateModified: "2026-05-10T00:00:00Z",
+    author: "Nguyen.go Team",
+    breadcrumbs: [
+        { name: "Home", url: "/" },
+        { name: "Docs", url: "/docs" },
+        { name: "Deployment", url: "/docs/deployment" },
+    ],
+}
+---
+<section class="max-w-4xl mx-auto px-6 pt-24 pb-16">
+    <div class="flex items-center gap-2 text-[13px] text-muted mb-6">
+        <nguyen-link href="/" class="hover:text-white transition-colors">Home</nguyen-link>
+        <svg width="10" height="10" viewBox="0 0 16 16" fill="none" class="opacity-50"><path d="M6 3L11 8L6 13" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+        <nguyen-link href="/docs" class="hover:text-white transition-colors">Docs</nguyen-link>
+        <svg width="10" height="10" viewBox="0 0 16 16" fill="none" class="opacity-50"><path d="M6 3L11 8L6 13" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+        <span class="text-muted-stronger">Deployment</span>
+    </div>
+
+    <p class="text-[13px] text-blue font-mono uppercase tracking-widest mb-4">Advanced</p>
+    <h1 class="text-[36px] font-semibold tracking-tight text-white mb-4">Deployment</h1>
+    <p class="text-[17px] text-muted max-w-2xl leading-relaxed mb-12">
+        Ship a single binary. No runtime dependencies, no container orchestration required — though both work great too.
+    </p>
+
+    <div class="space-y-10">
+        <div>
+            <h2 class="text-[22px] font-semibold tracking-tight text-white mb-4">Build for production</h2>
+            <div class="terminal mb-4">
+                <div class="terminal-bar">
+                    <span class="terminal-dot"></span><span class="terminal-dot"></span><span class="terminal-dot"></span>
+                    <span class="ml-3 text-[12px] font-mono text-muted">terminal</span>
+                </div>
+                <pre class="terminal-body text-[#c9d1d9]"><span style="color:#79c0ff">$</span> nguyen build
+<span style="color:#7ee787">✓</span> Built 12 pages
+<span style="color:#7ee787">✓</span> Generated sitemap.xml
+<span style="color:#7ee787">✓</span> Output: .nguyen/server
+
+<span style="color:#79c0ff">$</span> nguyen start
+<span style="color:#7ee787">✓</span> Production server on :3000</pre>
+            </div>
+        </div>
+
+        <div>
+            <h2 class="text-[22px] font-semibold tracking-tight text-white mb-4">Docker</h2>
+            <p class="text-[16px] text-muted leading-[1.75] mb-4">
+                A minimal Dockerfile for production:
+            </p>
+            <div class="terminal mb-4">
+                <div class="terminal-bar">
+                    <span class="terminal-dot"></span><span class="terminal-dot"></span><span class="terminal-dot"></span>
+                    <span class="ml-3 text-[12px] font-mono text-muted">Dockerfile</span>
+                </div>
+                <pre class="terminal-body text-[#c9d1d9]"><span style="color:#ff7b72">FROM</span> golang:1.22-alpine <span style="color:#ff7b72">AS</span> build
+<span style="color:#ff7b72">WORKDIR</span> /app
+<span style="color:#ff7b72">COPY</span> . .
+<span style="color:#ff7b72">RUN</span> go install github.com/dev2k6/Nguyen.go@latest
+<span style="color:#ff7b72">RUN</span> nguyen build
+
+<span style="color:#ff7b72">FROM</span> alpine:3.19
+<span style="color:#ff7b72">COPY</span> --from=build /app/.nguyen /app/.nguyen
+<span style="color:#ff7b72">COPY</span> --from=build /app/public /app/public
+<span style="color:#ff7b72">WORKDIR</span> /app
+<span style="color:#ff7b72">EXPOSE</span> 3000
+<span style="color:#ff7b72">CMD</span> [".nguyen/server"]</pre>
+            </div>
+        </div>
+
+        <div>
+            <h2 class="text-[22px] font-semibold tracking-tight text-white mb-4">Environment variables</h2>
+            <div class="card overflow-hidden mb-4">
+                <table class="cmp-table">
+                    <thead>
+                        <tr>
+                            <th class="!text-left">Variable</th>
+                            <th class="!text-left">Default</th>
+                            <th class="!text-left">Description</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td class="font-mono text-blue text-[13px]">PORT</td>
+                            <td class="text-muted font-mono text-[13px]">3000</td>
+                            <td class="text-muted-stronger">Server listen port</td>
+                        </tr>
+                        <tr>
+                            <td class="font-mono text-blue text-[13px]">HOST</td>
+                            <td class="text-muted font-mono text-[13px]">0.0.0.0</td>
+                            <td class="text-muted-stronger">Bind address</td>
+                        </tr>
+                        <tr>
+                            <td class="font-mono text-blue text-[13px]">NGUYEN_ENV</td>
+                            <td class="text-muted font-mono text-[13px]">production</td>
+                            <td class="text-muted-stronger">Runtime environment</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div>
+            <h2 class="text-[22px] font-semibold tracking-tight text-white mb-4">Production checklist</h2>
+            <div class="card p-7" style="background:rgba(14,165,233,0.04);border-color:rgba(14,165,233,0.25)">
+                <ul class="space-y-2 text-[14px] text-muted leading-relaxed" style="list-style:none;margin:0;padding:0">
+                    <li class="flex items-start gap-2"><span class="text-blue">&#10003;</span> Run <code class="text-blue font-mono text-[12px]">nguyen build</code> in CI</li>
+                    <li class="flex items-start gap-2"><span class="text-blue">&#10003;</span> Set <code class="text-blue font-mono text-[12px]">NGUYEN_ENV=production</code></li>
+                    <li class="flex items-start gap-2"><span class="text-blue">&#10003;</span> Serve static assets via CDN or reverse proxy</li>
+                    <li class="flex items-start gap-2"><span class="text-blue">&#10003;</span> Enable compression middleware</li>
+                    <li class="flex items-start gap-2"><span class="text-blue">&#10003;</span> Configure health check endpoint for load balancer</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-16">
+        <nguyen-link href="/docs/middleware" class="card card-blue-hover block">
+            <div style="padding:1rem 1.25rem;">
+                <div class="text-[12px] text-muted mb-2 flex items-center gap-1">
+                    <svg width="12" height="12" viewBox="0 0 16 16" fill="none"><path d="M10 3L5 8L10 13" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+                    Previous
+                </div>
+                <div class="text-[15px] font-medium text-white">Middleware</div>
+            </div>
+        </nguyen-link>
+        <nguyen-link href="/docs" class="card card-blue-hover block">
+            <div class="text-right" style="padding:1rem 1.25rem;">
+                <div class="text-[12px] text-muted mb-2 flex items-center gap-1 justify-end">
+                    Back to Docs
+                    <svg width="12" height="12" viewBox="0 0 16 16" fill="none"><path d="M6 3L11 8L6 13" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+                </div>
+                <div class="text-[15px] font-medium text-white">Docs overview</div>
+            </div>
+        </nguyen-link>
+    </div>
+</section>

@@ -1,0 +1,135 @@
+---
+layout = "app/layout"
+
+export const metadata = {
+    title: "Rendering — Nguyen.go",
+    description: "Rendering modes in Nguyen.go: SSR, SSG, ISR, and CSR — mix and match per page.",
+}
+
+export const geo = {
+    pageType: "TechArticle",
+    datePublished: "2026-05-01T00:00:00Z",
+    dateModified: "2026-05-10T00:00:00Z",
+    author: "Nguyen.go Team",
+    breadcrumbs: [
+        { name: "Home", url: "/" },
+        { name: "Docs", url: "/docs" },
+        { name: "Rendering", url: "/docs/rendering" },
+    ],
+}
+---
+<section class="max-w-4xl mx-auto px-6 pt-24 pb-16">
+    <div class="flex items-center gap-2 text-[13px] text-muted mb-6">
+        <nguyen-link href="/" class="hover:text-white transition-colors">Home</nguyen-link>
+        <svg width="10" height="10" viewBox="0 0 16 16" fill="none" class="opacity-50"><path d="M6 3L11 8L6 13" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+        <nguyen-link href="/docs" class="hover:text-white transition-colors">Docs</nguyen-link>
+        <svg width="10" height="10" viewBox="0 0 16 16" fill="none" class="opacity-50"><path d="M6 3L11 8L6 13" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+        <span class="text-muted-stronger">Rendering</span>
+    </div>
+
+    <p class="text-[13px] text-blue font-mono uppercase tracking-widest mb-4">Core concepts</p>
+    <h1 class="text-[36px] font-semibold tracking-tight text-white mb-4">Rendering</h1>
+    <p class="text-[17px] text-muted max-w-2xl leading-relaxed mb-12">
+        Choose how each page is rendered. Nguyen.go supports four modes — pick the right one per page based on your data freshness needs.
+    </p>
+
+    <div class="space-y-10">
+        <div>
+            <h2 class="text-[22px] font-semibold tracking-tight text-white mb-4">Rendering modes</h2>
+            <div class="card overflow-hidden mb-4">
+                <table class="cmp-table">
+                    <thead>
+                        <tr>
+                            <th class="!text-left">Mode</th>
+                            <th class="!text-left">When</th>
+                            <th class="!text-left">Use case</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td class="font-mono text-blue text-[13px]">SSR</td>
+                            <td class="text-muted-stronger">Every request</td>
+                            <td class="text-muted-stronger">Dynamic data, personalized content</td>
+                        </tr>
+                        <tr>
+                            <td class="font-mono text-blue text-[13px]">SSG</td>
+                            <td class="text-muted-stronger">Build time</td>
+                            <td class="text-muted-stronger">Marketing pages, blog posts</td>
+                        </tr>
+                        <tr>
+                            <td class="font-mono text-blue text-[13px]">ISR</td>
+                            <td class="text-muted-stronger">Cached + revalidate</td>
+                            <td class="text-muted-stronger">E-commerce, dashboards with stale tolerance</td>
+                        </tr>
+                        <tr>
+                            <td class="font-mono text-blue text-[13px]">CSR</td>
+                            <td class="text-muted-stronger">Client only</td>
+                            <td class="text-muted-stronger">Interactive widgets, auth-gated UIs</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div>
+            <h2 class="text-[22px] font-semibold tracking-tight text-white mb-4">SSR (default)</h2>
+            <p class="text-[16px] text-muted leading-[1.75] mb-4">
+                Every page is server-rendered by default. The Go code in frontmatter runs on each request, and the HTML is sent fully rendered to the client.
+            </p>
+        </div>
+
+        <div>
+            <h2 class="text-[22px] font-semibold tracking-tight text-white mb-4">SSG (Static Generation)</h2>
+            <p class="text-[16px] text-muted leading-[1.75] mb-4">
+                Pages without dynamic data are pre-rendered at build time. The output is plain HTML served from disk — zero server compute per request.
+            </p>
+        </div>
+
+        <div>
+            <h2 class="text-[22px] font-semibold tracking-tight text-white mb-4">ISR (Incremental Static Regeneration)</h2>
+            <p class="text-[16px] text-muted leading-[1.75] mb-4">
+                Add <code class="text-blue font-mono text-[14px]">export const revalidate = 60</code> to your frontmatter. The page is cached and regenerated in the background after the specified seconds.
+            </p>
+            <div class="terminal mb-4">
+                <div class="terminal-bar">
+                    <span class="terminal-dot"></span><span class="terminal-dot"></span><span class="terminal-dot"></span>
+                    <span class="ml-3 text-[12px] font-mono text-muted">pages/products.nguyen</span>
+                </div>
+                <pre class="terminal-body text-[#c9d1d9]"><span style="color:#6e7681">---</span>
+<span style="color:#ff7b72">export const</span> revalidate = <span style="color:#79c0ff">60</span> <span style="color:#6e7681">// regenerate every 60s</span>
+
+<span style="color:#79c0ff">products</span> := <span style="color:#d2a8ff">fetchProducts</span>()
+<span style="color:#6e7681">---</span>
+&lt;<span style="color:#7ee787">ul</span>&gt;...&lt;/<span style="color:#7ee787">ul</span>&gt;</pre>
+            </div>
+        </div>
+
+        <div>
+            <h2 class="text-[22px] font-semibold tracking-tight text-white mb-4">CSR (Client-Side Rendering)</h2>
+            <p class="text-[16px] text-muted leading-[1.75]">
+                Use Islands for components that should render entirely on the client. The server sends a placeholder, and the client hydrates the component after load. See the <nguyen-link href="/docs/islands" class="text-blue hover:underline">Islands</nguyen-link> page for details.
+            </p>
+        </div>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-16">
+        <nguyen-link href="/docs/routing" class="card card-blue-hover block">
+            <div style="padding:1rem 1.25rem;">
+                <div class="text-[12px] text-muted mb-2 flex items-center gap-1">
+                    <svg width="12" height="12" viewBox="0 0 16 16" fill="none"><path d="M10 3L5 8L10 13" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+                    Previous
+                </div>
+                <div class="text-[15px] font-medium text-white">Routing</div>
+            </div>
+        </nguyen-link>
+        <nguyen-link href="/docs/hooks" class="card card-blue-hover block">
+            <div class="text-right" style="padding:1rem 1.25rem;">
+                <div class="text-[12px] text-muted mb-2 flex items-center gap-1 justify-end">
+                    Next
+                    <svg width="12" height="12" viewBox="0 0 16 16" fill="none"><path d="M6 3L11 8L6 13" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+                </div>
+                <div class="text-[15px] font-medium text-white">Hooks</div>
+            </div>
+        </nguyen-link>
+    </div>
+</section>

@@ -1,0 +1,201 @@
+---
+layout = "app/layout"
+
+import "nguyen.go/pkg/core"
+
+// Dynamic route: pages/blog/[slug].nguyen → /blog/:slug
+slug := core.UseGlobalState("slug", "")
+post := loadPost(slug.(string))
+
+export const revalidate = 60
+
+export const metadata = {
+    title: "Blog — Nguyen.go",
+    description: "Articles, guides, and release notes from the Nguyen.go team.",
+}
+
+export const geo = {
+    pageType: "BlogPosting",
+    datePublished: "2026-05-01T00:00:00Z",
+    dateModified: "2026-05-09T00:00:00Z",
+    author: "Nguyen.go Team",
+    breadcrumbs: [
+        { name: "Home", url: "/" },
+        { name: "Blog", url: "/blog" },
+        { name: "Post", url: "" },
+    ],
+    tags: ["go", "webassembly", "tutorial"],
+}
+
+func loadPost(s string) map[string]string {
+    posts := map[string]map[string]string{
+        "getting-started": {
+            "title":   "Getting Started with Nguyen.go",
+            "date":    "May 1, 2026",
+            "author":  "Nguyen.go Team",
+            "readTime": "5 min read",
+            "excerpt": "Learn how to set up your first Nguyen.go project in under 5 minutes.",
+        },
+        "why-go-wasm": {
+            "title":   "Why Go + WebAssembly is the future",
+            "date":    "April 28, 2026",
+            "author":  "Thái Nguyên",
+            "readTime": "8 min read",
+            "excerpt": "Exploring the performance and developer experience benefits of Go in the browser.",
+        },
+        "ssr-vs-csr": {
+            "title":   "SSR vs CSR: when to use which",
+            "date":    "April 15, 2026",
+            "author":  "Nguyen.go Team",
+            "readTime": "6 min read",
+            "excerpt": "A practical guide to choosing the right rendering strategy for your pages.",
+        },
+    }
+    return posts[s]
+}
+---
+<article class="max-w-3xl mx-auto px-6 pt-16 pb-24 relative">
+    <div class="hero-glow" style="opacity:0.5"></div>
+
+    <!-- Breadcrumb -->
+    <nav class="flex items-center gap-2 text-[13px] text-muted mb-10 relative">
+        <nguyen-link href="/" class="hover:text-white transition-colors">Home</nguyen-link>
+        <svg width="10" height="10" viewBox="0 0 16 16" fill="none" class="opacity-50"><path d="M6 3L11 8L6 13" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        <nguyen-link href="/blog" class="hover:text-white transition-colors">Blog</nguyen-link>
+        <svg width="10" height="10" viewBox="0 0 16 16" fill="none" class="opacity-50"><path d="M6 3L11 8L6 13" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        <span class="text-muted-stronger">{slug}</span>
+    </nav>
+
+    <!-- Header -->
+    <header class="mb-12 relative">
+        <div class="flex items-center gap-2 mb-6 flex-wrap">
+            <span class="pill pill-blue">
+                <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/></svg>
+                Tutorial
+            </span>
+            <span class="pill">
+                <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                ISR · 60s
+            </span>
+        </div>
+
+        <h1 class="text-[clamp(2rem,5vw,3.25rem)] font-semibold tracking-tight text-white leading-[1.1] mb-8">
+            {post.title}
+        </h1>
+
+        <div class="flex items-center gap-4 flex-wrap pb-8 border-b" style="border-color:var(--color-border)">
+            <div class="flex items-center gap-3">
+                <div class="w-9 h-9 rounded-full" style="background:linear-gradient(135deg,#60a5fa,#0070f3)"></div>
+                <div>
+                    <div class="text-[13px] text-white font-medium">{post.author}</div>
+                    <div class="text-[12px] text-muted">{post.date} · {post.readTime}</div>
+                </div>
+            </div>
+            <div class="ml-auto flex items-center gap-1">
+                <button class="btn btn-ghost !h-8 !px-2" aria-label="Share">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
+                </button>
+                <button class="btn btn-ghost !h-8 !px-2" aria-label="Bookmark">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Content -->
+    <div class="prose-custom relative">
+        <p class="text-[18px] text-muted-stronger leading-relaxed mb-6">
+            {post.excerpt}
+        </p>
+
+        <p class="text-[16px] text-muted leading-[1.75] mb-6">
+            This post is rendered with <strong class="text-white font-medium">Incremental Static Regeneration</strong>.
+            The framework caches the HTML for 60 seconds, then regenerates it in the background on the next request.
+            No rebuild. No deploy. Just fresh content.
+        </p>
+
+        <h2 class="text-[24px] font-semibold text-white tracking-tight mt-12 mb-4">How dynamic routes work</h2>
+        <p class="text-[16px] text-muted leading-[1.75] mb-4">
+            File-based routing with dynamic segments is one of the core features. Drop a file named
+            <code class="text-blue font-mono text-[14px] px-1.5 py-0.5 rounded" style="background:var(--color-card);border:1px solid var(--color-border)">[param].nguyen</code>
+            and the framework extracts route parameters automatically.
+        </p>
+
+        <!-- Info card -->
+        <div class="card p-6 my-8" style="background:linear-gradient(180deg,rgba(0,112,243,0.04),transparent)">
+            <div class="flex items-start gap-3">
+                <div class="feat-icon shrink-0" style="width:2rem;height:2rem">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+                </div>
+                <div class="flex-1">
+                    <h3 class="text-[14px] font-medium text-white mb-2">How the slug resolves</h3>
+                    <ul class="text-[13px] text-muted space-y-1.5">
+                        <li>• The file <code class="text-blue font-mono text-[12px]">pages/blog/[slug].nguyen</code> maps to <code class="text-blue font-mono text-[12px]">/blog/:slug</code></li>
+                        <li>• Go code in the frontmatter loads post data based on the slug</li>
+                        <li>• The page is cached for 60 seconds, then regenerated on next request</li>
+                        <li>• <code class="text-blue font-mono text-[12px]">export const revalidate = 60</code> controls the ISR TTL</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <h2 class="text-[24px] font-semibold text-white tracking-tight mt-12 mb-4">Code sample</h2>
+        <p class="text-[16px] text-muted leading-[1.75] mb-6">
+            Here's what the page file looks like — Go in the frontmatter, HTML in the body, rendered on the server and streamed to the client.
+        </p>
+
+        <div class="terminal my-8">
+            <div class="terminal-bar">
+                <span class="terminal-dot"></span>
+                <span class="terminal-dot"></span>
+                <span class="terminal-dot"></span>
+                <span class="ml-3 text-[12px] font-mono text-muted">pages/blog/[slug].nguyen</span>
+            </div>
+            <pre class="terminal-body text-[#c9d1d9]"><span style="color:#6e7681">---</span>
+<span style="color:#ff7b72">import</span> <span style="color:#a5d6ff">"nguyen.go/pkg/core"</span>
+
+<span style="color:#79c0ff">slug</span> := core.<span style="color:#d2a8ff">UseGlobalState</span>(<span style="color:#a5d6ff">"slug"</span>, <span style="color:#a5d6ff">""</span>)
+
+<span style="color:#ff7b72">export const</span> <span style="color:#79c0ff">revalidate</span> = <span style="color:#ffa657">60</span>
+
+<span style="color:#ff7b72">func</span> <span style="color:#d2a8ff">loadPost</span>(s <span style="color:#ff7b72">string</span>) <span style="color:#ff7b72">map</span>[<span style="color:#ff7b72">string</span>]<span style="color:#ff7b72">string</span> {
+    <span style="color:#6e7681">// Fetch from DB, CMS, or filesystem</span>
+    <span style="color:#ff7b72">return</span> posts[s]
+}
+<span style="color:#6e7681">---</span>
+&lt;<span style="color:#7ee787">article</span>&gt;
+    &lt;<span style="color:#7ee787">h1</span>&gt;{post.title}&lt;/<span style="color:#7ee787">h1</span>&gt;
+    &lt;<span style="color:#7ee787">p</span>&gt;Slug: {<span style="color:#79c0ff">slug</span>}&lt;/<span style="color:#7ee787">p</span>&gt;
+&lt;/<span style="color:#7ee787">article</span>&gt;</pre>
+        </div>
+
+        <h2 class="text-[24px] font-semibold text-white tracking-tight mt-12 mb-4">Why ISR matters</h2>
+        <p class="text-[16px] text-muted leading-[1.75] mb-4">
+            Static sites are fast but stale. Server-rendered sites are fresh but slow. ISR splits the
+            difference: serve cached HTML instantly, regenerate in the background when content changes.
+        </p>
+        <p class="text-[16px] text-muted leading-[1.75] mb-6">
+            For a blog with 10,000 posts, this means one cache hit per post per minute — not one database round-trip per request. The math scales.
+        </p>
+    </div>
+
+    <!-- Footer / Next steps -->
+    <div class="divider my-12"></div>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+        <nguyen-link href="/blog" class="card card-blue-hover p-5 block">
+            <div class="text-[12px] text-muted mb-1 flex items-center gap-1">
+                <svg width="12" height="12" viewBox="0 0 16 16" fill="none"><path d="M10 3L5 8L10 13" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+                All posts
+            </div>
+            <div class="text-[14px] font-medium text-white">Browse the blog</div>
+        </nguyen-link>
+        <nguyen-link href="/docs" class="card card-blue-hover p-5 block text-right">
+            <div class="text-[12px] text-muted mb-1 flex items-center gap-1 justify-end">
+                Docs
+                <svg width="12" height="12" viewBox="0 0 16 16" fill="none"><path d="M6 3L11 8L6 13" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+            </div>
+            <div class="text-[14px] font-medium text-white">Read the documentation</div>
+        </nguyen-link>
+    </div>
+</article>

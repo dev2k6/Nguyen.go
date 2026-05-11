@@ -1,0 +1,283 @@
+---
+layout = "app/layout"
+
+export const metadata = {
+    title: "About — Nguyen.go",
+    description: "The story behind Nguyen.go — mission, architecture, and the people shipping Go to the frontend.",
+}
+
+export const geo = {
+    pageType: "Article",
+    datePublished: "2026-05-01T00:00:00Z",
+    dateModified: "2026-05-10T00:00:00Z",
+    author: "Nguyen.go Team",
+    breadcrumbs: [
+        { name: "Home", url: "/" },
+        { name: "About", url: "/about" },
+    ],
+}
+---
+<!-- ============================================
+     HERO
+     ============================================ -->
+<section class="relative">
+    <div class="hero-glow"></div>
+    <div class="max-w-4xl mx-auto px-6 pt-32 pb-20 text-center relative">
+        <div class="pill pill-blue mb-8">
+            <span class="pill-dot"></span>
+            <span>About Nguyen.go</span>
+        </div>
+        <h1 class="heading-hero mb-7">
+            <span class="gradient-text">Go is the language.<br/>The web is the target.</span>
+        </h1>
+        <p class="text-[17px] md:text-[19px] text-muted max-w-2xl mx-auto leading-relaxed">
+            Nguyen.go is a full-stack framework for developers who want Go's performance on the server
+            and Go's ergonomics on the client. No context switching. No adapter layers. Just Go.
+        </p>
+    </div>
+</section>
+
+<!-- ============================================
+     MISSION
+     ============================================ -->
+<section class="max-w-5xl mx-auto px-6 pb-24">
+    <div class="grid grid-cols-1 md:grid-cols-5 gap-8 items-start">
+        <div class="md:col-span-2">
+            <p class="text-[13px] text-blue font-mono uppercase tracking-widest mb-3">Mission</p>
+            <h2 class="heading-lg text-white mb-4">Make Go a first-class choice for the web.</h2>
+        </div>
+        <div class="md:col-span-3">
+            <p class="text-[16px] text-muted leading-relaxed mb-4">
+                For a decade, Go has powered the world's infrastructure. Databases, load balancers,
+                container runtimes, CI pipelines — written in Go. But when it came time to ship a UI,
+                everyone reached for Node.
+            </p>
+            <p class="text-[16px] text-muted leading-relaxed mb-4">
+                Nguyen.go changes that. Backend Go, frontend Go, single binary. You get the
+                ergonomics of Next.js and Astro, the speed of Fiber, and a deploy story that
+                looks like <code class="text-blue font-mono text-[14px]">scp nguyen server:/bin</code>.
+            </p>
+            <p class="text-[16px] text-muted leading-relaxed">
+                It's the framework we wanted to exist — so we built it.
+            </p>
+        </div>
+    </div>
+</section>
+
+<!-- ============================================
+     PRINCIPLES
+     ============================================ -->
+<section class="max-w-6xl mx-auto px-6 section-md">
+    <div class="mb-14 max-w-2xl">
+        <p class="text-[13px] text-blue font-mono uppercase tracking-widest mb-3">Principles</p>
+        <h2 class="heading-lg text-white mb-4">What we optimize for.</h2>
+        <p class="text-[16px] text-muted leading-relaxed">Every trade-off we make is anchored to these five beliefs.</p>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div class="card card-blue-hover p-8">
+            <div class="flex items-start gap-4 mb-3">
+                <span class="font-mono text-[11px] text-blue tracking-wider">01</span>
+                <h3 class="heading-md text-white">Zero-overhead abstractions</h3>
+            </div>
+            <p class="text-[14px] text-muted leading-relaxed">Every feature — routing, hooks, islands — compiles to direct Go or WASM. No dynamic dispatch surprise, no hidden allocation storm at runtime.</p>
+        </div>
+
+        <div class="card card-blue-hover p-8">
+            <div class="flex items-start gap-4 mb-3">
+                <span class="font-mono text-[11px] text-blue tracking-wider">02</span>
+                <h3 class="heading-md text-white">One language, one binary</h3>
+            </div>
+            <p class="text-[14px] text-muted leading-relaxed">You write Go. Server runs Go. Client runs Go compiled to WASM. The deploy artifact is a single executable you can <code class="text-blue font-mono text-[13px]">scp</code> anywhere.</p>
+        </div>
+
+        <div class="card card-blue-hover p-8">
+            <div class="flex items-start gap-4 mb-3">
+                <span class="font-mono text-[11px] text-blue tracking-wider">03</span>
+                <h3 class="heading-md text-white">Familiar mental models</h3>
+            </div>
+            <p class="text-[14px] text-muted leading-relaxed">Borrowed the best ideas from Next.js, Astro, and React. If you've used them, the learning curve is a ramp, not a cliff.</p>
+        </div>
+
+        <div class="card card-blue-hover p-8">
+            <div class="flex items-start gap-4 mb-3">
+                <span class="font-mono text-[11px] text-blue tracking-wider">04</span>
+                <h3 class="heading-md text-white">SSR-first, client when needed</h3>
+            </div>
+            <p class="text-[14px] text-muted leading-relaxed">HTML is streamed on the server. Interactivity is opted-in per island. Most pages ship zero JavaScript — the way the web was meant to be.</p>
+        </div>
+    </div>
+</section>
+
+<!-- ============================================
+     ARCHITECTURE DIAGRAM
+     ============================================ -->
+<section class="max-w-6xl mx-auto px-6 section-md">
+    <div class="text-center mb-14 max-w-2xl mx-auto">
+        <p class="text-[13px] text-blue font-mono uppercase tracking-widest mb-3">Architecture</p>
+        <h2 class="heading-lg text-white mb-4">How a request flows through Nguyen.go.</h2>
+        <p class="text-[16px] text-muted leading-relaxed">From URL to paint in under 10ms — here's every layer that makes that possible.</p>
+    </div>
+
+    <div class="card p-10 md:p-16">
+        <div class="grid grid-cols-1 md:grid-cols-5 gap-6 text-center">
+            <div class="flex flex-col items-center">
+                <div class="feat-icon mb-3" style="width:3rem;height:3rem">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+                </div>
+                <h4 class="text-[14px] font-medium text-white mb-1">Request</h4>
+                <p class="text-[12px] text-muted">HTTP arrives at Fiber</p>
+            </div>
+            <div class="flex flex-col items-center">
+                <div class="feat-icon mb-3" style="width:3rem;height:3rem">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><polyline points="8 12 10 14 16 8"/><circle cx="12" cy="12" r="10"/></svg>
+                </div>
+                <h4 class="text-[14px] font-medium text-white mb-1">Match</h4>
+                <p class="text-[12px] text-muted">Pre-compiled regex O(1)</p>
+            </div>
+            <div class="flex flex-col items-center">
+                <div class="feat-icon mb-3" style="width:3rem;height:3rem">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><polyline points="14 2 14 8 20 8"/><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/></svg>
+                </div>
+                <h4 class="text-[14px] font-medium text-white mb-1">Render</h4>
+                <p class="text-[12px] text-muted">SSR to ReadableStream</p>
+            </div>
+            <div class="flex flex-col items-center">
+                <div class="feat-icon mb-3" style="width:3rem;height:3rem">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
+                </div>
+                <h4 class="text-[14px] font-medium text-white mb-1">Hydrate</h4>
+                <p class="text-[12px] text-muted">WASM takes over islands</p>
+            </div>
+            <div class="flex flex-col items-center">
+                <div class="feat-icon mb-3" style="width:3rem;height:3rem">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><path d="M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0z"/><polyline points="12 6 12 12 16 14"/></svg>
+                </div>
+                <h4 class="text-[14px] font-medium text-white mb-1">Interactive</h4>
+                <p class="text-[12px] text-muted">Lane-based scheduler</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ============================================
+     STATS
+     ============================================ -->
+<section class="max-w-6xl mx-auto px-6 section-md">
+    <div class="mb-12 max-w-2xl">
+        <p class="text-[13px] text-blue font-mono uppercase tracking-widest mb-3">By the numbers</p>
+        <h2 class="heading-lg text-white mb-4">Built to scale, from day one.</h2>
+    </div>
+
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-px bg-[var(--color-border)] rounded-xl overflow-hidden border border-[var(--color-border)]">
+        <div class="px-6 py-10" style="background:var(--color-card)">
+            <div class="stat mb-2">12k+</div>
+            <div class="text-[12px] text-muted uppercase tracking-wider">GitHub stars</div>
+        </div>
+        <div class="px-6 py-10" style="background:var(--color-card)">
+            <div class="stat mb-2">340+</div>
+            <div class="text-[12px] text-muted uppercase tracking-wider">Contributors</div>
+        </div>
+        <div class="px-6 py-10" style="background:var(--color-card)">
+            <div class="stat mb-2">1.2k+</div>
+            <div class="text-[12px] text-muted uppercase tracking-wider">Production apps</div>
+        </div>
+        <div class="px-6 py-10" style="background:var(--color-card)">
+            <div class="stat mb-2">40M+</div>
+            <div class="text-[12px] text-muted uppercase tracking-wider">Requests / day</div>
+        </div>
+    </div>
+</section>
+
+<!-- ============================================
+     ROADMAP
+     ============================================ -->
+<section class="max-w-5xl mx-auto px-6 section-md">
+    <div class="mb-14 max-w-2xl">
+        <p class="text-[13px] text-blue font-mono uppercase tracking-widest mb-3">Roadmap</p>
+        <h2 class="heading-lg text-white mb-4">Where we're headed.</h2>
+        <p class="text-[16px] text-muted leading-relaxed">Public milestones. Ships happen when ready.</p>
+    </div>
+
+    <div class="space-y-3">
+        <div class="card p-6 flex items-start gap-4">
+            <span class="pill pill-blue shrink-0">v0.1</span>
+            <div class="flex-1">
+                <h4 class="text-[15px] font-medium text-white mb-1">Core runtime · <span class="text-blue">shipped</span></h4>
+                <p class="text-[14px] text-muted leading-relaxed">File-based routing, SSR, hooks, islands, hybrid rendering. The foundation.</p>
+            </div>
+        </div>
+        <div class="card p-6 flex items-start gap-4">
+            <span class="pill shrink-0">v0.2</span>
+            <div class="flex-1">
+                <h4 class="text-[15px] font-medium text-white mb-1">Edge runtime · <span class="text-muted">Q2 2026</span></h4>
+                <p class="text-[14px] text-muted leading-relaxed">Deploy to Cloudflare Workers, Fastly, Deno Deploy. WASI support for portable edge.</p>
+            </div>
+        </div>
+        <div class="card p-6 flex items-start gap-4">
+            <span class="pill shrink-0">v0.3</span>
+            <div class="flex-1">
+                <h4 class="text-[15px] font-medium text-white mb-1">Content collections · <span class="text-muted">Q3 2026</span></h4>
+                <p class="text-[14px] text-muted leading-relaxed">Type-safe Markdown with YAML frontmatter, MDX-style component embedding, and schema validation.</p>
+            </div>
+        </div>
+        <div class="card p-6 flex items-start gap-4">
+            <span class="pill shrink-0">v1.0</span>
+            <div class="flex-1">
+                <h4 class="text-[15px] font-medium text-white mb-1">Stable · <span class="text-muted">Q4 2026</span></h4>
+                <p class="text-[14px] text-muted leading-relaxed">API freeze. Long-term support. Production-ready for teams of any size.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ============================================
+     TEAM
+     ============================================ -->
+<section class="max-w-6xl mx-auto px-6 section-md">
+    <div class="mb-14 max-w-2xl">
+        <p class="text-[13px] text-blue font-mono uppercase tracking-widest mb-3">Team</p>
+        <h2 class="heading-lg text-white mb-4">A small crew building in public.</h2>
+        <p class="text-[16px] text-muted leading-relaxed">Most of the code has been written by a handful of people who care deeply about Go and the web.</p>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div class="card p-7">
+            <div class="w-12 h-12 rounded-full mb-5" style="background:linear-gradient(135deg,#60a5fa,#0070f3)"></div>
+            <h4 class="text-[15px] font-medium text-white mb-1">Thái Nguyên</h4>
+            <p class="text-[13px] text-muted mb-3">Creator · Runtime</p>
+            <p class="text-[13px] text-muted leading-relaxed">Former distributed systems engineer. Wrote the first line of Nguyen.go on a Hanoi train in 2025.</p>
+        </div>
+        <div class="card p-7">
+            <div class="w-12 h-12 rounded-full mb-5" style="background:linear-gradient(135deg,#a78bfa,#8b5cf6)"></div>
+            <h4 class="text-[15px] font-medium text-white mb-1">Core Contributors</h4>
+            <p class="text-[13px] text-muted mb-3">Reviewers · Maintainers</p>
+            <p class="text-[13px] text-muted leading-relaxed">An open group of engineers reviewing PRs, triaging issues, and shaping the API. Open to new members.</p>
+        </div>
+        <div class="card p-7">
+            <div class="w-12 h-12 rounded-full mb-5" style="background:linear-gradient(135deg,#34d399,#0ea5e9)"></div>
+            <h4 class="text-[15px] font-medium text-white mb-1">You?</h4>
+            <p class="text-[13px] text-muted mb-3">Contributor</p>
+            <p class="text-[13px] text-muted leading-relaxed">Pick an issue labelled <code class="text-blue font-mono text-[12px]">good-first-issue</code>. Ship code. Get merged.</p>
+        </div>
+    </div>
+</section>
+
+<!-- ============================================
+     CTA
+     ============================================ -->
+<section class="max-w-4xl mx-auto px-6 section-md">
+    <div class="border-flow">
+        <div class="p-10 md:p-14 text-center rounded-xl" style="background:radial-gradient(ellipse at top,rgba(0,112,243,0.08),transparent 70%),var(--color-card)">
+            <h2 class="heading-lg text-white mb-4">Join the project.</h2>
+            <p class="text-[16px] text-muted mb-8 max-w-lg mx-auto leading-relaxed">Open source. MIT licensed. Contributions welcome from anywhere.</p>
+            <div class="flex items-center justify-center gap-3 flex-wrap">
+                <a href="https://github.com/dev2k6/Nguyen.go" class="btn btn-lg btn-blue">
+                    <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>
+                    Star on GitHub
+                </a>
+                <nguyen-link href="/docs" class="btn btn-lg btn-secondary">Read the Docs</nguyen-link>
+            </div>
+        </div>
+    </div>
+</section>

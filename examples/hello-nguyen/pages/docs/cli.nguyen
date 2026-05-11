@@ -1,0 +1,140 @@
+---
+layout = "app/layout"
+
+export const metadata = {
+    title: "CLI Reference — Nguyen.go",
+    description: "Complete reference for the Nguyen.go CLI commands: dev, build, start, and more.",
+}
+
+export const geo = {
+    pageType: "TechArticle",
+    datePublished: "2026-05-01T00:00:00Z",
+    dateModified: "2026-05-10T00:00:00Z",
+    author: "Nguyen.go Team",
+    breadcrumbs: [
+        { name: "Home", url: "/" },
+        { name: "Docs", url: "/docs" },
+        { name: "CLI Reference", url: "/docs/cli" },
+    ],
+}
+---
+<section class="max-w-4xl mx-auto px-6 pt-24 pb-16">
+    <div class="flex items-center gap-2 text-[13px] text-muted mb-6">
+        <nguyen-link href="/" class="hover:text-white transition-colors">Home</nguyen-link>
+        <svg width="10" height="10" viewBox="0 0 16 16" fill="none" class="opacity-50"><path d="M6 3L11 8L6 13" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+        <nguyen-link href="/docs" class="hover:text-white transition-colors">Docs</nguyen-link>
+        <svg width="10" height="10" viewBox="0 0 16 16" fill="none" class="opacity-50"><path d="M6 3L11 8L6 13" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+        <span class="text-muted-stronger">CLI Reference</span>
+    </div>
+
+    <p class="text-[13px] text-blue font-mono uppercase tracking-widest mb-4">Getting started</p>
+    <h1 class="text-[36px] font-semibold tracking-tight text-white mb-4">CLI Reference</h1>
+    <p class="text-[17px] text-muted max-w-2xl leading-relaxed mb-12">
+        The <code class="text-blue font-mono text-[14px]">nguyen</code> CLI handles development, building, and serving your application.
+    </p>
+
+    <div class="space-y-10">
+        <div>
+            <h2 class="text-[22px] font-semibold tracking-tight text-white mb-4">Commands</h2>
+            <div class="card overflow-hidden">
+                <table class="cmp-table">
+                    <thead>
+                        <tr>
+                            <th class="!text-left">Command</th>
+                            <th class="!text-left">Description</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td class="font-mono text-blue text-[13px]">nguyen dev</td>
+                            <td class="text-muted-stronger">Start development server with HMR on port 3000</td>
+                        </tr>
+                        <tr>
+                            <td class="font-mono text-blue text-[13px]">nguyen build</td>
+                            <td class="text-muted-stronger">Compile pages, generate static HTML, and produce the production binary</td>
+                        </tr>
+                        <tr>
+                            <td class="font-mono text-blue text-[13px]">nguyen start</td>
+                            <td class="text-muted-stronger">Run the production server from the build output</td>
+                        </tr>
+                        <tr>
+                            <td class="font-mono text-blue text-[13px]">nguyen create &lt;name&gt;</td>
+                            <td class="text-muted-stronger">Scaffold a new project from the default template</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div>
+            <h2 class="text-[22px] font-semibold tracking-tight text-white mb-4">Global flags</h2>
+            <div class="card overflow-hidden">
+                <table class="cmp-table">
+                    <thead>
+                        <tr>
+                            <th class="!text-left">Flag</th>
+                            <th class="!text-left">Default</th>
+                            <th class="!text-left">Description</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td class="font-mono text-blue text-[13px]">--root</td>
+                            <td class="text-muted font-mono text-[13px]">.</td>
+                            <td class="text-muted-stronger">Set the project root directory</td>
+                        </tr>
+                        <tr>
+                            <td class="font-mono text-blue text-[13px]">--port</td>
+                            <td class="text-muted font-mono text-[13px]">3000</td>
+                            <td class="text-muted-stronger">Override the server port</td>
+                        </tr>
+                        <tr>
+                            <td class="font-mono text-blue text-[13px]">--host</td>
+                            <td class="text-muted font-mono text-[13px]">localhost</td>
+                            <td class="text-muted-stronger">Bind address for the server</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div>
+            <h2 class="text-[22px] font-semibold tracking-tight text-white mb-4">Examples</h2>
+            <div class="terminal mb-4">
+                <div class="terminal-bar">
+                    <span class="terminal-dot"></span><span class="terminal-dot"></span><span class="terminal-dot"></span>
+                    <span class="ml-3 text-[12px] font-mono text-muted">terminal</span>
+                </div>
+                <pre class="terminal-body text-[#c9d1d9]"><span style="color:#6e7681"># Dev on a custom port</span>
+<span style="color:#79c0ff">$</span> nguyen dev --port 8080
+
+<span style="color:#6e7681"># Build for production</span>
+<span style="color:#79c0ff">$</span> nguyen build
+
+<span style="color:#6e7681"># Start production server</span>
+<span style="color:#79c0ff">$</span> nguyen start --host 0.0.0.0 --port 8080</pre>
+            </div>
+        </div>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-16">
+        <nguyen-link href="/docs/first-page" class="card card-blue-hover block">
+            <div style="padding:1rem 1.25rem;">
+                <div class="text-[12px] text-muted mb-2 flex items-center gap-1">
+                    <svg width="12" height="12" viewBox="0 0 16 16" fill="none"><path d="M10 3L5 8L10 13" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+                    Previous
+                </div>
+                <div class="text-[15px] font-medium text-white">Your first page</div>
+            </div>
+        </nguyen-link>
+        <nguyen-link href="/docs/routing" class="card card-blue-hover block">
+            <div class="text-right" style="padding:1rem 1.25rem;">
+                <div class="text-[12px] text-muted mb-2 flex items-center gap-1 justify-end">
+                    Next
+                    <svg width="12" height="12" viewBox="0 0 16 16" fill="none"><path d="M6 3L11 8L6 13" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+                </div>
+                <div class="text-[15px] font-medium text-white">Routing</div>
+            </div>
+        </nguyen-link>
+    </div>
+</section>

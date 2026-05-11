@@ -1,0 +1,126 @@
+---
+layout = "app/layout"
+
+export const metadata = {
+    title: "Project Structure — Nguyen.go",
+    description: "Understand the directory layout and conventions of a Nguyen.go project.",
+}
+
+export const geo = {
+    pageType: "TechArticle",
+    datePublished: "2026-05-01T00:00:00Z",
+    dateModified: "2026-05-10T00:00:00Z",
+    author: "Nguyen.go Team",
+    breadcrumbs: [
+        { name: "Home", url: "/" },
+        { name: "Docs", url: "/docs" },
+        { name: "Project Structure", url: "/docs/project-structure" },
+    ],
+}
+---
+<section class="max-w-4xl mx-auto px-6 pt-24 pb-16">
+    <div class="flex items-center gap-2 text-[13px] text-muted mb-6">
+        <nguyen-link href="/" class="hover:text-white transition-colors">Home</nguyen-link>
+        <svg width="10" height="10" viewBox="0 0 16 16" fill="none" class="opacity-50"><path d="M6 3L11 8L6 13" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+        <nguyen-link href="/docs" class="hover:text-white transition-colors">Docs</nguyen-link>
+        <svg width="10" height="10" viewBox="0 0 16 16" fill="none" class="opacity-50"><path d="M6 3L11 8L6 13" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+        <span class="text-muted-stronger">Project Structure</span>
+    </div>
+
+    <p class="text-[13px] text-blue font-mono uppercase tracking-widest mb-4">Getting started</p>
+    <h1 class="text-[36px] font-semibold tracking-tight text-white mb-4">Project Structure</h1>
+    <p class="text-[17px] text-muted max-w-2xl leading-relaxed mb-12">
+        A Nguyen.go project follows a convention-over-configuration layout. Every directory has a clear purpose.
+    </p>
+
+    <div class="space-y-10">
+        <div>
+            <h2 class="text-[22px] font-semibold tracking-tight text-white mb-4">Directory layout</h2>
+            <div class="terminal mb-4">
+                <div class="terminal-bar">
+                    <span class="terminal-dot"></span><span class="terminal-dot"></span><span class="terminal-dot"></span>
+                    <span class="ml-3 text-[12px] font-mono text-muted">file tree</span>
+                </div>
+                <pre class="terminal-body text-[#c9d1d9]"><span style="color:#79c0ff">my-app/</span>
+├── <span style="color:#79c0ff">app/</span>              <span style="color:#6e7681"># Shared layouts</span>
+│   └── <span style="color:#7ee787">layout.nguyen</span> <span style="color:#6e7681"># Root layout (wraps all pages)</span>
+├── <span style="color:#79c0ff">pages/</span>            <span style="color:#6e7681"># File-based routes</span>
+│   ├── <span style="color:#7ee787">index.nguyen</span>  <span style="color:#6e7681"># → /</span>
+│   ├── <span style="color:#7ee787">about.nguyen</span>  <span style="color:#6e7681"># → /about</span>
+│   └── <span style="color:#79c0ff">blog/</span>         <span style="color:#6e7681"># → /blog/*</span>
+├── <span style="color:#79c0ff">public/</span>           <span style="color:#6e7681"># Static assets (served as-is)</span>
+├── <span style="color:#79c0ff">styles/</span>           <span style="color:#6e7681"># CSS source files</span>
+│   └── <span style="color:#7ee787">input.css</span>    <span style="color:#6e7681"># Tailwind entry point</span>
+├── <span style="color:#79c0ff">config/</span>           <span style="color:#6e7681"># App configuration</span>
+│   └── <span style="color:#7ee787">nguyen.config.yml</span>
+└── <span style="color:#79c0ff">cmd/</span>              <span style="color:#6e7681"># Go entrypoints (optional)</span>
+    ├── <span style="color:#79c0ff">dev/</span>
+    └── <span style="color:#79c0ff">server/</span></pre>
+            </div>
+        </div>
+
+        <div>
+            <h2 class="text-[22px] font-semibold tracking-tight text-white mb-4">Key directories</h2>
+            <div class="card overflow-hidden">
+                <table class="cmp-table">
+                    <thead>
+                        <tr>
+                            <th class="!text-left">Directory</th>
+                            <th class="!text-left">Purpose</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td class="font-mono text-blue text-[13px]">app/</td>
+                            <td class="text-muted-stronger">Shared layouts that wrap page content via <code class="text-blue font-mono text-[12px]">&lt;nguyen-slot /&gt;</code></td>
+                        </tr>
+                        <tr>
+                            <td class="font-mono text-blue text-[13px]">pages/</td>
+                            <td class="text-muted-stronger">Each <code class="text-blue font-mono text-[12px]">.nguyen</code> file becomes a route automatically</td>
+                        </tr>
+                        <tr>
+                            <td class="font-mono text-blue text-[13px]">public/</td>
+                            <td class="text-muted-stronger">Static files served at root path (images, fonts, favicons)</td>
+                        </tr>
+                        <tr>
+                            <td class="font-mono text-blue text-[13px]">styles/</td>
+                            <td class="text-muted-stronger">CSS source; processed by Tailwind during build</td>
+                        </tr>
+                        <tr>
+                            <td class="font-mono text-blue text-[13px]">config/</td>
+                            <td class="text-muted-stronger">YAML config for ports, GEO, PWA, and build options</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div>
+            <h2 class="text-[22px] font-semibold tracking-tight text-white mb-4">Special files</h2>
+            <p class="text-[16px] text-muted leading-[1.75] mb-4">
+                Files prefixed with <code class="text-blue font-mono text-[14px]">_</code> or named <code class="text-blue font-mono text-[14px]">layout.nguyen</code> are not exposed as routes. They serve internal purposes like shared UI shells.
+            </p>
+        </div>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-16">
+        <nguyen-link href="/docs/installation" class="card card-blue-hover block">
+            <div style="padding:1rem 1.25rem;">
+                <div class="text-[12px] text-muted mb-2 flex items-center gap-1">
+                    <svg width="12" height="12" viewBox="0 0 16 16" fill="none"><path d="M10 3L5 8L10 13" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+                    Previous
+                </div>
+                <div class="text-[15px] font-medium text-white">Installation</div>
+            </div>
+        </nguyen-link>
+        <nguyen-link href="/docs/first-page" class="card card-blue-hover block">
+            <div class="text-right" style="padding:1rem 1.25rem;">
+                <div class="text-[12px] text-muted mb-2 flex items-center gap-1 justify-end">
+                    Next
+                    <svg width="12" height="12" viewBox="0 0 16 16" fill="none"><path d="M6 3L11 8L6 13" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+                </div>
+                <div class="text-[15px] font-medium text-white">Your first page</div>
+            </div>
+        </nguyen-link>
+    </div>
+</section>

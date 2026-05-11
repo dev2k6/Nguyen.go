@@ -1,0 +1,151 @@
+---
+layout = "app/layout"
+
+export const metadata = {
+    title: "Routing — Nguyen.go",
+    description: "File-based routing in Nguyen.go: static routes, dynamic segments, catch-alls, and nested layouts.",
+}
+
+export const geo = {
+    pageType: "TechArticle",
+    datePublished: "2026-05-01T00:00:00Z",
+    dateModified: "2026-05-10T00:00:00Z",
+    author: "Nguyen.go Team",
+    breadcrumbs: [
+        { name: "Home", url: "/" },
+        { name: "Docs", url: "/docs" },
+        { name: "Routing", url: "/docs/routing" },
+    ],
+}
+---
+<section class="max-w-4xl mx-auto px-6 pt-24 pb-16">
+    <div class="flex items-center gap-2 text-[13px] text-muted mb-6">
+        <nguyen-link href="/" class="hover:text-white transition-colors">Home</nguyen-link>
+        <svg width="10" height="10" viewBox="0 0 16 16" fill="none" class="opacity-50"><path d="M6 3L11 8L6 13" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+        <nguyen-link href="/docs" class="hover:text-white transition-colors">Docs</nguyen-link>
+        <svg width="10" height="10" viewBox="0 0 16 16" fill="none" class="opacity-50"><path d="M6 3L11 8L6 13" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+        <span class="text-muted-stronger">Routing</span>
+    </div>
+
+    <p class="text-[13px] text-blue font-mono uppercase tracking-widest mb-4">Core concepts</p>
+    <h1 class="text-[36px] font-semibold tracking-tight text-white mb-4">Routing</h1>
+    <p class="text-[17px] text-muted max-w-2xl leading-relaxed mb-12">
+        Every <code class="text-blue font-mono text-[14px]">.nguyen</code> file in <code class="text-blue font-mono text-[14px]">pages/</code> becomes a route. No config, no manifest — the filesystem is the router.
+    </p>
+
+    <div class="space-y-10">
+        <div>
+            <h2 class="text-[22px] font-semibold tracking-tight text-white mb-4">Static routes</h2>
+            <p class="text-[16px] text-muted leading-[1.75] mb-4">
+                Drop a file and it becomes a URL:
+            </p>
+            <div class="terminal mb-4">
+                <div class="terminal-bar">
+                    <span class="terminal-dot"></span><span class="terminal-dot"></span><span class="terminal-dot"></span>
+                    <span class="ml-3 text-[12px] font-mono text-muted">file → route</span>
+                </div>
+                <pre class="terminal-body text-[#c9d1d9]"><span style="color:#79c0ff">pages/</span>
+├── <span style="color:#7ee787">index.nguyen</span>        <span style="color:#6e7681"># → /</span>
+├── <span style="color:#7ee787">about.nguyen</span>        <span style="color:#6e7681"># → /about</span>
+├── <span style="color:#79c0ff">blog/</span>
+│   ├── <span style="color:#7ee787">index.nguyen</span>    <span style="color:#6e7681"># → /blog</span>
+│   └── <span style="color:#7ee787">[slug].nguyen</span>   <span style="color:#6e7681"># → /blog/:slug</span>
+└── <span style="color:#7ee787">404.nguyen</span>          <span style="color:#6e7681"># → catch-all fallback</span></pre>
+            </div>
+        </div>
+
+        <div>
+            <h2 class="text-[22px] font-semibold tracking-tight text-white mb-4">Dynamic segments</h2>
+            <p class="text-[16px] text-muted leading-[1.75] mb-4">
+                Wrap a filename segment in square brackets to capture a URL parameter:
+            </p>
+            <div class="card overflow-hidden mb-4">
+                <table class="cmp-table">
+                    <thead>
+                        <tr>
+                            <th class="!text-left">Pattern</th>
+                            <th class="!text-left">Matches</th>
+                            <th class="!text-left">Example</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td class="font-mono text-blue text-[13px]">[slug].nguyen</td>
+                            <td class="text-muted-stronger">Single segment</td>
+                            <td class="text-muted font-mono text-[13px]">/blog/hello</td>
+                        </tr>
+                        <tr>
+                            <td class="font-mono text-blue text-[13px]">[...path].nguyen</td>
+                            <td class="text-muted-stronger">Catch-all (1+ segments)</td>
+                            <td class="text-muted font-mono text-[13px]">/a/b/c</td>
+                        </tr>
+                        <tr>
+                            <td class="font-mono text-blue text-[13px]">[[...lang]].nguyen</td>
+                            <td class="text-muted-stronger">Optional catch-all</td>
+                            <td class="text-muted font-mono text-[13px]">/ or /en/about</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div>
+            <h2 class="text-[22px] font-semibold tracking-tight text-white mb-4">Accessing params</h2>
+            <p class="text-[16px] text-muted leading-[1.75] mb-4">
+                Route parameters are available via <code class="text-blue font-mono text-[14px]">UseGlobalState</code>:
+            </p>
+            <div class="terminal mb-4">
+                <div class="terminal-bar">
+                    <span class="terminal-dot"></span><span class="terminal-dot"></span><span class="terminal-dot"></span>
+                    <span class="ml-3 text-[12px] font-mono text-muted">pages/blog/[slug].nguyen</span>
+                </div>
+                <pre class="terminal-body text-[#c9d1d9]"><span style="color:#6e7681">---</span>
+<span style="color:#ff7b72">import</span> <span style="color:#a5d6ff">"nguyen.go/pkg/core"</span>
+
+<span style="color:#79c0ff">slug</span> := core.<span style="color:#d2a8ff">UseGlobalState</span>(<span style="color:#a5d6ff">"slug"</span>, <span style="color:#a5d6ff">""</span>)
+<span style="color:#6e7681">---</span>
+&lt;<span style="color:#7ee787">h1</span>&gt;Post: {<span style="color:#79c0ff">slug</span>}&lt;/<span style="color:#7ee787">h1</span>&gt;</pre>
+            </div>
+        </div>
+
+        <div>
+            <h2 class="text-[22px] font-semibold tracking-tight text-white mb-4">Route priority</h2>
+            <p class="text-[16px] text-muted leading-[1.75]">
+                Static segments always win over dynamic ones. <code class="text-blue font-mono text-[14px]">/blog/featured</code> (static file) matches before <code class="text-blue font-mono text-[14px]">/blog/:slug</code> (dynamic). Catch-alls have the lowest priority.
+            </p>
+        </div>
+
+        <div class="card p-7" style="background:rgba(0,112,243,0.04);border-color:rgba(0,112,243,0.25)">
+            <div class="flex items-start gap-4">
+                <div class="feat-icon shrink-0" style="width:2rem;height:2rem;background:rgba(0,112,243,0.15);border-color:rgba(0,112,243,0.3)">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#60a5fa" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+                </div>
+                <div>
+                    <h4 class="text-[14px] font-medium text-white mb-2">Nested layouts</h4>
+                    <p class="text-[14px] text-muted leading-relaxed">Place a <code class="text-blue font-mono text-[12px]">layout.nguyen</code> in any directory to wrap all pages in that subtree. Layouts compose from root to leaf.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-16">
+        <nguyen-link href="/docs/cli" class="card card-blue-hover block">
+            <div style="padding:1rem 1.25rem;">
+                <div class="text-[12px] text-muted mb-2 flex items-center gap-1">
+                    <svg width="12" height="12" viewBox="0 0 16 16" fill="none"><path d="M10 3L5 8L10 13" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+                    Previous
+                </div>
+                <div class="text-[15px] font-medium text-white">CLI reference</div>
+            </div>
+        </nguyen-link>
+        <nguyen-link href="/docs/rendering" class="card card-blue-hover block">
+            <div class="text-right" style="padding:1rem 1.25rem;">
+                <div class="text-[12px] text-muted mb-2 flex items-center gap-1 justify-end">
+                    Next
+                    <svg width="12" height="12" viewBox="0 0 16 16" fill="none"><path d="M6 3L11 8L6 13" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+                </div>
+                <div class="text-[15px] font-medium text-white">Rendering</div>
+            </div>
+        </nguyen-link>
+    </div>
+</section>

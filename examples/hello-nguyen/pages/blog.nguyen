@@ -1,0 +1,243 @@
+---
+layout = "app/layout"
+
+export const metadata = {
+    title: "Blog — Nguyen.go",
+    description: "Release notes, tutorials, and deep dives from the Nguyen.go team.",
+}
+
+export const geo = {
+    pageType: "Blog",
+    datePublished: "2026-05-01T00:00:00Z",
+    dateModified: "2026-05-10T00:00:00Z",
+    author: "Nguyen.go Team",
+    breadcrumbs: [
+        { name: "Home", url: "/" },
+        { name: "Blog", url: "/blog" },
+    ],
+}
+---
+<!-- ============================================
+     HEADER
+     ============================================ -->
+<section class="relative">
+    <div class="hero-glow" style="opacity:0.6"></div>
+    <div class="max-w-5xl mx-auto px-6 pt-28 pb-16 relative">
+        <p class="text-[13px] text-blue font-mono uppercase tracking-widest mb-4">The blog</p>
+        <h1 class="heading-lg text-white mb-4" style="font-size:clamp(2.5rem,5vw,3.75rem)">
+            <span class="gradient-text">Writing about the web,<br/>from Go's point of view.</span>
+        </h1>
+        <p class="text-[17px] text-muted max-w-2xl leading-relaxed">
+            Release notes, tutorials, and honest opinions about building a framework in public.
+        </p>
+    </div>
+</section>
+
+<!-- ============================================
+     FEATURED POST
+     ============================================ -->
+<section class="max-w-5xl mx-auto px-6 pb-16">
+    <nguyen-link href="/blog/why-go-wasm" class="card card-blue-hover block overflow-hidden">
+        <div class="grid grid-cols-1 md:grid-cols-5 gap-0">
+            <div class="md:col-span-2 relative aspect-[4/3] md:aspect-auto overflow-hidden" style="background:linear-gradient(135deg,rgba(0,112,243,0.15),rgba(96,165,250,0.05))">
+                <div class="absolute inset-0 grid-lines" style="opacity:0.6"></div>
+                <div class="absolute inset-0 flex items-center justify-center">
+                    <div class="text-center">
+                        <svg width="64" height="64" viewBox="0 0 24 24" fill="none" style="opacity:0.6"><path d="M12 2L21.66 7.5V16.5L12 22L2.34 16.5V7.5L12 2Z" fill="url(#pg)"/><defs><linearGradient id="pg" x1="12" y1="2" x2="12" y2="22"><stop stop-color="#ffffff"/><stop offset="1" stop-color="#0070f3"/></linearGradient></defs></svg>
+                    </div>
+                </div>
+            </div>
+            <div class="md:col-span-3 p-8 md:p-10">
+                <div class="flex items-center gap-2 mb-4 flex-wrap">
+                    <span class="pill pill-blue">
+                        <span class="pill-dot"></span>
+                        Featured
+                    </span>
+                    <span class="pill">Engineering</span>
+                </div>
+                <h2 class="text-[26px] md:text-[32px] font-semibold tracking-tight text-white leading-[1.15] mb-4">
+                    Why Go + WebAssembly is the future of the web
+                </h2>
+                <p class="text-[15px] text-muted leading-relaxed mb-6">
+                    After a year of shipping Nguyen.go in production, here's what we've learned about
+                    building UIs in Go — the wins, the trade-offs, and why we're never going back.
+                </p>
+                <div class="flex items-center gap-3">
+                    <div class="w-8 h-8 rounded-full" style="background:linear-gradient(135deg,#60a5fa,#0070f3)"></div>
+                    <div>
+                        <div class="text-[13px] text-white font-medium">Thái Nguyên</div>
+                        <div class="text-[12px] text-muted">April 28, 2026 · 8 min read</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nguyen-link>
+</section>
+
+<!-- ============================================
+     FILTER BAR
+     ============================================ -->
+<section class="max-w-5xl mx-auto px-6 mb-8">
+    <div class="flex items-center gap-2 flex-wrap">
+        <button class="pill pill-blue">All posts</button>
+        <button class="pill">Engineering</button>
+        <button class="pill">Tutorials</button>
+        <button class="pill">Release notes</button>
+        <button class="pill">Case studies</button>
+        <div class="ml-auto flex items-center gap-2">
+            <span class="text-[12px] text-muted font-mono">12 posts</span>
+        </div>
+    </div>
+</section>
+
+<!-- ============================================
+     POST GRID
+     ============================================ -->
+<section class="max-w-5xl mx-auto px-6 pb-20">
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <!-- Post 1 -->
+        <nguyen-link href="/blog/getting-started" class="card card-blue-hover block p-7">
+            <div class="flex items-center gap-2 mb-4">
+                <span class="pill pill-blue">
+                    <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/></svg>
+                    Tutorial
+                </span>
+            </div>
+            <h3 class="text-[19px] font-semibold tracking-tight text-white leading-[1.25] mb-3">
+                Getting started with Nguyen.go in 5 minutes
+            </h3>
+            <p class="text-[14px] text-muted leading-relaxed mb-6">
+                Install the CLI, scaffold a project, and ship your first page — all before your coffee gets cold.
+            </p>
+            <div class="flex items-center justify-between text-[12px] text-muted">
+                <span>May 1, 2026</span>
+                <span>5 min read</span>
+            </div>
+        </nguyen-link>
+
+        <!-- Post 2 -->
+        <nguyen-link href="/blog/ssr-vs-csr" class="card card-blue-hover block p-7">
+            <div class="flex items-center gap-2 mb-4">
+                <span class="pill">Engineering</span>
+            </div>
+            <h3 class="text-[19px] font-semibold tracking-tight text-white leading-[1.25] mb-3">
+                SSR vs CSR: when to use which
+            </h3>
+            <p class="text-[14px] text-muted leading-relaxed mb-6">
+                A practical guide to choosing the right rendering strategy for every page in your app.
+            </p>
+            <div class="flex items-center justify-between text-[12px] text-muted">
+                <span>April 15, 2026</span>
+                <span>6 min read</span>
+            </div>
+        </nguyen-link>
+
+        <!-- Post 3 -->
+        <nguyen-link href="/blog/islands-architecture" class="card card-blue-hover block p-7">
+            <div class="flex items-center gap-2 mb-4">
+                <span class="pill">Engineering</span>
+            </div>
+            <h3 class="text-[19px] font-semibold tracking-tight text-white leading-[1.25] mb-3">
+                Islands architecture explained
+            </h3>
+            <p class="text-[14px] text-muted leading-relaxed mb-6">
+                Ship zero JavaScript by default, hydrate only the parts that need it. Here's how it works under the hood.
+            </p>
+            <div class="flex items-center justify-between text-[12px] text-muted">
+                <span>April 3, 2026</span>
+                <span>7 min read</span>
+            </div>
+        </nguyen-link>
+
+        <!-- Post 4 -->
+        <nguyen-link href="/blog/v0-1-0" class="card card-blue-hover block p-7">
+            <div class="flex items-center gap-2 mb-4">
+                <span class="pill pill-blue">
+                    <span class="pill-dot"></span>
+                    Release notes
+                </span>
+            </div>
+            <h3 class="text-[19px] font-semibold tracking-tight text-white leading-[1.25] mb-3">
+                Announcing Nguyen.go v0.1.0
+            </h3>
+            <p class="text-[14px] text-muted leading-relaxed mb-6">
+                Our first stable release. File-based routing, SSR, hooks, islands, hybrid rendering — all shipped.
+            </p>
+            <div class="flex items-center justify-between text-[12px] text-muted">
+                <span>March 20, 2026</span>
+                <span>4 min read</span>
+            </div>
+        </nguyen-link>
+
+        <!-- Post 5 -->
+        <nguyen-link href="/blog/lane-scheduler" class="card card-blue-hover block p-7">
+            <div class="flex items-center gap-2 mb-4">
+                <span class="pill">Engineering</span>
+            </div>
+            <h3 class="text-[19px] font-semibold tracking-tight text-white leading-[1.25] mb-3">
+                Implementing React's lane-based scheduler in Go
+            </h3>
+            <p class="text-[14px] text-muted leading-relaxed mb-6">
+                A deep dive into priority-based update batching and how we brought it to WASM.
+            </p>
+            <div class="flex items-center justify-between text-[12px] text-muted">
+                <span>March 10, 2026</span>
+                <span>12 min read</span>
+            </div>
+        </nguyen-link>
+
+        <!-- Post 6 -->
+        <nguyen-link href="/blog/deployment" class="card card-blue-hover block p-7">
+            <div class="flex items-center gap-2 mb-4">
+                <span class="pill">Tutorial</span>
+            </div>
+            <h3 class="text-[19px] font-semibold tracking-tight text-white leading-[1.25] mb-3">
+                Deploying Nguyen.go to any Linux box
+            </h3>
+            <p class="text-[14px] text-muted leading-relaxed mb-6">
+                <code class="text-blue font-mono text-[12px]">scp</code>, <code class="text-blue font-mono text-[12px]">systemd</code>, and a Caddyfile — that's the whole deploy.
+            </p>
+            <div class="flex items-center justify-between text-[12px] text-muted">
+                <span>February 28, 2026</span>
+                <span>5 min read</span>
+            </div>
+        </nguyen-link>
+    </div>
+
+    <!-- Pagination -->
+    <div class="flex items-center justify-center gap-2 mt-14">
+        <button class="btn btn-ghost !h-9 !px-3" disabled style="opacity:0.4">
+            <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M10 3L5 8L10 13" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+            Previous
+        </button>
+        <div class="flex items-center gap-1 mx-2">
+            <button class="btn btn-blue !h-9 !px-3 !text-[13px]">1</button>
+            <button class="btn btn-ghost !h-9 !px-3 !text-[13px]">2</button>
+            <button class="btn btn-ghost !h-9 !px-3 !text-[13px]">3</button>
+        </div>
+        <button class="btn btn-secondary !h-9 !px-3">
+            Next
+            <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M6 3L11 8L6 13" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+        </button>
+    </div>
+</section>
+
+<!-- ============================================
+     NEWSLETTER CTA
+     ============================================ -->
+<section class="max-w-3xl mx-auto px-6 pb-24">
+    <div class="card p-10 text-center" style="background:radial-gradient(ellipse at top,rgba(0,112,243,0.06),transparent 70%),var(--color-card)">
+        <p class="text-[13px] text-blue font-mono uppercase tracking-widest mb-3">Newsletter</p>
+        <h3 class="heading-lg text-white mb-3" style="font-size:1.75rem">Stay in the loop.</h3>
+        <p class="text-[15px] text-muted mb-6 max-w-md mx-auto leading-relaxed">
+            New posts, release notes, and the occasional deep dive. No spam. Unsubscribe anytime.
+        </p>
+        <form class="flex items-center gap-2 max-w-md mx-auto flex-wrap justify-center">
+            <input type="email" placeholder="you@example.com" class="flex-1 h-11 px-4 rounded-lg text-[14px]" style="min-width:200px;background:var(--color-background);border:1px solid var(--color-border);color:var(--color-foreground)" />
+            <button type="submit" class="btn btn-blue" style="height:44px">
+                Subscribe
+                <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M6 3L11 8L6 13" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+            </button>
+        </form>
+    </div>
+</section>

@@ -1,0 +1,37 @@
+{
+  "languages": {
+    "Go": {
+      "language_servers": ["gopls"],
+      "formatter": "language_server",
+      "format_on_save": true,
+      "lsp": {
+        "gopls": {
+          "initialization_options": {
+            "build": {
+              "allowModfileModifications": true,
+              "buildFlags": ["-tags=js,wasm"],
+              "env": {
+                "GOOS": "js",
+                "GOARCH": "wasm"
+              }
+            },
+            "formatting": {
+              "gofumpt": false
+            },
+            "ui.diagnostic.annotations": {
+              "bounds": true,
+              "escape": true,
+              "inline": true,
+              "nil": true
+            },
+            "ui.diagnostic.staticcheck": true,
+            "ui.diagnostic.vulncheck": "Off"
+          }
+        }
+      }
+    }
+  },
+  "file_types": {
+    "Go": ["*.go", "*.nguyen"]
+  }
+}

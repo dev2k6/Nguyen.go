@@ -1,0 +1,125 @@
+---
+layout = "app/layout"
+
+export const metadata = {
+    title: "Hooks — Nguyen.go",
+    description: "Reactive hooks in Nguyen.go: UseGlobalState, SetGlobalState, and effect patterns.",
+}
+
+export const geo = {
+    pageType: "TechArticle",
+    datePublished: "2026-05-01T00:00:00Z",
+    dateModified: "2026-05-10T00:00:00Z",
+    author: "Nguyen.go Team",
+    breadcrumbs: [
+        { name: "Home", url: "/" },
+        { name: "Docs", url: "/docs" },
+        { name: "Hooks", url: "/docs/hooks" },
+    ],
+}
+---
+<section class="max-w-4xl mx-auto px-6 pt-24 pb-16">
+    <div class="flex items-center gap-2 text-[13px] text-muted mb-6">
+        <nguyen-link href="/" class="hover:text-white transition-colors">Home</nguyen-link>
+        <svg width="10" height="10" viewBox="0 0 16 16" fill="none" class="opacity-50"><path d="M6 3L11 8L6 13" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+        <nguyen-link href="/docs" class="hover:text-white transition-colors">Docs</nguyen-link>
+        <svg width="10" height="10" viewBox="0 0 16 16" fill="none" class="opacity-50"><path d="M6 3L11 8L6 13" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+        <span class="text-muted-stronger">Hooks</span>
+    </div>
+
+    <p class="text-[13px] text-blue font-mono uppercase tracking-widest mb-4">Core concepts</p>
+    <h1 class="text-[36px] font-semibold tracking-tight text-white mb-4">Hooks</h1>
+    <p class="text-[17px] text-muted max-w-2xl leading-relaxed mb-12">
+        Hooks are the reactive primitives of Nguyen.go. Declare state in Go, and the framework keeps the DOM in sync automatically.
+    </p>
+
+    <div class="space-y-10">
+        <div>
+            <h2 class="text-[22px] font-semibold tracking-tight text-white mb-4">UseGlobalState</h2>
+            <p class="text-[16px] text-muted leading-[1.75] mb-4">
+                Declares a reactive state variable with a key and initial value. The value is rendered during SSR and hydrated on the client.
+            </p>
+            <div class="terminal mb-4">
+                <div class="terminal-bar">
+                    <span class="terminal-dot"></span><span class="terminal-dot"></span><span class="terminal-dot"></span>
+                    <span class="ml-3 text-[12px] font-mono text-muted">frontmatter</span>
+                </div>
+                <pre class="terminal-body text-[#c9d1d9]"><span style="color:#ff7b72">import</span> <span style="color:#a5d6ff">"nguyen.go/pkg/core"</span>
+
+<span style="color:#79c0ff">count</span> := core.<span style="color:#d2a8ff">UseGlobalState</span>(<span style="color:#a5d6ff">"count"</span>, <span style="color:#79c0ff">0</span>)</pre>
+            </div>
+            <p class="text-[16px] text-muted leading-[1.75]">
+                In the template, use <code class="text-blue font-mono text-[14px]">{count}</code> to render the value. It outputs a <code class="text-blue font-mono text-[14px]">&lt;span data-nguyen-text="count"&gt;</code> for client-side reactivity.
+            </p>
+        </div>
+
+        <div>
+            <h2 class="text-[22px] font-semibold tracking-tight text-white mb-4">SetGlobalState</h2>
+            <p class="text-[16px] text-muted leading-[1.75] mb-4">
+                Updates a state variable. Typically called inside event handlers:
+            </p>
+            <div class="terminal mb-4">
+                <div class="terminal-bar">
+                    <span class="terminal-dot"></span><span class="terminal-dot"></span><span class="terminal-dot"></span>
+                    <span class="ml-3 text-[12px] font-mono text-muted">handler function</span>
+                </div>
+                <pre class="terminal-body text-[#c9d1d9]"><span style="color:#ff7b72">func</span> <span style="color:#d2a8ff">increment</span>() {
+    <span style="color:#79c0ff">current</span> := core.<span style="color:#d2a8ff">GetGlobalState</span>(<span style="color:#a5d6ff">"count"</span>).(<span style="color:#ff7b72">int</span>)
+    core.<span style="color:#d2a8ff">SetGlobalState</span>(<span style="color:#a5d6ff">"count"</span>, <span style="color:#79c0ff">current</span> + <span style="color:#79c0ff">1</span>)
+}</pre>
+            </div>
+        </div>
+
+        <div>
+            <h2 class="text-[22px] font-semibold tracking-tight text-white mb-4">Event binding</h2>
+            <p class="text-[16px] text-muted leading-[1.75] mb-4">
+                Bind handlers to DOM events using the <code class="text-blue font-mono text-[14px]">@event</code> syntax:
+            </p>
+            <div class="terminal mb-4">
+                <div class="terminal-bar">
+                    <span class="terminal-dot"></span><span class="terminal-dot"></span><span class="terminal-dot"></span>
+                    <span class="ml-3 text-[12px] font-mono text-muted">template</span>
+                </div>
+                <pre class="terminal-body text-[#c9d1d9]">&lt;<span style="color:#7ee787">button</span> <span style="color:#79c0ff">@click</span>=<span style="color:#a5d6ff">"increment()"</span>&gt;
+  Count: {<span style="color:#79c0ff">count</span>}
+&lt;/<span style="color:#7ee787">button</span>&gt;</pre>
+            </div>
+            <p class="text-[16px] text-muted leading-[1.75]">
+                During SSR, <code class="text-blue font-mono text-[14px]">@click</code> becomes <code class="text-blue font-mono text-[14px]">data-nguyen-click</code>. The hydration script picks it up and wires the event listener.
+            </p>
+        </div>
+
+        <div class="card p-7" style="background:rgba(0,112,243,0.04);border-color:rgba(0,112,243,0.25)">
+            <div class="flex items-start gap-4">
+                <div class="feat-icon shrink-0" style="width:2rem;height:2rem;background:rgba(0,112,243,0.15);border-color:rgba(0,112,243,0.3)">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#60a5fa" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+                </div>
+                <div>
+                    <h4 class="text-[14px] font-medium text-white mb-2">No WASM required</h4>
+                    <p class="text-[14px] text-muted leading-relaxed">The hydration script is vanilla JS. State updates and event handlers work without loading a WASM binary — keeping bundle size minimal.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-16">
+        <nguyen-link href="/docs/rendering" class="card card-blue-hover block">
+            <div style="padding:1rem 1.25rem;">
+                <div class="text-[12px] text-muted mb-2 flex items-center gap-1">
+                    <svg width="12" height="12" viewBox="0 0 16 16" fill="none"><path d="M10 3L5 8L10 13" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+                    Previous
+                </div>
+                <div class="text-[15px] font-medium text-white">Rendering</div>
+            </div>
+        </nguyen-link>
+        <nguyen-link href="/docs/islands" class="card card-blue-hover block">
+            <div class="text-right" style="padding:1rem 1.25rem;">
+                <div class="text-[12px] text-muted mb-2 flex items-center gap-1 justify-end">
+                    Next
+                    <svg width="12" height="12" viewBox="0 0 16 16" fill="none"><path d="M6 3L11 8L6 13" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+                </div>
+                <div class="text-[15px] font-medium text-white">Islands</div>
+            </div>
+        </nguyen-link>
+    </div>
+</section>

@@ -1,0 +1,265 @@
+---
+layout = "app/layout"
+
+export const metadata = {
+    title: "Showcase — Nguyen.go",
+    description: "Production sites and apps running on Nguyen.go in the wild.",
+}
+
+export const geo = {
+    pageType: "CollectionPage",
+    datePublished: "2026-05-01T00:00:00Z",
+    dateModified: "2026-05-10T00:00:00Z",
+    author: "Nguyen.go Team",
+    breadcrumbs: [
+        { name: "Home", url: "/" },
+        { name: "Showcase", url: "/showcase" },
+    ],
+}
+---
+<!-- ============================================
+     HEADER
+     ============================================ -->
+<section class="relative">
+    <div class="hero-glow" style="opacity:0.5"></div>
+    <div class="max-w-6xl mx-auto px-6 pt-28 pb-16 relative">
+        <div class="flex items-center gap-2 text-[13px] text-muted mb-6">
+            <nguyen-link href="/" class="hover:text-white transition-colors">Home</nguyen-link>
+            <svg width="10" height="10" viewBox="0 0 16 16" fill="none" class="opacity-50"><path d="M6 3L11 8L6 13" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+            <span class="text-muted-stronger">Showcase</span>
+        </div>
+
+        <p class="text-[13px] text-blue font-mono uppercase tracking-widest mb-4">Showcase</p>
+        <h1 class="heading-lg text-white mb-4" style="font-size:clamp(2.5rem,5vw,3.75rem)">
+            <span class="gradient-text">Built with Nguyen.go.<br/>Shipping in production.</span>
+        </h1>
+        <p class="text-[17px] text-muted max-w-2xl leading-relaxed">
+            Real teams. Real traffic. Running on a single Go binary. Here's who's building on Nguyen.go.
+        </p>
+
+        <div class="flex items-center gap-3 mt-8 flex-wrap">
+            <nguyen-link href="#submit" class="btn btn-blue">
+                Submit your site
+                <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M6 3L11 8L6 13" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+            </nguyen-link>
+        </div>
+    </div>
+</section>
+
+<!-- ============================================
+     FEATURED SHOWCASE
+     ============================================ -->
+<section class="max-w-6xl mx-auto px-6 pb-16">
+    <a href="https://flux.example.com" class="card card-blue-hover block overflow-hidden">
+        <div class="grid grid-cols-1 md:grid-cols-5">
+            <div class="md:col-span-3 aspect-video md:aspect-auto relative overflow-hidden" style="background:linear-gradient(135deg,#060a1a,#0f1729)">
+                <div class="absolute inset-0 grid-lines" style="opacity:0.3"></div>
+                <div class="absolute inset-0 flex items-center justify-center">
+                    <div class="text-center">
+                        <div class="text-[56px] font-bold tracking-tight gradient-blue mb-2" style="letter-spacing:-0.04em">Flux</div>
+                        <p class="text-[13px] text-muted font-mono">flux.example.com</p>
+                    </div>
+                </div>
+                <div class="absolute top-4 left-4">
+                    <span class="pill pill-blue">
+                        <span class="pill-dot"></span>
+                        Featured
+                    </span>
+                </div>
+            </div>
+            <div class="md:col-span-2 p-8 md:p-10 flex flex-col justify-center">
+                <h2 class="text-[24px] font-semibold tracking-tight text-white mb-3">Flux — observability for Go teams</h2>
+                <p class="text-[14px] text-muted leading-relaxed mb-6">
+                    High-throughput log aggregation and tracing. Rewrote their entire frontend from Next.js to Nguyen.go —
+                    dropped 3 containers, saved $2k/month.
+                </p>
+                <div class="flex items-center gap-4 text-[12px] text-muted mb-6">
+                    <span class="flex items-center gap-1.5">
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/></svg>
+                        SaaS
+                    </span>
+                    <span class="flex items-center gap-1.5">
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+                        12M req/mo
+                    </span>
+                </div>
+                <span class="text-[13px] text-blue font-medium flex items-center gap-1">
+                    Visit site
+                    <svg width="12" height="12" viewBox="0 0 16 16" fill="none"><path d="M6 3L11 8L6 13" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+                </span>
+            </div>
+        </div>
+    </a>
+</section>
+
+<!-- ============================================
+     FILTER
+     ============================================ -->
+<section class="max-w-6xl mx-auto px-6 pb-10">
+    <div class="flex items-center gap-2 flex-wrap">
+        <button class="pill pill-blue">All</button>
+        <button class="pill">SaaS</button>
+        <button class="pill">Agency</button>
+        <button class="pill">E-commerce</button>
+        <button class="pill">Media</button>
+        <button class="pill">Developer tools</button>
+    </div>
+</section>
+
+<!-- ============================================
+     SHOWCASE GRID
+     ============================================ -->
+<section class="max-w-6xl mx-auto px-6 pb-20">
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+
+        <!-- Site 1 -->
+        <a href="#" class="card card-blue-hover block overflow-hidden">
+            <div class="aspect-video relative overflow-hidden" style="background:linear-gradient(135deg,#0f1729,#1e293b)">
+                <div class="absolute inset-0 grid-lines" style="opacity:0.3"></div>
+                <div class="absolute inset-0 flex items-center justify-center">
+                    <div class="text-[28px] font-bold tracking-tight text-white" style="letter-spacing:-0.04em">Lumen</div>
+                </div>
+                <div class="absolute top-3 left-3"><span class="pill">SaaS</span></div>
+            </div>
+            <div class="p-5">
+                <h3 class="text-[15px] font-semibold text-white mb-1">Lumen Analytics</h3>
+                <p class="text-[13px] text-muted mb-3 leading-relaxed">Privacy-first analytics with zero cookies and sub-10ms response times.</p>
+                <div class="text-[11px] text-muted font-mono">lumen.app</div>
+            </div>
+        </a>
+
+        <!-- Site 2 -->
+        <a href="#" class="card card-blue-hover block overflow-hidden">
+            <div class="aspect-video relative overflow-hidden" style="background:linear-gradient(135deg,#1a0a1f,#2e1035)">
+                <div class="absolute inset-0 grid-lines" style="opacity:0.3"></div>
+                <div class="absolute inset-0 flex items-center justify-center">
+                    <div class="text-[26px] font-bold tracking-tight" style="color:#e9d5ff;letter-spacing:-0.04em">Mintbox</div>
+                </div>
+                <div class="absolute top-3 left-3"><span class="pill">E-commerce</span></div>
+            </div>
+            <div class="p-5">
+                <h3 class="text-[15px] font-semibold text-white mb-1">Mintbox</h3>
+                <p class="text-[13px] text-muted mb-3 leading-relaxed">Specialty coffee subscription. ISR + islands for lightning-fast product pages.</p>
+                <div class="text-[11px] text-muted font-mono">mintbox.co</div>
+            </div>
+        </a>
+
+        <!-- Site 3 -->
+        <a href="#" class="card card-blue-hover block overflow-hidden">
+            <div class="aspect-video relative overflow-hidden" style="background:linear-gradient(135deg,#0a1a13,#0f2e20)">
+                <div class="absolute inset-0 grid-lines" style="opacity:0.3"></div>
+                <div class="absolute inset-0 flex items-center justify-center">
+                    <div class="text-[26px] font-bold tracking-tight" style="color:#86efac;letter-spacing:-0.04em">Orbit</div>
+                </div>
+                <div class="absolute top-3 left-3"><span class="pill">Developer tools</span></div>
+            </div>
+            <div class="p-5">
+                <h3 class="text-[15px] font-semibold text-white mb-1">Orbit</h3>
+                <p class="text-[13px] text-muted mb-3 leading-relaxed">Staging environments on demand. The entire dashboard runs as one Go binary.</p>
+                <div class="text-[11px] text-muted font-mono">orbit.dev</div>
+            </div>
+        </a>
+
+        <!-- Site 4 -->
+        <a href="#" class="card card-blue-hover block overflow-hidden">
+            <div class="aspect-video relative overflow-hidden" style="background:linear-gradient(135deg,#1a1a0a,#2e2810)">
+                <div class="absolute inset-0 grid-lines" style="opacity:0.3"></div>
+                <div class="absolute inset-0 flex items-center justify-center">
+                    <div class="text-[26px] font-bold tracking-tight" style="color:#fde047;letter-spacing:-0.04em">Ledger</div>
+                </div>
+                <div class="absolute top-3 left-3"><span class="pill">Fintech</span></div>
+            </div>
+            <div class="p-5">
+                <h3 class="text-[15px] font-semibold text-white mb-1">Ledger Studio</h3>
+                <p class="text-[13px] text-muted mb-3 leading-relaxed">Double-entry accounting for startups. Financial dashboards rendered server-side.</p>
+                <div class="text-[11px] text-muted font-mono">ledger.studio</div>
+            </div>
+        </a>
+
+        <!-- Site 5 -->
+        <a href="#" class="card card-blue-hover block overflow-hidden">
+            <div class="aspect-video relative overflow-hidden" style="background:linear-gradient(135deg,#1f0a0a,#3d1515)">
+                <div class="absolute inset-0 grid-lines" style="opacity:0.3"></div>
+                <div class="absolute inset-0 flex items-center justify-center">
+                    <div class="text-[26px] font-bold tracking-tight" style="color:#fca5a5;letter-spacing:-0.04em">Cinder</div>
+                </div>
+                <div class="absolute top-3 left-3"><span class="pill">Media</span></div>
+            </div>
+            <div class="p-5">
+                <h3 class="text-[15px] font-semibold text-white mb-1">Cinder Review</h3>
+                <p class="text-[13px] text-muted mb-3 leading-relaxed">Literary magazine. Every post ISR'd, global CDN edge cache, 100 Lighthouse score.</p>
+                <div class="text-[11px] text-muted font-mono">cinder.review</div>
+            </div>
+        </a>
+
+        <!-- Site 6 -->
+        <a href="#" class="card card-blue-hover block overflow-hidden">
+            <div class="aspect-video relative overflow-hidden" style="background:linear-gradient(135deg,#0a141a,#0f2d3d)">
+                <div class="absolute inset-0 grid-lines" style="opacity:0.3"></div>
+                <div class="absolute inset-0 flex items-center justify-center">
+                    <div class="text-[26px] font-bold tracking-tight" style="color:#7dd3fc;letter-spacing:-0.04em">Tidepool</div>
+                </div>
+                <div class="absolute top-3 left-3"><span class="pill">Agency</span></div>
+            </div>
+            <div class="p-5">
+                <h3 class="text-[15px] font-semibold text-white mb-1">Tidepool Studio</h3>
+                <p class="text-[13px] text-muted mb-3 leading-relaxed">Digital agency portfolio. Built and rebuilt their stack — settled on Nguyen.go.</p>
+                <div class="text-[11px] text-muted font-mono">tidepool.studio</div>
+            </div>
+        </a>
+    </div>
+</section>
+
+<!-- ============================================
+     METRICS
+     ============================================ -->
+<section class="max-w-6xl mx-auto px-6 pb-20">
+    <div class="mb-10 max-w-2xl">
+        <p class="text-[13px] text-blue font-mono uppercase tracking-widest mb-3">Scale</p>
+        <h2 class="heading-lg text-white mb-4">Production-tested at every size.</h2>
+        <p class="text-[16px] text-muted leading-relaxed">From indie blogs to enterprise dashboards — the same framework, the same binary.</p>
+    </div>
+
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-px bg-[var(--color-border)] rounded-xl overflow-hidden border border-[var(--color-border)]">
+        <div class="px-6 py-10" style="background:var(--color-card)">
+            <div class="stat mb-2">1.2k+</div>
+            <div class="text-[12px] text-muted uppercase tracking-wider">Live sites</div>
+        </div>
+        <div class="px-6 py-10" style="background:var(--color-card)">
+            <div class="stat mb-2">40M</div>
+            <div class="text-[12px] text-muted uppercase tracking-wider">Requests / day</div>
+        </div>
+        <div class="px-6 py-10" style="background:var(--color-card)">
+            <div class="stat mb-2">&lt;5ms</div>
+            <div class="text-[12px] text-muted uppercase tracking-wider">Avg SSR time</div>
+        </div>
+        <div class="px-6 py-10" style="background:var(--color-card)">
+            <div class="stat mb-2">99.99%</div>
+            <div class="text-[12px] text-muted uppercase tracking-wider">Uptime</div>
+        </div>
+    </div>
+</section>
+
+<!-- ============================================
+     SUBMIT CTA
+     ============================================ -->
+<section id="submit" class="max-w-4xl mx-auto px-6 section-md">
+    <div class="border-flow">
+        <div class="p-10 md:p-14 text-center rounded-xl" style="background:radial-gradient(ellipse at top,rgba(0,112,243,0.08),transparent 70%),var(--color-card)">
+            <p class="text-[13px] text-blue font-mono uppercase tracking-widest mb-3">Submit your site</p>
+            <h2 class="heading-lg text-white mb-4">Shipped something with Nguyen.go?</h2>
+            <p class="text-[16px] text-muted mb-8 max-w-lg mx-auto leading-relaxed">
+                We'd love to feature it. Drop us a link and a short note about your stack.
+            </p>
+            <div class="flex items-center justify-center gap-3 flex-wrap">
+                <a href="https://github.com/dev2k6/Nguyen.go/showcase" class="btn btn-lg btn-blue">
+                    Submit on GitHub
+                    <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M6 3L11 8L6 13" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+                </a>
+                <a href="mailto:hello@nguyen.go" class="btn btn-lg btn-secondary">
+                    Email us
+                </a>
+            </div>
+        </div>
+    </div>
+</section>

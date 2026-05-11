@@ -1,0 +1,286 @@
+---
+layout = "app/layout"
+
+export const metadata = {
+    title: "Docs — Nguyen.go",
+    description: "Official documentation for Nguyen.go — installation, routing, rendering modes, hooks, and deployment.",
+}
+
+export const geo = {
+    pageType: "TechArticle",
+    datePublished: "2026-05-01T00:00:00Z",
+    dateModified: "2026-05-10T00:00:00Z",
+    author: "Nguyen.go Team",
+    breadcrumbs: [
+        { name: "Home", url: "/" },
+        { name: "Docs", url: "/docs" },
+    ],
+}
+---
+<!-- ============================================
+     HEADER
+     ============================================ -->
+<section class="relative">
+    <div class="hero-glow" style="opacity:0.5"></div>
+    <div class="max-w-6xl mx-auto px-6 pt-24 pb-12 relative">
+        <div class="flex items-center gap-2 text-[13px] text-muted mb-6">
+            <nguyen-link href="/" class="hover:text-white transition-colors">Home</nguyen-link>
+            <svg width="10" height="10" viewBox="0 0 16 16" fill="none" class="opacity-50"><path d="M6 3L11 8L6 13" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+            <span class="text-muted-stronger">Docs</span>
+        </div>
+
+        <p class="text-[13px] text-blue font-mono uppercase tracking-widest mb-4">Documentation</p>
+        <h1 class="heading-lg text-white mb-4" style="font-size:clamp(2.25rem,5vw,3.5rem)">
+            Build with Nguyen.go.
+        </h1>
+        <p class="text-[17px] text-muted max-w-2xl leading-relaxed">
+            Everything you need to go from zero to production — installation, concepts, APIs, and recipes.
+        </p>
+    </div>
+</section>
+
+<!-- ============================================
+     QUICK START GRID
+     ============================================ -->
+<section class="max-w-6xl mx-auto px-6 pb-16">
+    <div class="mb-8">
+        <p class="text-[13px] text-blue font-mono uppercase tracking-widest mb-3">Get Started</p>
+        <h2 class="text-[28px] font-semibold tracking-tight text-white">Quick start guides.</h2>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <nguyen-link href="/docs/installation" class="card card-blue-hover block p-7">
+            <div class="feat-icon mb-5">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>
+            </div>
+            <h3 class="heading-md text-white mb-2">Installation</h3>
+            <p class="text-[14px] text-muted leading-relaxed mb-4">Install the CLI via <code class="text-blue font-mono text-[13px]">go install</code>. Create a new project in seconds.</p>
+            <span class="text-[13px] text-blue font-medium flex items-center gap-1">
+                Get started
+                <svg width="12" height="12" viewBox="0 0 16 16" fill="none"><path d="M6 3L11 8L6 13" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+            </span>
+        </nguyen-link>
+
+        <nguyen-link href="/docs/routing" class="card card-blue-hover block p-7">
+            <div class="feat-icon mb-5">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><polyline points="14 2 14 8 20 8"/><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/></svg>
+            </div>
+            <h3 class="heading-md text-white mb-2">Routing</h3>
+            <p class="text-[14px] text-muted leading-relaxed mb-4">File-based routes, dynamic segments, catch-alls, and nested layouts.</p>
+            <span class="text-[13px] text-blue font-medium flex items-center gap-1">
+                Learn routing
+                <svg width="12" height="12" viewBox="0 0 16 16" fill="none"><path d="M6 3L11 8L6 13" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+            </span>
+        </nguyen-link>
+
+        <nguyen-link href="/docs/rendering" class="card card-blue-hover block p-7">
+            <div class="feat-icon mb-5">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+            </div>
+            <h3 class="heading-md text-white mb-2">Rendering</h3>
+            <p class="text-[14px] text-muted leading-relaxed mb-4">SSR, SSG, ISR, and CSR. Mix and match per page.</p>
+            <span class="text-[13px] text-blue font-medium flex items-center gap-1">
+                Rendering modes
+                <svg width="12" height="12" viewBox="0 0 16 16" fill="none"><path d="M6 3L11 8L6 13" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+            </span>
+        </nguyen-link>
+    </div>
+</section>
+
+<!-- ============================================
+     INSTALL COMMAND
+     ============================================ -->
+<section class="max-w-6xl mx-auto px-6 pb-16">
+    <div class="mb-6">
+        <p class="text-[13px] text-blue font-mono uppercase tracking-widest mb-3">Install in 30 seconds</p>
+        <h2 class="text-[28px] font-semibold tracking-tight text-white">Two commands, zero boilerplate.</h2>
+    </div>
+
+    <div class="space-y-3 max-w-2xl">
+        <div class="cmd-block">
+            <span class="cmd-prompt">$</span>
+            <span class="cmd-text">go install github.com/dev2k6/Nguyen.go@latest</span>
+        </div>
+        <div class="cmd-block">
+            <span class="cmd-prompt">$</span>
+            <span class="cmd-text">nguyen create my-app && cd my-app && nguyen dev</span>
+        </div>
+    </div>
+
+    <p class="text-[14px] text-muted mt-5 leading-relaxed max-w-2xl">
+        That's the whole setup. No <code class="text-blue font-mono text-[13px]">npm install</code>, no <code class="text-blue font-mono text-[13px]">node_modules/</code>, no lockfile surprises.
+    </p>
+</section>
+
+<!-- ============================================
+     SIDEBAR + CONTENT LAYOUT
+     ============================================ -->
+<section class="max-w-6xl mx-auto px-6 py-16 border-t border-[var(--color-border)]">
+    <div class="grid grid-cols-1 md:grid-cols-[220px_1fr] gap-12">
+
+        <!-- Sidebar -->
+        <aside>
+            <div class="sticky top-20">
+                <nav class="card" style="padding:1.1rem 1rem;border-color:var(--color-border)">
+                    <div class="pb-4 mb-4" style="border-bottom:1px solid var(--color-border)">
+                        <h4 class="text-[11px] font-medium text-muted-stronger uppercase tracking-widest mb-3">Getting started</h4>
+                        <ul class="space-y-1.5 text-[13px]" style="list-style:none;margin:0;padding:0">
+                            <li><a href="/docs/installation" class="block text-muted hover:text-white transition-colors" style="padding:0.35rem 0.55rem;border-radius:0.5rem">Installation</a></li>
+                            <li><a href="/docs/project-structure" class="block text-muted hover:text-white transition-colors" style="padding:0.35rem 0.55rem;border-radius:0.5rem">Project structure</a></li>
+                            <li><a href="/docs/first-page" class="block text-muted hover:text-white transition-colors" style="padding:0.35rem 0.55rem;border-radius:0.5rem">Your first page</a></li>
+                            <li><a href="/docs/cli" class="block text-muted hover:text-white transition-colors" style="padding:0.35rem 0.55rem;border-radius:0.5rem">CLI reference</a></li>
+                        </ul>
+                    </div>
+                    <div class="pb-4 mb-4" style="border-bottom:1px solid var(--color-border)">
+                        <h4 class="text-[11px] font-medium text-muted-stronger uppercase tracking-widest mb-3">Core concepts</h4>
+                        <ul class="space-y-1.5 text-[13px]" style="list-style:none;margin:0;padding:0">
+                            <li><a href="#routing" class="block text-blue font-medium" style="padding:0.35rem 0.55rem;border-radius:0.5rem;background:rgba(0,112,243,0.08);border:1px solid rgba(0,112,243,0.22)">Routing</a></li>
+                            <li><a href="/docs/rendering" class="block text-muted hover:text-white transition-colors" style="padding:0.35rem 0.55rem;border-radius:0.5rem">Rendering</a></li>
+                            <li><a href="/docs/hooks" class="block text-muted hover:text-white transition-colors" style="padding:0.35rem 0.55rem;border-radius:0.5rem">Hooks</a></li>
+                            <li><a href="/docs/islands" class="block text-muted hover:text-white transition-colors" style="padding:0.35rem 0.55rem;border-radius:0.5rem">Islands</a></li>
+                            <li><a href="/docs/state" class="block text-muted hover:text-white transition-colors" style="padding:0.35rem 0.55rem;border-radius:0.5rem">State management</a></li>
+                        </ul>
+                    </div>
+                    <div class="pt-0.5">
+                        <h4 class="text-[11px] font-medium text-muted-stronger uppercase tracking-widest mb-3">Advanced</h4>
+                        <ul class="space-y-1.5 text-[13px]" style="list-style:none;margin:0;padding:0">
+                            <li><a href="/docs/api-routes" class="block text-muted hover:text-white transition-colors" style="padding:0.35rem 0.55rem;border-radius:0.5rem">API routes</a></li>
+                            <li><a href="/docs/middleware" class="block text-muted hover:text-white transition-colors" style="padding:0.35rem 0.55rem;border-radius:0.5rem">Middleware</a></li>
+                            <li><a href="/docs/deployment" class="block text-muted hover:text-white transition-colors" style="padding:0.35rem 0.55rem;border-radius:0.5rem">Deployment</a></li>
+                        </ul>
+                    </div>
+                </nav>
+            </div>
+        </aside>
+
+        <!-- Content -->
+        <div class="min-w-0">
+            <div id="routing" class="mb-12">
+                <p class="text-[12px] text-muted font-mono uppercase tracking-widest mb-2">Core concepts</p>
+                <h2 class="text-[32px] font-semibold tracking-tight text-white mb-4">Routing</h2>
+                <p class="text-[16px] text-muted leading-[1.75] mb-6">
+                    Nguyen.go uses the filesystem as the source of truth for routes. Every file in
+                    <code class="text-blue font-mono text-[14px] px-1.5 py-0.5 rounded" style="background:var(--color-card);border:1px solid var(--color-border)">pages/</code>
+                    becomes a page — no configuration required.
+                </p>
+            </div>
+
+            <div class="mb-10">
+                <h3 class="text-[22px] font-semibold tracking-tight text-white mb-4">Static routes</h3>
+                <p class="text-[16px] text-muted leading-[1.75] mb-5">
+                    Drop a file in <code class="text-blue font-mono text-[14px]">pages/</code> and it becomes a URL.
+                </p>
+
+                <div class="terminal mb-5">
+                    <div class="terminal-bar">
+                        <span class="terminal-dot"></span>
+                        <span class="terminal-dot"></span>
+                        <span class="terminal-dot"></span>
+                        <span class="ml-3 text-[12px] font-mono text-muted">file tree</span>
+                    </div>
+                    <pre class="terminal-body text-[#c9d1d9]"><span style="color:#79c0ff">pages/</span>
+├── <span style="color:#7ee787">index.nguyen</span>        <span style="color:#6e7681"># /</span>
+├── <span style="color:#7ee787">about.nguyen</span>        <span style="color:#6e7681"># /about</span>
+├── <span style="color:#79c0ff">blog/</span>
+│   ├── <span style="color:#7ee787">index.nguyen</span>    <span style="color:#6e7681"># /blog</span>
+│   └── <span style="color:#7ee787">[slug].nguyen</span>   <span style="color:#6e7681"># /blog/:slug</span>
+└── <span style="color:#7ee787">404.nguyen</span>          <span style="color:#6e7681"># catch-all</span></pre>
+                </div>
+            </div>
+
+            <div class="mb-10">
+                <h3 class="text-[22px] font-semibold tracking-tight text-white mb-4">Dynamic segments</h3>
+                <p class="text-[16px] text-muted leading-[1.75] mb-5">
+                    Wrap a segment in square brackets to make it dynamic.
+                </p>
+
+                <div class="card overflow-hidden mb-5">
+                    <table class="cmp-table">
+                        <thead>
+                            <tr>
+                                <th class="!text-left">Pattern</th>
+                                <th class="!text-left">Matches</th>
+                                <th class="!text-left">Example</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td class="font-mono text-blue text-[13px]">pages/blog/[slug].nguyen</td>
+                                <td class="text-muted-stronger">/blog/:slug</td>
+                                <td class="text-muted font-mono text-[13px]">/blog/hello</td>
+                            </tr>
+                            <tr>
+                                <td class="font-mono text-blue text-[13px]">pages/[...path].nguyen</td>
+                                <td class="text-muted-stronger">catch-all</td>
+                                <td class="text-muted font-mono text-[13px]">/a/b/c</td>
+                            </tr>
+                            <tr>
+                                <td class="font-mono text-blue text-[13px]">pages/[[...lang]].nguyen</td>
+                                <td class="text-muted-stronger">optional catch-all</td>
+                                <td class="text-muted font-mono text-[13px]">/ · /en/about</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="mb-10">
+                <h3 class="text-[22px] font-semibold tracking-tight text-white mb-4">Accessing params</h3>
+                <p class="text-[16px] text-muted leading-[1.75] mb-5">
+                    Route parameters are exposed via <code class="text-blue font-mono text-[14px]">UseGlobalState</code> and typed at the point of use.
+                </p>
+
+                <div class="terminal mb-5">
+                    <div class="terminal-bar">
+                        <span class="terminal-dot"></span>
+                        <span class="terminal-dot"></span>
+                        <span class="terminal-dot"></span>
+                        <span class="ml-3 text-[12px] font-mono text-muted">pages/blog/[slug].nguyen</span>
+                    </div>
+                    <pre class="terminal-body text-[#c9d1d9]"><span style="color:#6e7681">---</span>
+<span style="color:#ff7b72">import</span> <span style="color:#a5d6ff">"nguyen.go/pkg/core"</span>
+
+<span style="color:#79c0ff">slug</span> := core.<span style="color:#d2a8ff">UseGlobalState</span>(<span style="color:#a5d6ff">"slug"</span>, <span style="color:#a5d6ff">""</span>)
+<span style="color:#79c0ff">post</span> := <span style="color:#d2a8ff">loadPost</span>(<span style="color:#79c0ff">slug</span>.(<span style="color:#ff7b72">string</span>))
+<span style="color:#6e7681">---</span>
+&lt;<span style="color:#7ee787">h1</span>&gt;{<span style="color:#79c0ff">post</span>.<span style="color:#79c0ff">title</span>}&lt;/<span style="color:#7ee787">h1</span>&gt;</pre>
+                </div>
+            </div>
+
+            <!-- Callouts: Info + Warning -->
+            <div class="card p-7 mb-8" style="background:rgba(0,112,243,0.04);border-color:rgba(0,112,243,0.25)">
+                <div class="flex items-start gap-4">
+                    <div class="feat-icon shrink-0" style="width:2rem;height:2rem;background:rgba(0,112,243,0.15);border-color:rgba(0,112,243,0.3)">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#60a5fa" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+                    </div>
+                    <div>
+                        <h4 class="text-[14px] font-medium text-white mb-2">Pro tip</h4>
+                        <p class="text-[14px] text-muted leading-relaxed">Static segments always win over dynamic ones during routing. <code class="text-blue font-mono text-[12px]">/blog/featured</code> matches before <code class="text-blue font-mono text-[12px]">/blog/:slug</code>.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Previous / Next -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-16">
+                <nguyen-link href="/docs/installation" class="card card-blue-hover block">
+                    <div style="padding:1rem 1.25rem;">
+                        <div class="text-[12px] text-muted mb-2 flex items-center gap-1">
+                            <svg width="12" height="12" viewBox="0 0 16 16" fill="none"><path d="M10 3L5 8L10 13" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+                            Previous
+                        </div>
+                        <div class="text-[15px] font-medium text-white">Installation</div>
+                    </div>
+                </nguyen-link>
+                <nguyen-link href="/docs/rendering" class="card card-blue-hover block">
+                    <div class="text-right" style="padding:1rem 1.25rem;">
+                        <div class="text-[12px] text-muted mb-2 flex items-center gap-1 justify-end">
+                            Next
+                            <svg width="12" height="12" viewBox="0 0 16 16" fill="none"><path d="M6 3L11 8L6 13" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+                        </div>
+                        <div class="text-[15px] font-medium text-white">Rendering modes</div>
+                    </div>
+                </nguyen-link>
+            </div>
+        </div>
+    </div>
+</section>

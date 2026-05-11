@@ -1,0 +1,56 @@
+---
+layout = "app/layout"
+
+export const metadata = {
+    title: "404 — Page Not Found",
+    description: "The page you're looking for doesn't exist.",
+}
+
+export const geo = {
+    pageType: "WebPage",
+}
+---
+<section class="relative min-h-screen flex items-center justify-center px-6 py-20">
+    <div class="hero-glow"></div>
+    <div class="grid-lines absolute inset-0 pointer-events-none" style="opacity:0.4"></div>
+
+    <div class="relative text-center max-w-xl">
+        <div class="pill pill-blue mb-8 mx-auto">
+            <span class="pill-dot"></span>
+            <span>Error 404</span>
+        </div>
+
+        <h1 class="heading-hero mb-6">
+            <span class="gradient-blue">404</span>
+        </h1>
+
+        <h2 class="heading-lg text-white mb-4">Page not found</h2>
+
+        <p class="text-[16px] text-muted max-w-md mx-auto mb-10 leading-relaxed">
+            The page you're looking for doesn't exist or has been moved.
+            Check the URL or navigate back to somewhere familiar.
+        </p>
+
+        <div class="flex items-center justify-center gap-3 flex-wrap mb-10">
+            <nguyen-link href="/" class="btn btn-lg btn-blue">
+                <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M10 3L5 8L10 13" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                Back to Home
+            </nguyen-link>
+            <nguyen-link href="/docs" class="btn btn-lg btn-secondary">
+                View Documentation
+            </nguyen-link>
+        </div>
+
+        <div class="divider mb-8"></div>
+
+        <div class="flex items-center justify-center gap-6 text-[13px] text-muted flex-wrap">
+            <a href="/docs" class="hover:text-white transition-colors">Docs</a>
+            <span class="w-1 h-1 rounded-full" style="background:var(--color-border)"></span>
+            <a href="/blog" class="hover:text-white transition-colors">Blog</a>
+            <span class="w-1 h-1 rounded-full" style="background:var(--color-border)"></span>
+            <a href="/examples" class="hover:text-white transition-colors">Examples</a>
+            <span class="w-1 h-1 rounded-full" style="background:var(--color-border)"></span>
+            <a href="https://github.com/dev2k6/Nguyen.go" class="hover:text-white transition-colors">GitHub</a>
+        </div>
+    </div>
+</section>

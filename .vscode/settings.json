@@ -1,0 +1,21 @@
+{
+  "files.associations": {
+    "*.nguyen": "go"
+  },
+  "emmet.includeLanguages": {
+    "go": "html"
+  },
+  "go.toolsManagement.autoUpdate": false,
+  "gopls": {
+    "formatting.gofumpt": false,
+    "build.experimentalWorkspaceModule": true,
+    "build.buildFlags": ["-tags=js,wasm"],
+    "build.env": {
+      "GOOS": "js",
+      "GOARCH": "wasm"
+    }
+  },
+  "[go]": {
+    "editor.formatOnSave": true
+  }
+}
