@@ -69,7 +69,7 @@ go install github.com/dev2k6/Nguyen.go@latest
 Or build from source:
 
 ```bash
-git clone https://github.com/dev2k6/Nguyen.go.go.git
+git clone https://github.com/dev2k6/Nguyen.go.git
 cd nguyen.go
 go build -o nguyen ./cmd/nguyen/
 ```
