@@ -48,7 +48,7 @@ func init() {
 	createCmd.Flags().BoolVar(&flagCreateTailwind, "tailwind", false, "Set up Tailwind CSS via standalone CLI (no npm required)")
 }
 
-const tailwindVersion = "v4.1.11"
+const tailwindVersion = "latest"
 
 func runCreate(projectName string) {
 	green := "\033[32m"
@@ -99,7 +99,7 @@ func runCreate(projectName string) {
 			flagCreateTailwind = false
 		}
 		if tailwindBin != "" {
-			fmt.Printf("  %s✓%s Tailwind CLI %s (%s/%s)\n", green, reset, tailwindVersion, runtime.GOOS, runtime.GOARCH)
+			fmt.Printf("  %s✓%s Tailwind CLI %s (%s/%s)\n", green, reset, "latest", runtime.GOOS, runtime.GOARCH)
 			fmt.Println()
 		}
 	}
@@ -254,7 +254,6 @@ func downloadTailwind(targetDir string) (string, error) {
 
 	// Try multiple URLs (latest and versioned)
 	urls := []string{
-		fmt.Sprintf("https://github.com/tailwindlabs/tailwindcss/releases/download/%s/%s", tailwindVersion, filename),
 		fmt.Sprintf("https://github.com/tailwindlabs/tailwindcss/releases/latest/download/%s", filename),
 	}
 

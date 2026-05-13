@@ -5,6 +5,7 @@ import (
 	"os"
 	"path/filepath"
 
+	"github.com/dev2k6/Nguyen.go/internal/version"
 	"github.com/spf13/cobra"
 )
 
@@ -17,7 +18,7 @@ WebAssembly (TinyGo) for client-side rendering. Supports .nguyen syntax
 with advanced rendering features (SSR, ISR, CSR).
 
 Author: Thái Nguyên <thainguyen.junior@gmail.com>`, asciiArt()),
-	Version: "1.0.0",
+	Version: version.Version,
 }
 
 var flagRoot string

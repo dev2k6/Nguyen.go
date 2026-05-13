@@ -4,9 +4,12 @@ import (
 	"crypto/sha256"
 	"fmt"
 	"regexp"
+	"strings"
 )
 
 var scopedStyleRx = regexp.MustCompile(`<style\s+scoped\s*>([\s\S]*?)</style>`)
+var classAttrRx = regexp.MustCompile(`class="([^"]+)"`)
+var classSelectorRx = regexp.MustCompile(`\.([a-zA-Z_][\w-]*)`)
 
 // ScopedCSS holds the result of processing scoped CSS
 type ScopedCSS struct {
@@ -46,34 +49,50 @@ func ProcessScopedCSS(filepath string, html string) (string, map[string]*ScopedC
 	// Apply hashed class names to HTML elements
 	for _, scoped := range results {
 		for original, hashed := range scoped.Map {
-			// Replace class="original" → class="original hashed"
-			classRx := regexp.MustCompile(`class="` + regexp.QuoteMeta(original) + `"`)
-			result = classRx.ReplaceAllString(result,
-				fmt.Sprintf(`class="%s %s"`, original, hashed))
+			result = replaceClassAttr(result, original, hashed)
 		}
 	}
 
 	return result, results
 }
 
+func replaceClassAttr(html, original, hashed string) string {
+	return classAttrRx.ReplaceAllStringFunc(html, func(match string) string {
+		sub := classAttrRx.FindStringSubmatch(match)
+		if len(sub) < 2 {
+			return match
+		}
+		classes := sub[1]
+		if classes == original || containsClass(classes, original) {
+			return fmt.Sprintf(`class="%s %s"`, classes, hashed)
+		}
+		return match
+	})
+}
+
+func containsClass(classes, target string) bool {
+	for _, c := range strings.Split(classes, " ") {
+		if c == target {
+			return true
+		}
+	}
+	return false
+}
+
 // scopeCSS rewrites CSS selectors to include a data-v-{hash} scope constraint.
 func scopeCSS(css string, hash string, classMap map[string]string) string {
-	// Match class selectors: .classname
-	classRx := regexp.MustCompile(`\.([a-zA-Z_][\w-]*)`)
-
 	seen := make(map[string]bool)
 
-	result := classRx.ReplaceAllStringFunc(css, func(match string) string {
+	result := classSelectorRx.ReplaceAllStringFunc(css, func(match string) string {
 		name := match[1:] // strip leading .
 		if seen[name] {
-			return match
+			return "." + classMap[name]
 		}
 		seen[name] = true
 
 		hashed := name + "-" + hash
 		classMap[name] = hashed
 
-		// Append data-v constraint to the selector
 		return fmt.Sprintf(".%s", hashed)
 	})
 

@@ -4,6 +4,7 @@ import (
 	"encoding/binary"
 	"encoding/json"
 	"path/filepath"
+	"strconv"
 	"strings"
 
 	"github.com/dev2k6/Nguyen.go/internal/parser"
@@ -148,17 +149,7 @@ func EncodePartialFrame(pr *PartialResult) ([]byte, error) {
 	return frame, nil
 }
 
-// Itoa converts an int to string without importing strconv.
+// Itoa converts an int to string.
 func Itoa(n int) string {
-	if n == 0 {
-		return "0"
-	}
-	var buf [20]byte
-	i := len(buf)
-	for n > 0 {
-		i--
-		buf[i] = byte('0' + n%10)
-		n /= 10
-	}
-	return string(buf[i:])
+	return strconv.Itoa(n)
 }

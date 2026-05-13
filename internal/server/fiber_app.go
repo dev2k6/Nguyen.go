@@ -123,7 +123,7 @@ func New(opts Options) (*App, error) {
 	app.Use(compress.New(compress.Config{Level: compress.LevelBestSpeed}))
 	app.Use(etag.New())
 	app.Use(limiter.New(limiter.Config{
-		Max:          100,
+		Max:          600,
 		Expiration:   1 * time.Minute,
 		KeyGenerator: func(c *fiber.Ctx) string { return c.IP() },
 		LimitReached: func(c *fiber.Ctx) error {

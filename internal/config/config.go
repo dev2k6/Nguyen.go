@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/dev2k6/Nguyen.go/internal/version"
 	"gopkg.in/yaml.v3"
 )
 
@@ -143,7 +144,7 @@ type PWAIcon struct {
 func DefaultConfig() *NguyenConfig {
 	return &NguyenConfig{
 		Name:    "nguyen-app",
-		Version: "1.0.0",
+		Version: version.Version,
 		Server: ServerConfig{
 			Host:          "localhost",
 			Port:          3000,
