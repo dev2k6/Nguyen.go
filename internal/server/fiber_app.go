@@ -166,13 +166,16 @@ func New(opts Options) (*App, error) {
 	}, nil
 }
 
-// MountNavigateEndpoint registers the /_nguyen/navigate endpoint for SPA navigation.
+// MountNavigateEndpoint registers the /_nguyen/navigate endpoint for SPA navigation
+// and the /_nguyen/prefetch batch endpoint for concurrent multi-route prefetching.
 func (a *App) MountNavigateEndpoint(layouts []router.LayoutInfo) {
-	a.Fiber.Get("/_nguyen/navigate", NavigateHandler(NavigateHandlerConfig{
+	cfg := NavigateHandlerConfig{
 		Routes:  a.Routes,
 		Layouts: layouts,
 		Version: a.Config.Version,
-	}))
+	}
+	a.Fiber.Get("/_nguyen/navigate", NavigateHandler(cfg))
+	a.Fiber.Post("/_nguyen/prefetch", BatchNavigateHandler(cfg))
 }
 
 // MountRoutes registers all file-system discovered routes on the Fiber app.

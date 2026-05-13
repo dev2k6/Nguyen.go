@@ -1,6 +1,6 @@
 // nguyen_bridge.js - Nguyen.go browser bridge
 // Purpose: Load WASM, bootstrap app, HMR via SSE, prefetch observer, image enhancement
-// Target size: < 8KB
+// SPA engine: DOM morphing, batch prefetch, idle-time scheduling
 
 (function () {
     'use strict';
@@ -192,7 +192,6 @@
 
             __nguyenLoadedChunks[chunkName] = true;
             __nguyenChunkCache[chunkName] = instance.exports;
-            console.log('[Nguyen.go] Loaded chunk:', chunkName);
             return instance.exports;
         } catch (e) {
             console.error('[Nguyen.go] Failed to load chunk:', chunkName, e);
@@ -249,15 +248,12 @@
     // ========== Bootstrap ==========
 
     async function bootstrap() {
-        // Check if SSR already rendered the page with hydration markers
         var hasSSRContent = !!document.querySelector('[data-nguyen-hydrate]') ||
                             !!document.querySelector('[data-nguyen-click]') ||
                             !!document.querySelector('[data-nguyen-text]');
 
         if (hasSSRContent) {
-            // SSR mode: page already rendered, just set up event delegation
             setupSSREventDelegation();
-            console.log('[Nguyen.go] SSR hydration active');
             return;
         }
 
@@ -275,22 +271,17 @@
             var caps = await fetchCapabilities();
 
             if (caps.chunkMode) {
-                // Per-route chunk mode: manifest → shared → current route
                 var manifest = await loadManifest();
                 if (manifest) {
                     await loadSharedWasm();
                     var currentPath = normalizeRoutePath(window.location.pathname || '/');
                     await window.__nguyenLoadRoute(currentPath || '/');
                 } else {
-                    // Manifest missing despite chunkMode — fall back to single wasm
                     await loadSingleWasm();
                 }
             } else {
-                // Single app.wasm mode (dev or build without per-route)
                 await loadSingleWasm();
             }
-
-            console.log('[Nguyen.go] Started successfully');
         } catch (err) {
             console.error('[Nguyen.go] Init failed:', err);
             root.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;height:100vh;font-family:system-ui,sans-serif;">'
@@ -299,9 +290,6 @@
         }
     }
 
-    // SSR event delegation: handles data-nguyen-{event}={handlerName} attributes
-    // without requiring WASM. Used when the server rendered the page with SSR.
-    // Checks both window.__nguyenHandlers and inline _handlerFns registry.
     function setupSSREventDelegation() {
         var evTypes = ['click', 'input', 'change', 'submit', 'keydown', 'keyup'];
         evTypes.forEach(function(evType) {
@@ -311,16 +299,14 @@
                 if (!el) return;
                 var handlerName = el.getAttribute(attr);
                 if (!handlerName) return;
-                // Try window.__nguyenHandlers (WASM style)
                 if (window.__nguyenHandlers && window.__nguyenHandlers[handlerName]) {
                     e.preventDefault();
                     window.__nguyenHandlers[handlerName](e);
                     return;
                 }
-                // Try _handlerFns pattern: handlerName_eventType (SSR hydration style)
-                var fn = _handlerFns ? _handlerFns[handlerName] : null;
+                var fn = window._handlerFns ? window._handlerFns[handlerName] : null;
                 if (!fn) {
-                    fn = _handlerFns ? _handlerFns[handlerName + '_' + evType] : null;
+                    fn = window._handlerFns ? window._handlerFns[handlerName + '_' + evType] : null;
                 }
                 if (fn) {
                     e.preventDefault();
@@ -344,12 +330,15 @@
         go.run(instance);
     }
 
-    // ========== SPA Navigation ==========
+    // ========== SPA Navigation Engine ==========
+    // Optimized for Go backend: binary frame protocol, batch prefetch,
+    // DOM morphing for minimal reflow, idle-time scheduling.
 
     var __nguyenPartialCache = Object.create(null);
     var __nguyenPartialCacheKeys = [];
-    var __nguyenPartialCacheMax = 20;
+    var __nguyenPartialCacheMax = 50;
     var __nguyenNavigating = false;
+    var __nguyenNavAbort = null;
 
     function cachePartial(path, data) {
         if (__nguyenPartialCacheKeys.length >= __nguyenPartialCacheMax) {
@@ -372,14 +361,43 @@
         return { meta: meta, html: html };
     }
 
-    async function fetchPartial(path) {
+    async function fetchPartial(path, signal) {
         if (__nguyenPartialCache[path]) return __nguyenPartialCache[path];
         var from = window.location.pathname;
-        var resp = await fetch('/_nguyen/navigate?path=' + encodeURIComponent(path) + '&from=' + encodeURIComponent(from));
+        var opts = {};
+        if (signal) opts.signal = signal;
+        var resp = await fetch('/_nguyen/navigate?path=' + encodeURIComponent(path) + '&from=' + encodeURIComponent(from), opts);
         if (!resp.ok) return null;
         var data = await parsePartialResponse(resp);
         if (data) cachePartial(path, data);
         return data;
+    }
+
+    // Batch prefetch: send multiple paths to Go backend for concurrent rendering
+    async function batchPrefetch(paths) {
+        var uncached = paths.filter(function(p) {
+            var n = normalizeRoutePath(p);
+            return n && !__nguyenPartialCache[n];
+        }).map(normalizeRoutePath).filter(Boolean);
+
+        if (uncached.length === 0) return;
+
+        try {
+            var resp = await fetch('/_nguyen/prefetch', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ paths: uncached, from: window.location.pathname })
+            });
+            if (!resp.ok) return;
+            var data = await resp.json();
+            if (data.results) {
+                data.results.forEach(function(r) {
+                    if (r.path && r.html) {
+                        cachePartial(r.path, { meta: { title: r.title, outlet: r.outlet }, html: r.html });
+                    }
+                });
+            }
+        } catch (e) {}
     }
 
     function findOutlet(depth) {
@@ -388,16 +406,115 @@
         return document.getElementById('app');
     }
 
+    // DOM morphing: update only changed parts instead of full innerHTML replacement.
+    // Preserves focus, scroll position, and form state.
+    function morphDOM(outlet, newHTML) {
+        var temp = document.createElement('div');
+        temp.innerHTML = newHTML;
+
+        // Fast path: if outlet has no children or structure differs significantly, replace
+        if (!outlet.firstElementChild || !temp.firstElementChild) {
+            outlet.innerHTML = newHTML;
+            return;
+        }
+
+        var oldNodes = Array.from(outlet.childNodes);
+        var newNodes = Array.from(temp.childNodes);
+
+        // If top-level node count differs significantly, just swap
+        if (Math.abs(oldNodes.length - newNodes.length) > 5) {
+            outlet.innerHTML = newHTML;
+            return;
+        }
+
+        // Morph each top-level node
+        var maxLen = Math.max(oldNodes.length, newNodes.length);
+        for (var i = 0; i < maxLen; i++) {
+            var oldNode = oldNodes[i];
+            var newNode = newNodes[i];
+
+            if (!newNode) {
+                if (oldNode) outlet.removeChild(oldNode);
+                continue;
+            }
+
+            if (!oldNode) {
+                outlet.appendChild(newNode.cloneNode(true));
+                continue;
+            }
+
+            // Different node types or tags — replace
+            if (oldNode.nodeType !== newNode.nodeType ||
+                (oldNode.nodeType === 1 && oldNode.tagName !== newNode.tagName)) {
+                outlet.replaceChild(newNode.cloneNode(true), oldNode);
+                continue;
+            }
+
+            // Text nodes
+            if (oldNode.nodeType === 3) {
+                if (oldNode.textContent !== newNode.textContent) {
+                    oldNode.textContent = newNode.textContent;
+                }
+                continue;
+            }
+
+            // Element nodes — update attributes and recurse
+            if (oldNode.nodeType === 1) {
+                updateAttributes(oldNode, newNode);
+                // Skip morphing for active input/textarea to preserve user state
+                if (oldNode === document.activeElement &&
+                    (oldNode.tagName === 'INPUT' || oldNode.tagName === 'TEXTAREA')) {
+                    continue;
+                }
+                morphDOM(oldNode, newNode.innerHTML);
+            }
+        }
+    }
+
+    function updateAttributes(oldEl, newEl) {
+        // Remove old attributes not in new
+        var oldAttrs = oldEl.attributes;
+        for (var i = oldAttrs.length - 1; i >= 0; i--) {
+            var name = oldAttrs[i].name;
+            if (!newEl.hasAttribute(name)) {
+                oldEl.removeAttribute(name);
+            }
+        }
+        // Set new/changed attributes
+        var newAttrs = newEl.attributes;
+        for (var j = 0; j < newAttrs.length; j++) {
+            var attr = newAttrs[j];
+            if (oldEl.getAttribute(attr.name) !== attr.value) {
+                oldEl.setAttribute(attr.name, attr.value);
+            }
+        }
+    }
+
     function performSwap(data) {
         var outlet = findOutlet(data.meta.outlet);
-        outlet.innerHTML = data.html;
+
+        // Use DOM morphing for minimal reflow
+        morphDOM(outlet, data.html);
 
         if (data.meta.title) {
             document.title = data.meta.title;
         }
 
-        // Re-run hydration for new content
-        setupSSREventDelegation();
+        // Update meta description if present
+        if (data.meta.desc) {
+            var descMeta = document.querySelector('meta[name="description"]');
+            if (descMeta) descMeta.setAttribute('content', data.meta.desc);
+        }
+
+        // Re-hydrate state spans
+        if (data.meta.state) {
+            Object.keys(data.meta.state).forEach(function(key) {
+                var spans = document.querySelectorAll('[data-nguyen-text="' + key + '"]');
+                spans.forEach(function(span) { span.textContent = data.meta.state[key]; });
+                if (window.__nguyenState) window.__nguyenState[key] = data.meta.state[key];
+            });
+        }
+
         enhanceImages();
 
         // Load WASM chunk if in chunk mode
@@ -409,25 +526,36 @@
         window.dispatchEvent(new CustomEvent('nguyen:navigate', {
             detail: { path: window.location.pathname, meta: data.meta }
         }));
+
+        // Scroll to top on navigation
+        window.scrollTo(0, 0);
     }
 
     async function performNavigation(path) {
-        if (__nguyenNavigating) return;
+        if (__nguyenNavigating) {
+            // Abort previous in-flight navigation
+            if (__nguyenNavAbort) {
+                __nguyenNavAbort.abort();
+            }
+        }
         __nguyenNavigating = true;
+        __nguyenNavAbort = new AbortController();
         document.documentElement.classList.add('nguyen-navigating');
 
         try {
-            var data = await fetchPartial(path);
+            var data = await fetchPartial(path, __nguyenNavAbort.signal);
             if (!data) {
                 window.location.href = path;
                 return;
             }
-            history.pushState({}, '', path);
+            history.pushState({ path: path }, '', path);
             performSwap(data);
         } catch (e) {
+            if (e.name === 'AbortError') return;
             window.location.href = path;
         } finally {
             __nguyenNavigating = false;
+            __nguyenNavAbort = null;
             document.documentElement.classList.remove('nguyen-navigating');
         }
     }
@@ -465,50 +593,92 @@
     // Popstate — handle browser back/forward
     window.addEventListener('popstate', function () {
         var path = window.location.pathname;
-        // Clear cache entry to get fresh from-context
         delete __nguyenPartialCache[path];
         performNavigation(path);
     });
 
-    // Prefetch partial HTML on hover (extends existing WASM prefetch)
-    function prefetchPartial(path) {
-        var normalized = normalizeRoutePath(path);
-        if (!normalized || __nguyenPartialCache[normalized]) return;
-        fetchPartial(normalized).catch(function () {});
-    }
-
     // Expose navigateTo globally for programmatic use
     window.__nguyenNavigate = navigateTo;
 
-    // ========== Prefetch Observer ==========
+    // ========== Intelligent Prefetch System ==========
+    // Uses requestIdleCallback for non-blocking prefetch scheduling.
+    // Collects visible links and batch-prefetches them via Go's concurrent endpoint.
+
+    var __nguyenPrefetchQueue = [];
+    var __nguyenPrefetchScheduled = false;
+
+    function schedulePrefetch(path) {
+        var normalized = normalizeRoutePath(path);
+        if (!normalized || __nguyenPartialCache[normalized]) return;
+        if (__nguyenPrefetchQueue.indexOf(normalized) !== -1) return;
+        __nguyenPrefetchQueue.push(normalized);
+
+        if (!__nguyenPrefetchScheduled) {
+            __nguyenPrefetchScheduled = true;
+            var schedule = window.requestIdleCallback || function(cb) { setTimeout(cb, 50); };
+            schedule(flushPrefetchQueue, { timeout: 3000 });
+        }
+    }
+
+    function flushPrefetchQueue() {
+        __nguyenPrefetchScheduled = false;
+        if (__nguyenPrefetchQueue.length === 0) return;
+
+        var batch = __nguyenPrefetchQueue.splice(0, 10);
+        batchPrefetch(batch);
+
+        // Also prefetch WASM chunks
+        batch.forEach(function(p) { prefetchRoute(p); });
+    }
 
     function setupPrefetchObserver() {
+        // Hover prefetch — immediate single route
         document.addEventListener('mouseover', function (e) {
             var a = e.target.closest('a[href]');
             if (!a) return;
             var href = a.getAttribute('href');
             if (!href || href.startsWith('http') || href.startsWith('#')) return;
+            var normalized = normalizeRoutePath(href);
+            if (normalized && !__nguyenPartialCache[normalized]) {
+                fetchPartial(normalized).catch(function () {});
+            }
             prefetchRoute(href);
-            prefetchPartial(href);
         }, { passive: true });
 
+        // Viewport-based batch prefetch using IntersectionObserver
         if (typeof IntersectionObserver !== 'undefined') {
             var observer = new IntersectionObserver(function (entries) {
                 entries.forEach(function (entry) {
                     if (!entry.isIntersecting) return;
                     var href = entry.target.getAttribute('href');
-                    if (href) {
-                        prefetchRoute(href);
+                    if (href && !href.startsWith('http') && !href.startsWith('#')) {
+                        schedulePrefetch(href);
                     }
                     observer.unobserve(entry.target);
                 });
-            }, { rootMargin: '200px' });
+            }, { rootMargin: '300px' });
 
+            // Observe links after initial render settles
             setTimeout(function () {
                 document.querySelectorAll('a[href]').forEach(function (a) {
-                    observer.observe(a);
+                    var href = a.getAttribute('href');
+                    if (href && !href.startsWith('http') && !href.startsWith('#')) {
+                        observer.observe(a);
+                    }
                 });
-            }, 1200);
+            }, 800);
+
+            // Re-observe after SPA navigation
+            window.addEventListener('nguyen:navigate', function() {
+                setTimeout(function() {
+                    document.querySelectorAll('a[href]').forEach(function (a) {
+                        var href = a.getAttribute('href');
+                        if (href && !href.startsWith('http') && !href.startsWith('#')) {
+                            observer.observe(a);
+                        }
+                    });
+                }, 200);
+            });
         }
     }
 
@@ -519,12 +689,7 @@
 
         var sse = new EventSource('/_nguyen/hmr');
 
-        sse.onopen = function () {
-            console.log('[Nguyen.go HMR] Connected');
-        };
-
         sse.addEventListener('css-reload', function () {
-            console.log('[Nguyen.go HMR] CSS hot reload');
             var links = document.querySelectorAll('link[rel="stylesheet"]');
             links.forEach(function (link) {
                 var href = link.getAttribute('href');
@@ -535,12 +700,13 @@
         });
 
         sse.addEventListener('reload', function () {
-            console.log('[Nguyen.go HMR] Full reload');
+            // Clear SPA cache on reload
+            __nguyenPartialCache = Object.create(null);
+            __nguyenPartialCacheKeys = [];
             location.reload();
         });
 
         sse.onerror = function () {
-            console.log('[Nguyen.go HMR] Disconnected, reconnecting...');
             sse.close();
             setTimeout(connectHMR, 2000);
         };
@@ -559,13 +725,8 @@
                 .then(function(resp) { return resp.arrayBuffer(); })
                 .then(function(buffer) { return WebAssembly.compile(buffer); })
                 .then(function(mod) { return WebAssembly.instantiate(mod, go.importObject); })
-                .then(function(instance) {
-                    go.run(instance);
-                    console.log('[Nguyen.go] Island hydrated:', islandID);
-                })
-                .catch(function(err) {
-                    console.warn('[Nguyen.go] Island hydration failed:', islandID, err);
-                });
+                .then(function(instance) { go.run(instance); })
+                .catch(function() {});
         });
     }
 
