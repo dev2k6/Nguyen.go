@@ -17,7 +17,7 @@ import (
 var exportCmd = &cobra.Command{
 	Use:   "export",
 	Short: "Export all pages to static HTML for CDN deployment",
-	Long: `Pre-renders every .nguyen route into static HTML files.
+	Long: `Pre-renders every .gox route into static HTML files.
 The output is placed in .nguyen/static/ and can be served
 by any static file server or CDN with zero Go runtime.
 

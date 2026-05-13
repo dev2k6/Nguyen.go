@@ -24,7 +24,7 @@ var devCmd = &cobra.Command{
 	Use:   "dev",
 	Short: "Start the development server with Hot Module Replacement",
 	Long: `Starts the Go development server in dev mode.
-Watches .nguyen files for changes and automatically reloads
+Watches .gox files for changes and automatically reloads
 the browser via WebSocket for instant feedback.`,
 	Run: func(cmd *cobra.Command, args []string) {
 		runDev()
@@ -159,7 +159,7 @@ func runDev() {
 			}
 		}
 
-		// Parse .nguyen file
+		// Parse .gox file
 		ngFile, err := parser.Parse(route.FilePath)
 		if err != nil {
 			log.Printf("  ✕ Parse error for %s: %v\n", route.Pattern, err)

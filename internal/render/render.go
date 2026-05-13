@@ -40,7 +40,7 @@ var (
 	nguyenLinkEnd = regexp.MustCompile(`</nguyen-link>`)
 )
 
-// RenderSSR performs server-side rendering of a .nguyen file.
+// RenderSSR performs server-side rendering of a .gox file.
 // It processes the template, replaces {variable} interpolations with
 // computed state values, injects metadata into <head>, and returns
 // the complete HTML.
@@ -295,7 +295,7 @@ func composeLayout(f *parser.File, pageHTML string, layouts []router.LayoutInfo)
 }
 
 func composeWithLayoutRef(layoutRef string, f *parser.File, pageHTML string) string {
-	layoutRef += ".nguyen"
+	layoutRef += ".gox"
 	layoutFile, err := parser.Parse(layoutRef)
 	if err != nil {
 		pageDir := filepath.Dir(f.Path)

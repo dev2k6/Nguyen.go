@@ -16,7 +16,7 @@ type ComponentInfo struct {
 
 // safeGoExprRx matches a restricted expression grammar that is safe to paste
 // into generated Go source without enabling code-injection via crafted
-// .nguyen templates. Allowed: identifiers, dot access, indexing, simple
+// .gox templates. Allowed: identifiers, dot access, indexing, simple
 // comparisons, numeric/string literals, boolean operators, parentheses.
 // Rejected: statements, function bodies, semicolons, braces, backticks,
 // new keyword usage such as `go`/`defer`/`func`.
@@ -351,7 +351,7 @@ func collectEvents(node *htmlNode) []eventReg {
 }
 
 // parseHTML converts an HTML string into a tree of htmlNodes.
-// Uses a simple tokenizing approach suitable for .nguyen templates.
+// Uses a simple tokenizing approach suitable for .gox templates.
 func parseHTML(html string) *htmlNode {
 	tokens := tokenizeHTML(html)
 	if len(tokens) == 0 {

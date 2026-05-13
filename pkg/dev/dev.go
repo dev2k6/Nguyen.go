@@ -30,7 +30,7 @@ type Config struct {
 }
 
 // Run starts the Nguyen.go development server with SSR, HMR, and Tailwind watcher.
-// It discovers .nguyen files from the pages/ directory, sets up file-system routing,
+// It discovers .gox files from the pages/ directory, sets up file-system routing,
 // and serves with the rendering mode specified in config.
 //
 // Usage in main():

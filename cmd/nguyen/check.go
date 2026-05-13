@@ -13,8 +13,8 @@ import (
 
 var checkCmd = &cobra.Command{
 	Use:   "check",
-	Short: "Validate .nguyen file syntax without building",
-	Long: `Scans all .nguyen files in the pages/ directory and
+	Short: "Validate .gox file syntax without building",
+	Long: `Scans all .gox files in the pages/ directory and
 validates their syntax. Checks for:
   - Proper frontmatter delimiters (---)
   - Valid Go code in frontmatter
@@ -50,20 +50,20 @@ func runCheck() {
 		os.Exit(1)
 	}
 
-	// Discover .nguyen files
+	// Discover .gox files
 	var files []string
 	filepath.Walk(pagesDir, func(path string, info os.FileInfo, err error) error {
 		if err != nil {
 			return err
 		}
-		if !info.IsDir() && strings.HasSuffix(info.Name(), ".nguyen") {
+		if !info.IsDir() && strings.HasSuffix(info.Name(), ".gox") {
 			files = append(files, path)
 		}
 		return nil
 	})
 
 	if len(files) == 0 {
-		fmt.Printf("  %s⚠%s  No .nguyen files found\n", yellow, reset)
+		fmt.Printf("  %s⚠%s  No .gox files found\n", yellow, reset)
 		fmt.Println()
 		return
 	}

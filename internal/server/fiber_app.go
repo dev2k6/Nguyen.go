@@ -177,7 +177,7 @@ func (a *App) MountNavigateEndpoint(layouts []router.LayoutInfo) {
 
 // MountRoutes registers all file-system discovered routes on the Fiber app.
 // Routes are mounted in priority order (static before dynamic).
-// renderFunc receives the parsed .nguyen file for rendering.
+// renderFunc receives the parsed .gox file for rendering.
 func (a *App) MountRoutes(renderFunc func(*fiber.Ctx, router.Route) error) {
 	for _, route := range a.Routes {
 		if route.Is404 {

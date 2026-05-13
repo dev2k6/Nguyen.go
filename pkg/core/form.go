@@ -48,7 +48,7 @@ type FormState struct {
 
 // UseForm manages form state with validation.
 //
-// Usage in .nguyen frontmatter:
+// Usage in .gox frontmatter:
 //
 //	validators := map[string]*core.FieldValidator{
 //	    "email": {Required: true, MinLength: 3},

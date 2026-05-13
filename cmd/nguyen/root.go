@@ -14,7 +14,7 @@ var RootCmd = &cobra.Command{
 	Short: "Nguyen.go - Full-stack Web Framework",
 	Long: fmt.Sprintf(`%s
 Nguyen.go is a Full-stack Web Framework combining Go backend with
-WebAssembly (TinyGo) for client-side rendering. Supports .nguyen syntax
+WebAssembly (TinyGo) for client-side rendering. Supports .gox syntax
 with advanced rendering features (SSR, ISR, CSR).
 
 Author: Thái Nguyên <thainguyen.junior@gmail.com>`, asciiArt()),

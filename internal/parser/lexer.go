@@ -19,7 +19,7 @@ var (
 	parseCache   = make(map[string]*parseCacheEntry)
 )
 
-// File represents a parsed .nguyen file
+// File represents a parsed .gox file
 type File struct {
 	Path         string     // Original file path
 	GoCode       string     // Go code in frontmatter section
@@ -29,7 +29,7 @@ type File struct {
 	ScopedCSS    *ScopedCSS // Scoped CSS data if <style scoped> was found
 }
 
-// Parse reads and parses a .nguyen file, separating frontmatter from template.
+// Parse reads and parses a .gox file, separating frontmatter from template.
 // Results are cached by file modification time to avoid repeated disk reads and re-parses.
 func Parse(path string) (*File, error) {
 	stat, err := os.Stat(path)
@@ -120,7 +120,7 @@ func parseString(content, path string) (*File, error) {
 }
 
 // Name returns the component name derived from the file path
-// e.g.: pages/index.nguyen → "index", pages/product.nguyen → "product"
+// e.g.: pages/index.gox → "index", pages/product.gox → "product"
 func (f *File) Name() string {
 	fileName := f.Path
 
@@ -133,8 +133,8 @@ func (f *File) Name() string {
 		fileName = fileName[idx+1:]
 	}
 
-	// Remove .nguyen extension
-	fileName = strings.TrimSuffix(fileName, ".nguyen")
+	// Remove .gox extension
+	fileName = strings.TrimSuffix(fileName, ".gox")
 	return fileName
 }
 

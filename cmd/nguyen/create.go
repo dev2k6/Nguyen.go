@@ -20,8 +20,8 @@ var createCmd = &cobra.Command{
 	Long: `Creates a new Nguyen.go project from the built-in template.
 
 The project includes:
-  - pages/ with index.nguyen, about.nguyen, 404.nguyen
-  - app/layout.nguyen root layout
+  - pages/ with index.gox, about.gox, 404.gox
+  - app/layout.gox root layout
   - styles/global.css design system
   - middleware/, api/, components/, lib/
   - Fiber app.go entry point
@@ -148,13 +148,13 @@ func runCreate(projectName string) {
 			content = strings.ReplaceAll(content, "name: hello-nguyen", "name: "+newModule)
 		}
 
-		// Replace import paths in .nguyen files
-		if strings.HasSuffix(srcPath, ".nguyen") {
+		// Replace import paths in .gox files
+		if strings.HasSuffix(srcPath, ".gox") {
 			content = strings.ReplaceAll(content, oldModule, newModule)
 		}
 
 		// Tailwind: inject output.css link instead of CDN script
-		if flagCreateTailwind && strings.HasSuffix(srcPath, "layout.nguyen") {
+		if flagCreateTailwind && strings.HasSuffix(srcPath, "layout.gox") {
 			content = injectTailwindLink(content)
 		}
 
@@ -184,9 +184,9 @@ func runCreate(projectName string) {
 		twConfig := `/** @type {import('tailwindcss').Config} */
 module.exports = {
   content: [
-    "./pages/**/*.nguyen",
-    "./app/**/*.nguyen",
-    "./components/**/*.nguyen",
+    "./pages/**/*.gox",
+    "./app/**/*.gox",
+    "./components/**/*.gox",
   ],
 }
 `

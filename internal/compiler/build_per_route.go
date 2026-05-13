@@ -25,7 +25,7 @@ type BuildPerRouteResult struct {
 	Errors     []string
 }
 
-// BuildPerRoute compiles each .nguyen page into its own .wasm file.
+// BuildPerRoute compiles each .gox page into its own .wasm file.
 // Also builds a shared.wasm containing the common core code (DOM, Router).
 func BuildPerRoute(pagesDir, outputDir string) (*BuildPerRouteResult, error) {
 	tinygo, err := FindTinyGo()

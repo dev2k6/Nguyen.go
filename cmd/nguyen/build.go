@@ -20,8 +20,8 @@ import (
 
 var buildCmd = &cobra.Command{
 	Use:   "build",
-	Short: "Build your .nguyen files into optimized WebAssembly",
-	Long: `Compiles all .nguyen files in the pages/ directory into
+	Short: "Build your .gox files into optimized WebAssembly",
+	Long: `Compiles all .gox files in the pages/ directory into
 a single app.wasm binary using TinyGo. The output is
 optimized for production deployment with minimal bundle size.`,
 	Run: func(cmd *cobra.Command, args []string) {
@@ -72,17 +72,17 @@ func runBuild() {
 		if err != nil {
 			return err
 		}
-		if !info.IsDir() && strings.HasSuffix(info.Name(), ".nguyen") {
+		if !info.IsDir() && strings.HasSuffix(info.Name(), ".gox") {
 			nguyenFiles = append(nguyenFiles, path)
 		}
 		return nil
 	})
 
 	if len(nguyenFiles) == 0 {
-		log.Fatalf("  %s✕%s No .nguyen files found in %s\n", yellow, reset, pagesDir)
+		log.Fatalf("  %s✕%s No .gox files found in %s\n", yellow, reset, pagesDir)
 	}
 
-	fmt.Printf("  %sFound %d .nguyen file(s)%s\n", dim, len(nguyenFiles), reset)
+	fmt.Printf("  %sFound %d .gox file(s)%s\n", dim, len(nguyenFiles), reset)
 	fmt.Println()
 
 	outputDir := flagBuildOutput

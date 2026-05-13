@@ -28,11 +28,11 @@ type Segment struct {
 
 // Route describes one resolved page route
 type Route struct {
-	FilePath  string         // absolute path to .nguyen file
+	FilePath  string         // absolute path to .gox file
 	Pattern   string         // Fiber-compatible pattern: /blog/:slug
 	Segments  []Segment      // parsed segments
-	Is404     bool           // true for 404.nguyen
-	IsLayout  bool           // true for layout.nguyen files
+	Is404     bool           // true for 404.gox
+	IsLayout  bool           // true for layout.gox files
 	Priority  int            // lower = evaluated first (static > dynamic > catch-all)
 	GuardName string         // route guard name from frontmatter (guard = "auth")
 	Regex     *regexp.Regexp // pre-compiled regex for O(1) request matching (Astro-style)
@@ -46,7 +46,7 @@ type LayoutInfo struct {
 	DirPath  string // directory containing this layout
 }
 
-// FindLayouts discovers all layout.nguyen files and their hierarchical order.
+// FindLayouts discovers all layout.gox files and their hierarchical order.
 // Returns sorted by depth (shallowest first).
 func FindLayouts(rootDir string) ([]LayoutInfo, error) {
 	var layouts []LayoutInfo
@@ -58,7 +58,7 @@ func FindLayouts(rootDir string) ([]LayoutInfo, error) {
 		if info.IsDir() {
 			return nil
 		}
-		base := strings.TrimSuffix(info.Name(), ".nguyen")
+		base := strings.TrimSuffix(info.Name(), ".gox")
 		if base != "layout" {
 			return nil
 		}
@@ -93,8 +93,8 @@ func FindLayouts(rootDir string) ([]LayoutInfo, error) {
 }
 
 // GetLayoutsForRoute returns layout files that apply to a given page.
-// Layouts are matched by directory nesting: /pages/layout.nguyen applies
-// to all pages, /pages/blog/layout.nguyen applies to /pages/blog/*.
+// Layouts are matched by directory nesting: /pages/layout.gox applies
+// to all pages, /pages/blog/layout.gox applies to /pages/blog/*.
 func GetLayoutsForRoute(pagePath string, layouts []LayoutInfo) []LayoutInfo {
 	var applicable []LayoutInfo
 	pageDir := filepath.ToSlash(filepath.Dir(pagePath))
@@ -109,13 +109,13 @@ func GetLayoutsForRoute(pagePath string, layouts []LayoutInfo) []LayoutInfo {
 	return applicable
 }
 
-// Discover walks the pages directory and resolves all .nguyen files into routes.
+// Discover walks the pages directory and resolves all .gox files into routes.
 // Implements file-system routing:
 //
-//	pages/index.nguyen       → /
-//	pages/about.nguyen       → /about
-//	pages/blog/[slug].nguyen → /blog/:slug
-//	pages/404.nguyen         → catch-all fallback
+//	pages/index.gox       → /
+//	pages/about.gox       → /about
+//	pages/blog/[slug].gox → /blog/:slug
+//	pages/404.gox         → catch-all fallback
 func Discover(rootDir string) ([]Route, error) {
 	var routes []Route
 
@@ -126,7 +126,7 @@ func Discover(rootDir string) ([]Route, error) {
 		if info.IsDir() {
 			return nil
 		}
-		if !strings.HasSuffix(info.Name(), ".nguyen") {
+		if !strings.HasSuffix(info.Name(), ".gox") {
 			return nil
 		}
 
@@ -154,17 +154,17 @@ func Discover(rootDir string) ([]Route, error) {
 
 // resolveRoute converts one file path into a Route
 func resolveRoute(rootDir, fullPath string, info os.FileInfo) (Route, error) {
-	// Relative path from root, minus .nguyen extension
+	// Relative path from root, minus .gox extension
 	rel, err := filepath.Rel(rootDir, fullPath)
 	if err != nil {
 		return Route{}, err
 	}
 	rel = filepath.ToSlash(rel)
-	rel = strings.TrimSuffix(rel, ".nguyen")
+	rel = strings.TrimSuffix(rel, ".gox")
 
 	// Special files
 	base := filepath.Base(fullPath)
-	base = strings.TrimSuffix(base, ".nguyen")
+	base = strings.TrimSuffix(base, ".gox")
 
 	// 404 page
 	if base == "404" {

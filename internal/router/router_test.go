@@ -187,7 +187,7 @@ func (r *Route) ComputePriority() {
 
 // TestPathToSlash verifies backslash conversion
 func TestPathToSlash(t *testing.T) {
-	path := `pages\blog\[slug].nguyen`
+	path := `pages\blog\[slug].gox`
 	// Simulate filepath.ToSlash
 	path = strings.ReplaceAll(path, `\`, "/")
 	if !strings.Contains(path, "/") {

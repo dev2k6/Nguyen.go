@@ -32,7 +32,7 @@ func NavigateHandler(cfg NavigateHandlerConfig) fiber.Handler {
 			return c.Status(404).JSON(fiber.Map{"error": "route not found"})
 		}
 
-		// Parse .nguyen file
+		// Parse .gox file
 		ngFile, err := parser.Parse(matched.FilePath)
 		if err != nil {
 			return c.Status(500).JSON(fiber.Map{"error": "parse failed"})

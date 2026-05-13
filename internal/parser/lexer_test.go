@@ -7,7 +7,7 @@ import (
 
 func TestParse_NoFrontmatter(t *testing.T) {
 	content := "<html><body>Hello World</body></html>"
-	result, err := parseString(content, "test.nguyen")
+	result, err := parseString(content, "test.gox")
 	if err != nil {
 		t.Fatalf("Unexpected error: %v", err)
 	}
@@ -27,7 +27,7 @@ func increment() { count++ }
 <html>
 <body>Hello</body>
 </html>`
-	result, err := parseString(content, "test.nguyen")
+	result, err := parseString(content, "test.gox")
 	if err != nil {
 		t.Fatalf("Unexpected error: %v", err)
 	}
@@ -45,7 +45,7 @@ count := 0
 <html>
 <body>Hello</body>
 </html>`
-	_, err := parseString(content, "test.nguyen")
+	_, err := parseString(content, "test.gox")
 	if err == nil {
 		t.Fatal("Expected error when missing closing --- for frontmatter")
 	}
@@ -57,7 +57,7 @@ func TestParse_EmptyFrontmatter(t *testing.T) {
 <html>
 <body>Hello</body>
 </html>`
-	result, err := parseString(content, "test.nguyen")
+	result, err := parseString(content, "test.gox")
 	if err != nil {
 		t.Fatalf("Unexpected error: %v", err)
 	}
@@ -71,10 +71,10 @@ func TestName(t *testing.T) {
 		path     string
 		expected string
 	}{
-		{"pages/index.nguyen", "index"},
-		{"pages/product.nguyen", "product"},
-		{"pages\\about.nguyen", "about"},
-		{"/project/pages/home.nguyen", "home"},
+		{"pages/index.gox", "index"},
+		{"pages/product.gox", "product"},
+		{"pages\\about.gox", "about"},
+		{"/project/pages/home.gox", "home"},
 	}
 
 	for _, tc := range tests {
@@ -91,9 +91,9 @@ func TestPackageName(t *testing.T) {
 		path     string
 		expected string
 	}{
-		{"pages/index.nguyen", "page_index"},
-		{"pages/my-product.nguyen", "page_my_product"},
-		{"pages/[id].nguyen", "page_id"},
+		{"pages/index.gox", "page_index"},
+		{"pages/my-product.gox", "page_my_product"},
+		{"pages/[id].gox", "page_id"},
 	}
 
 	for _, tc := range tests {

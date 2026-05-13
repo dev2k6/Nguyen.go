@@ -9,7 +9,7 @@ import (
 // NguyenTransition wraps children with CSS enter/leave animations.
 // It adds/removes CSS classes to trigger transitions on mount/unmount.
 //
-// Usage in .nguyen template:
+// Usage in .gox template:
 //
 //	<nguyen-transition name="fade">
 //	    <div>Content</div>

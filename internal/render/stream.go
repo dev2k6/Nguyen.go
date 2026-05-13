@@ -127,7 +127,7 @@ func buildDataInjectScript(data map[string]interface{}) string {
 }
 
 // RenderSSRStream performs SSR in streaming mode.
-// It parses the .nguyen file, extracts sync-renderable HTML, sends the shell,
+// It parses the .gox file, extracts sync-renderable HTML, sends the shell,
 // waits for async data, injects it, then closes.
 //
 // This is the high-level convenience function used by the dev server.

@@ -2,4 +2,4 @@
 " Place this in ~/.config/nvim/ftdetect/nguyen.vim (Neovim)
 " or ~/.vim/ftdetect/nguyen.vim (Vim)
 
-au BufRead,BufNewFile *.nguyen set filetype=go
+au BufRead,BufNewFile *.gox set filetype=go

@@ -53,7 +53,7 @@ func TestExtractEventHandlers_NoEvents(t *testing.T) {
 
 func TestTranspile_CreatesPackage(t *testing.T) {
 	f := &File{
-		Path:         "pages/index.nguyen",
+		Path:         "pages/index.gox",
 		GoCode:       "count := 0",
 		HTMLTemplate: "<div>Hello</div>",
 	}
@@ -72,7 +72,7 @@ func TestTranspile_CreatesPackage(t *testing.T) {
 
 func TestTranspile_WithGoCode(t *testing.T) {
 	f := &File{
-		Path:         "pages/counter.nguyen",
+		Path:         "pages/counter.gox",
 		GoCode:       "count := 0\nfunc increment() {}",
 		HTMLTemplate: `<button @click="increment()">+</button>`,
 	}
@@ -88,7 +88,7 @@ func TestTranspile_WithGoCode(t *testing.T) {
 
 func TestTranspile_DetectsStateVars(t *testing.T) {
 	f := &File{
-		Path:         "pages/counter.nguyen",
+		Path:         "pages/counter.gox",
 		GoCode:       "count := 0",
 		HTMLTemplate: "<div>Count: {count}</div>",
 	}
@@ -100,7 +100,7 @@ func TestTranspile_DetectsStateVars(t *testing.T) {
 
 func TestTranspile_DetectsEventHandlers(t *testing.T) {
 	f := &File{
-		Path:         "pages/button.nguyen",
+		Path:         "pages/button.gox",
 		GoCode:       "func increment() {}",
 		HTMLTemplate: `<button @click="increment()">+</button>`,
 	}
@@ -112,7 +112,7 @@ func TestTranspile_DetectsEventHandlers(t *testing.T) {
 
 func TestTranspile_GeneratesRenderFunction(t *testing.T) {
 	f := &File{
-		Path:         "pages/index.nguyen",
+		Path:         "pages/index.gox",
 		GoCode:       "",
 		HTMLTemplate: "<div>Hello</div>",
 	}
