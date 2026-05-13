@@ -68,6 +68,9 @@ func RenderSSR(f *parser.File, version string, layouts ...router.LayoutInfo) *Re
 	// Build HTML from template
 	html := f.HTMLTemplate
 
+	// Process fragments (remove wrapper tags)
+	html = ProcessFragments(html)
+
 	// Replace {variable} with reactive hydration spans.
 	// Each known state variable gets a <span data-nguyen-text="key">value</span>
 	// so the client-side JS can update it when state changes.
@@ -83,6 +86,9 @@ func RenderSSR(f *parser.File, version string, layouts ...router.LayoutInfo) *Re
 	// Transform <nguyen-link> → <a> for SSR output
 	html = nguyenLinkRx.ReplaceAllString(html, `<a$1>`)
 	html = nguyenLinkEnd.ReplaceAllString(html, `</a>`)
+
+	// Process conditional directives (<nguyen-show>, <nguyen-hide>)
+	html = ProcessConditionals(html, result.State)
 
 	// Compose with layout if declared in frontmatter or nested layouts discovered
 	html = composeLayout(f, html, layouts)
