@@ -1,15 +1,15 @@
 # Routing
 
-Nguyen.go uses file-system routing. Every `.nguyen` file in the `pages/` directory becomes a route automatically.
+Nguyen.go uses file-system routing. Every `.gox` file in the `pages/` directory becomes a route automatically.
 
 ## Basic Routes
 
 | File | Route |
 |------|-------|
-| `pages/index.nguyen` | `/` |
-| `pages/about.nguyen` | `/about` |
-| `pages/blog.nguyen` | `/blog` |
-| `pages/contact.nguyen` | `/contact` |
+| `pages/index.gox` | `/` |
+| `pages/about.gox` | `/about` |
+| `pages/blog.gox` | `/blog` |
+| `pages/contact.gox` | `/contact` |
 
 ## Nested Routes
 
@@ -17,9 +17,9 @@ Subdirectories create nested URL paths:
 
 | File | Route |
 |------|-------|
-| `pages/blog/index.nguyen` | `/blog` |
-| `pages/blog/first-post.nguyen` | `/blog/first-post` |
-| `pages/docs/getting-started.nguyen` | `/docs/getting-started` |
+| `pages/blog/index.gox` | `/blog` |
+| `pages/blog/first-post.gox` | `/blog/first-post` |
+| `pages/docs/getting-started.gox` | `/docs/getting-started` |
 
 ## Dynamic Routes
 
@@ -27,9 +27,9 @@ Use brackets `[param]` for dynamic segments:
 
 | File | Route | Example |
 |------|-------|---------|
-| `pages/blog/[slug].nguyen` | `/blog/:slug` | `/blog/hello-world` |
-| `pages/users/[id].nguyen` | `/users/:id` | `/users/42` |
-| `pages/[category]/[id].nguyen` | `/:category/:id` | `/tech/123` |
+| `pages/blog/[slug].gox` | `/blog/:slug` | `/blog/hello-world` |
+| `pages/users/[id].gox` | `/users/:id` | `/users/42` |
+| `pages/[category]/[id].gox` | `/:category/:id` | `/tech/123` |
 
 Access params in your page via the route context.
 
@@ -39,7 +39,7 @@ Use `[...param]` for catch-all segments:
 
 | File | Route | Matches |
 |------|-------|---------|
-| `pages/docs/[...path].nguyen` | `/docs/*` | `/docs/a/b/c` |
+| `pages/docs/[...path].gox` | `/docs/*` | `/docs/a/b/c` |
 
 ## Optional Catch-All
 
@@ -47,11 +47,11 @@ Use `[[...param]]` for optional catch-all (matches with or without the segment):
 
 | File | Route | Matches |
 |------|-------|---------|
-| `pages/shop/[[...slug]].nguyen` | `/shop`, `/shop/a/b` | Both |
+| `pages/shop/[[...slug]].gox` | `/shop`, `/shop/a/b` | Both |
 
 ## 404 Page
 
-Create `pages/404.nguyen` for a custom not-found page. It has the lowest priority and catches all unmatched routes.
+Create `pages/404.gox` for a custom not-found page. It has the lowest priority and catches all unmatched routes.
 
 ```nguyen
 ---
@@ -81,7 +81,7 @@ Routes are evaluated in priority order (most specific first):
 
 ### Root Layout
 
-Create `pages/layout.nguyen` to wrap all pages:
+Create `pages/layout.gox` to wrap all pages:
 
 ```nguyen
 ---
@@ -118,31 +118,31 @@ export const metadata = {
 
 ### Nested Layouts
 
-Create `layout.nguyen` in any subdirectory. It wraps pages in that directory and all subdirectories:
+Create `layout.gox` in any subdirectory. It wraps pages in that directory and all subdirectories:
 
 ```
 pages/
-├── layout.nguyen           # Root layout (all pages)
-├── index.nguyen
+├── layout.gox           # Root layout (all pages)
+├── index.gox
 ├── blog/
-│   ├── layout.nguyen       # Blog layout (blog pages only)
-│   ├── index.nguyen
-│   └── [slug].nguyen
+│   ├── layout.gox       # Blog layout (blog pages only)
+│   ├── index.gox
+│   └── [slug].gox
 └── docs/
-    ├── layout.nguyen       # Docs layout (docs pages only)
-    └── getting-started.nguyen
+    ├── layout.gox       # Docs layout (docs pages only)
+    └── getting-started.gox
 ```
 
 Layouts compose from shallowest to deepest. A page at `/blog/hello` gets:
-1. Root `layout.nguyen` (outermost)
-2. Blog `layout.nguyen` (innermost, wraps page content)
+1. Root `layout.gox` (outermost)
+2. Blog `layout.gox` (innermost, wraps page content)
 
 ### Named Slots
 
 Layouts can define multiple slot regions:
 
 ```nguyen
-<!-- layout.nguyen -->
+<!-- layout.gox -->
 <div class="layout">
     <aside>
         <nguyen-slot name="sidebar" />
@@ -156,7 +156,7 @@ Layouts can define multiple slot regions:
 Pages fill named slots with the `slot` attribute:
 
 ```nguyen
-<!-- page.nguyen -->
+<!-- page.gox -->
 <div slot="sidebar">
     <nav>Sidebar content</nav>
 </div>
@@ -243,7 +243,7 @@ The component re-renders when query params change.
 
 | File | Purpose |
 |------|---------|
-| `layout.nguyen` | Layout wrapper for directory |
-| `404.nguyen` | Custom not-found page |
-| `_app.nguyen` | App-level wrapper (internal) |
+| `layout.gox` | Layout wrapper for directory |
+| `404.gox` | Custom not-found page |
+| `_app.gox` | App-level wrapper (internal) |
 | Files starting with `_` | Ignored by router |

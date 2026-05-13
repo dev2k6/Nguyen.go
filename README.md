@@ -7,7 +7,7 @@ A full-stack Go web framework for building modern web applications. Nguyen.go co
 ### Core
 - **Go + TinyGo WASM** — Write frontend components in Go, compile to WebAssembly
 - **React-style reconciler** — Virtual DOM diffing with keyed reconciliation
-- **Template syntax** — `.nguyen` files with Go frontmatter and HTML templates
+- **Template syntax** — `.gox` files with Go frontmatter and HTML templates
 - **SSR / ISR / CSR** — Server-side rendering, Incremental Static Regeneration, or Client-Side Rendering per page
 - **Streaming SSR** — Transfer-Encoding: chunked responses for faster Time to First Byte
 - **Hot Module Replacement** — SSE-based HMR for CSS and full page reloads
@@ -19,11 +19,11 @@ A full-stack Go web framework for building modern web applications. Nguyen.go co
 - **Variable interpolation** — `{stateVar}` in templates with reactive hydration
 
 ### Routing
-- **File-system routing** — `pages/index.nguyen` → `/`, `pages/about.nguyen` → `/about`
-- **Nested layouts** — Auto-discovered `layout.nguyen` per directory hierarchy
-- **Dynamic routes** — `pages/blog/[slug].nguyen` → `/blog/:slug`
-- **Catch-all routes** — `pages/[...path].nguyen` → wildcard matching
-- **Optional params** — `pages/[[...path]].nguyen` → optional catch-all
+- **File-system routing** — `pages/index.gox` → `/`, `pages/about.gox` → `/about`
+- **Nested layouts** — Auto-discovered `layout.gox` per directory hierarchy
+- **Dynamic routes** — `pages/blog/[slug].gox` → `/blog/:slug`
+- **Catch-all routes** — `pages/[...path].gox` → wildcard matching
+- **Optional params** — `pages/[[...path]].gox` → optional catch-all
 - **Route guards** — Named guard registration with `RegisterGuard`
 - **Search params** — `UseSearchParams()` with reactive updates
 
@@ -98,10 +98,10 @@ nguyen dev
 |---------|-------------|
 | `nguyen create <name>` | Scaffold a new project from template |
 | `nguyen dev` | Start dev server with HMR and file watching |
-| `nguyen build` | Compile `.nguyen` files to optimized WASM + static HTML |
+| `nguyen build` | Compile `.gox` files to optimized WASM + static HTML |
 | `nguyen start` | Start production server from build output |
 | `nguyen export` | Pre-render all pages to static HTML for CDN deployment |
-| `nguyen check` | Validate `.nguyen` file syntax without building |
+| `nguyen check` | Validate `.gox` file syntax without building |
 
 ### Common Flags
 
@@ -124,15 +124,15 @@ nguyen start --dir .nguyen          # Build directory to serve
 
 ```
 my-app/
-├── pages/                  # File-system routes (.nguyen files)
-│   ├── index.nguyen        # → /
-│   ├── about.nguyen        # → /about
-│   ├── 404.nguyen          # → catch-all fallback
-│   ├── layout.nguyen       # Root layout (wraps all pages)
+├── pages/                  # File-system routes (.gox files)
+│   ├── index.gox           # → /
+│   ├── about.gox           # → /about
+│   ├── 404.gox             # → catch-all fallback
+│   ├── layout.gox          # Root layout (wraps all pages)
 │   └── blog/
-│       ├── index.nguyen    # → /blog
-│       ├── [slug].nguyen   # → /blog/:slug
-│       └── layout.nguyen   # Blog-specific layout
+│       ├── index.gox       # → /blog
+│       ├── [slug].gox      # → /blog/:slug
+│       └── layout.gox      # Blog-specific layout
 ├── api/                    # API route handlers (Go)
 │   └── routes.go
 ├── styles/                 # CSS files
@@ -145,9 +145,9 @@ my-app/
 └── go.sum
 ```
 
-## Template Syntax (`.nguyen` files)
+## Template Syntax (`.gox` files)
 
-A `.nguyen` file has two sections separated by `---`:
+A `.gox` file has two sections separated by `---`:
 
 1. **Frontmatter** — Go code (imports, state, handlers, metadata)
 2. **Template** — HTML with reactive interpolation
@@ -218,7 +218,7 @@ Supported events: `@click`, `@input`, `@change`, `@submit`, `@keydown`, `@keyup`
 
 ### Layouts
 
-Create a `layout.nguyen` in any directory. It wraps all pages in that directory and below:
+Create a `layout.gox` in any directory. It wraps all pages in that directory and below:
 
 ```nguyen
 ---
@@ -461,7 +461,7 @@ CMD ["./nguyen", "start"]
 │                   Internal Packages                       │
 ├──────────┬──────────┬──────────┬──────────┬─────────────┤
 │  parser  │  router  │  render  │ compiler │   server    │
-│  (.nguyen│  (file-  │  (SSR,   │  (TinyGo │  (Fiber,   │
+│  (.gox│  (file-  │  (SSR,   │  (TinyGo │  (Fiber,   │
 │   lexer) │  system) │  stream) │   WASM)  │   HMR)     │
 ├──────────┼──────────┼──────────┼──────────┼─────────────┤
 │  config  │  cache   │   geo    │   pwa    │  optimizer  │
@@ -490,7 +490,7 @@ cp ftdetect/nguyen.vim ~/.config/nvim/ftdetect/
 cp ftdetect/nguyen.vim ~/.vim/ftdetect/
 ```
 
-This enables Go syntax highlighting for `.nguyen` files.
+This enables Go syntax highlighting for `.gox` files.
 
 ## Contributing
 

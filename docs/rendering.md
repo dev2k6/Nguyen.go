@@ -25,7 +25,7 @@ render:
 ### How It Works
 
 1. Request arrives at the server
-2. Nguyen.go parses the `.nguyen` file
+2. Nguyen.go parses the `.gox` file
 3. Go frontmatter is evaluated (state initialization, metadata extraction)
 4. Template is rendered with `{variable}` interpolation
 5. Layout composition is applied

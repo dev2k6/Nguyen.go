@@ -316,7 +316,7 @@ export const geo = {
                 <span class="terminal-dot"></span>
                 <span class="terminal-dot"></span>
                 <span class="terminal-dot"></span>
-                <span class="ml-3 text-[12px] font-mono text-muted">pages/index.nguyen</span>
+                <span class="ml-3 text-[12px] font-mono text-muted">pages/index.gox</span>
                 <span class="ml-auto pill !h-5 !text-[10px]">Go + HTML</span>
             </div>
             <pre class="terminal-body text-[#c9d1d9]"><span style="color:#6e7681">---</span>

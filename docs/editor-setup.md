@@ -1,6 +1,6 @@
 # Editor & IDE Setup
 
-Configure your editor to recognize `.nguyen` files as Go for syntax highlighting, autocompletion, and formatting.
+Configure your editor to recognize `.gox` files as Go for syntax highlighting, autocompletion, and formatting.
 
 ## VS Code
 
@@ -18,7 +18,7 @@ Clone the repo and open in VS Code — settings apply automatically.
 ```json
 {
   "files.associations": {
-    "*.nguyen": "go"
+    "*.gox": "go"
   },
   "emmet.includeLanguages": {
     "go": "html"
@@ -27,7 +27,7 @@ Clone the repo and open in VS Code — settings apply automatically.
 ```
 
 This gives you:
-- Go syntax highlighting in `.nguyen` files
+- Go syntax highlighting in `.gox` files
 - Emmet HTML expansion in the template section
 - gopls autocompletion for Go code in frontmatter
 
@@ -38,7 +38,7 @@ The project includes `.idea/filetypes.xml`. If you need to configure manually:
 1. Go to **Settings → Editor → File Types**
 2. Find **Go** in the list
 3. Click **+** under "Registered Patterns"
-4. Add `*.nguyen`
+4. Add `*.gox`
 5. Click **OK**
 
 Or add to `.idea/filetypes.xml`:
@@ -64,7 +64,7 @@ The project includes `.zed/settings.json`. Manual setup:
 ```json
 {
   "file_types": {
-    "Go": ["*.nguyen"]
+    "Go": ["*.gox"]
   }
 }
 ```
@@ -86,13 +86,13 @@ cp ftdetect/nguyen.vim ~/.vim/ftdetect/
 Contents of `ftdetect/nguyen.vim`:
 
 ```vim
-au BufRead,BufNewFile *.nguyen set filetype=go
+au BufRead,BufNewFile *.gox set filetype=go
 ```
 
 For additional HTML support in the template section, add to your config:
 
 ```vim
-" Enable HTML snippets in .nguyen files
+" Enable HTML snippets in .gox files
 autocmd FileType go if expand('%:e') == 'nguyen' | setlocal omnifunc=htmlcomplete#CompleteTags | endif
 ```
 
@@ -108,7 +108,7 @@ file-types = ["go", "nguyen"]
 
 ## Sublime Text
 
-1. Open any `.nguyen` file
+1. Open any `.gox` file
 2. Go to **View → Syntax → Open all with current extension as... → Go**
 
 Or create `Nguyen.sublime-settings` in your Packages/User directory:
@@ -124,7 +124,7 @@ Or create `Nguyen.sublime-settings` in your Packages/User directory:
 The project includes `.editorconfig` for consistent formatting across all editors:
 
 ```ini
-[*.nguyen]
+[*.gox]
 indent_style = space
 indent_size = 4
 ```
@@ -133,7 +133,7 @@ Any editor with EditorConfig support (most modern editors) will apply these rule
 
 ## Language Server (gopls)
 
-The `.nguyen` frontmatter is valid Go code. gopls provides:
+The `.gox` frontmatter is valid Go code. gopls provides:
 - Autocompletion for imports and functions
 - Type checking
 - Go to definition

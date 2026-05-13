@@ -3,7 +3,7 @@ layout = "app/layout"
 
 import "nguyen.go/pkg/core"
 
-// Dynamic route: pages/blog/[slug].nguyen → /blog/:slug
+// Dynamic route: pages/blog/[slug].gox → /blog/:slug
 slug := core.UseGlobalState("slug", "")
 post := loadPost(slug.(string))
 
@@ -117,7 +117,7 @@ func loadPost(s string) map[string]string {
         <h2 class="text-[24px] font-semibold text-white tracking-tight mt-12 mb-4">How dynamic routes work</h2>
         <p class="text-[16px] text-muted leading-[1.75] mb-4">
             File-based routing with dynamic segments is one of the core features. Drop a file named
-            <code class="text-blue font-mono text-[14px] px-1.5 py-0.5 rounded" style="background:var(--color-card);border:1px solid var(--color-border)">[param].nguyen</code>
+            <code class="text-blue font-mono text-[14px] px-1.5 py-0.5 rounded" style="background:var(--color-card);border:1px solid var(--color-border)">[param].gox</code>
             and the framework extracts route parameters automatically.
         </p>
 
@@ -130,7 +130,7 @@ func loadPost(s string) map[string]string {
                 <div class="flex-1">
                     <h3 class="text-[14px] font-medium text-white mb-2">How the slug resolves</h3>
                     <ul class="text-[13px] text-muted space-y-1.5">
-                        <li>• The file <code class="text-blue font-mono text-[12px]">pages/blog/[slug].nguyen</code> maps to <code class="text-blue font-mono text-[12px]">/blog/:slug</code></li>
+                        <li>• The file <code class="text-blue font-mono text-[12px]">pages/blog/[slug].gox</code> maps to <code class="text-blue font-mono text-[12px]">/blog/:slug</code></li>
                         <li>• Go code in the frontmatter loads post data based on the slug</li>
                         <li>• The page is cached for 60 seconds, then regenerated on next request</li>
                         <li>• <code class="text-blue font-mono text-[12px]">export const revalidate = 60</code> controls the ISR TTL</li>
@@ -149,7 +149,7 @@ func loadPost(s string) map[string]string {
                 <span class="terminal-dot"></span>
                 <span class="terminal-dot"></span>
                 <span class="terminal-dot"></span>
-                <span class="ml-3 text-[12px] font-mono text-muted">pages/blog/[slug].nguyen</span>
+                <span class="ml-3 text-[12px] font-mono text-muted">pages/blog/[slug].gox</span>
             </div>
             <pre class="terminal-body text-[#c9d1d9]"><span style="color:#6e7681">---</span>
 <span style="color:#ff7b72">import</span> <span style="color:#a5d6ff">"nguyen.go/pkg/core"</span>

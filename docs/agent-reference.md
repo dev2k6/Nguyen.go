@@ -7,11 +7,11 @@ This document is designed for AI coding assistants (GitHub Copilot, Claude, Curs
 Nguyen.go is a full-stack Go web framework. It uses:
 - **Go** for backend (Fiber HTTP server)
 - **TinyGo → WebAssembly** for frontend (React-style virtual DOM)
-- **`.nguyen` files** as single-file components (Go frontmatter + HTML template)
+- **`.gox` files** as single-file components (Go frontmatter + HTML template)
 
-## `.nguyen` File Format
+## `.gox` File Format
 
-A `.nguyen` file has two sections separated by `---`:
+A `.gox` file has two sections separated by `---`:
 
 ```
 ---
@@ -241,13 +241,13 @@ core.Island(core.IslandConfig{
 
 | File | Route |
 |------|-------|
-| `pages/index.nguyen` | `/` |
-| `pages/about.nguyen` | `/about` |
-| `pages/blog/[slug].nguyen` | `/blog/:slug` |
-| `pages/docs/[...path].nguyen` | `/docs/*` |
-| `pages/[[...opt]].nguyen` | optional catch-all |
-| `pages/404.nguyen` | fallback |
-| `pages/layout.nguyen` | layout wrapper |
+| `pages/index.gox` | `/` |
+| `pages/about.gox` | `/about` |
+| `pages/blog/[slug].gox` | `/blog/:slug` |
+| `pages/docs/[...path].gox` | `/docs/*` |
+| `pages/[[...opt]].gox` | optional catch-all |
+| `pages/404.gox` | fallback |
+| `pages/layout.gox` | layout wrapper |
 
 ## Configuration (nguyen.config.yml)
 
@@ -364,7 +364,7 @@ func Register(app fiber.Router) {
 
 - `pkg/core` uses `//go:build js && wasm` — only compiles for WASM target
 - Backend code (`internal/`, `cmd/`) compiles normally for any OS
-- The `.nguyen` compiler transpiles frontmatter into valid Go for TinyGo
+- The `.gox` compiler transpiles frontmatter into valid Go for TinyGo
 
 ## Module Path
 
@@ -372,7 +372,7 @@ func Register(app fiber.Router) {
 nguyen.go                    # module name in go.mod
 nguyen.go/pkg/core           # WASM runtime (hooks, VNode, reconciler)
 nguyen.go/pkg/nguyen         # Server library (App, Options)
-nguyen.go/internal/parser    # .nguyen file parser
+nguyen.go/internal/parser    # .gox file parser
 nguyen.go/internal/router    # file-system router
 nguyen.go/internal/render    # SSR engine
 nguyen.go/internal/compiler  # TinyGo WASM compiler

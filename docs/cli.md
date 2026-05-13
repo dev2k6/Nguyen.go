@@ -28,7 +28,7 @@ nguyen create <project-name> [flags]
 ### What It Creates
 
 - `pages/` with index, about, and 404 pages
-- `layout.nguyen` root layout
+- `layout.gox` root layout
 - `styles/` with CSS
 - `api/` for API routes
 - `config/nguyen.config.yml`
@@ -78,7 +78,7 @@ nguyen dev --port 8080 --pages src/pages
 
 ## nguyen build
 
-Compile `.nguyen` files into optimized production output.
+Compile `.gox` files into optimized production output.
 
 ```bash
 nguyen build [flags]
@@ -97,7 +97,7 @@ nguyen build [flags]
 
 ### Build Steps
 
-1. **Parse** — Validate and transpile all `.nguyen` files
+1. **Parse** — Validate and transpile all `.gox` files
 2. **Compile** — Generate Go source for each component
 3. **WASM** — Compile to WebAssembly via TinyGo (unless `--no-wasm`)
 4. **PWA** — Generate manifest.json and sw.js
@@ -207,7 +207,7 @@ nguyen export --output dist
 
 ## nguyen check
 
-Validate `.nguyen` file syntax without building.
+Validate `.gox` file syntax without building.
 
 ```bash
 nguyen check [flags]
@@ -231,11 +231,11 @@ nguyen check [flags]
 ### Output
 
 ```
-  ● index.nguyen          ✓ PASS
+  ● index.gox          ✓ PASS
     Package: page_index  States: 1  Events: 2
-  ● about.nguyen          ✓ PASS
+  ● about.gox          ✓ PASS
     Package: page_about  States: 0  Events: 0
-  ● blog/[slug].nguyen    ✓ PASS
+  ● blog/[slug].gox    ✓ PASS
     Package: page_slug   States: 0  Events: 0
 
   ────────────────────────────────────────

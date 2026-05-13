@@ -43,10 +43,10 @@ export const geo = {
                 </div>
                 <pre class="terminal-body text-[#c9d1d9]"><span style="color:#79c0ff">my-app/</span>
 ├── <span style="color:#79c0ff">app/</span>              <span style="color:#6e7681"># Shared layouts</span>
-│   └── <span style="color:#7ee787">layout.nguyen</span> <span style="color:#6e7681"># Root layout (wraps all pages)</span>
+│   └── <span style="color:#7ee787">layout.gox</span> <span style="color:#6e7681"># Root layout (wraps all pages)</span>
 ├── <span style="color:#79c0ff">pages/</span>            <span style="color:#6e7681"># File-based routes</span>
-│   ├── <span style="color:#7ee787">index.nguyen</span>  <span style="color:#6e7681"># → /</span>
-│   ├── <span style="color:#7ee787">about.nguyen</span>  <span style="color:#6e7681"># → /about</span>
+│   ├── <span style="color:#7ee787">index.gox</span>  <span style="color:#6e7681"># → /</span>
+│   ├── <span style="color:#7ee787">about.gox</span>  <span style="color:#6e7681"># → /about</span>
 │   └── <span style="color:#79c0ff">blog/</span>         <span style="color:#6e7681"># → /blog/*</span>
 ├── <span style="color:#79c0ff">public/</span>           <span style="color:#6e7681"># Static assets (served as-is)</span>
 ├── <span style="color:#79c0ff">styles/</span>           <span style="color:#6e7681"># CSS source files</span>
@@ -76,7 +76,7 @@ export const geo = {
                         </tr>
                         <tr>
                             <td class="font-mono text-blue text-[13px]">pages/</td>
-                            <td class="text-muted-stronger">Each <code class="text-blue font-mono text-[12px]">.nguyen</code> file becomes a route automatically</td>
+                            <td class="text-muted-stronger">Each <code class="text-blue font-mono text-[12px]">.gox</code> file becomes a route automatically</td>
                         </tr>
                         <tr>
                             <td class="font-mono text-blue text-[13px]">public/</td>
@@ -98,7 +98,7 @@ export const geo = {
         <div>
             <h2 class="text-[22px] font-semibold tracking-tight text-white mb-4">Special files</h2>
             <p class="text-[16px] text-muted leading-[1.75] mb-4">
-                Files prefixed with <code class="text-blue font-mono text-[14px]">_</code> or named <code class="text-blue font-mono text-[14px]">layout.nguyen</code> are not exposed as routes. They serve internal purposes like shared UI shells.
+                Files prefixed with <code class="text-blue font-mono text-[14px]">_</code> or named <code class="text-blue font-mono text-[14px]">layout.gox</code> are not exposed as routes. They serve internal purposes like shared UI shells.
             </p>
         </div>
     </div>

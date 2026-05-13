@@ -2,6 +2,12 @@ module github.com/dev2k6/Nguyen.go
 
 go 1.25.0
 
+retract (
+	v1.0.2 // published with incomplete features
+	v1.0.3 // published with incomplete features
+	v1.0.4 // published with incomplete features
+)
+
 require (
 	github.com/gofiber/fiber/v2 v2.52.6
 	github.com/spf13/cobra v1.9.1

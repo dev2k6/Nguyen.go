@@ -1,6 +1,6 @@
 @import "tailwindcss";
-@source "../app/**/*.nguyen";
-@source "../pages/**/*.nguyen";
+@source "../app/**/*.gox";
+@source "../pages/**/*.gox";
 
 @theme {
   --font-sans: "Geist", ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;

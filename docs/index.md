@@ -8,7 +8,7 @@ Welcome to the Nguyen.go documentation. Nguyen.go is a full-stack Go web framewo
 - [Getting Started](./getting-started.md) — Installation, project setup, first page
 
 ### Core Concepts
-- [Template Syntax](./template-syntax.md) — `.nguyen` file format, interpolation, events, control flow
+- [Template Syntax](./template-syntax.md) — `.gox` file format, interpolation, events, control flow
 - [Routing](./routing.md) — File-system routing, dynamic params, layouts, navigation
 - [Rendering](./rendering.md) — SSR, ISR, CSR modes, streaming, hydration
 - [Hooks & State](./hooks.md) — UseState, UseEffect, UseMemo, global state, scheduler
@@ -38,7 +38,7 @@ Welcome to the Nguyen.go documentation. Nguyen.go is a full-stack Go web framewo
 │                   Internal Packages                       │
 ├──────────┬──────────┬──────────┬──────────┬─────────────┤
 │  parser  │  router  │  render  │ compiler │   server    │
-│  (.nguyen│  (file-  │  (SSR,   │  (TinyGo │  (Fiber,   │
+│  (.gox│  (file-  │  (SSR,   │  (TinyGo │  (Fiber,   │
 │   lexer) │  system) │  stream) │   WASM)  │   HMR)     │
 ├──────────┼──────────┼──────────┼──────────┼─────────────┤
 │  config  │  cache   │   geo    │   pwa    │  optimizer  │
@@ -67,7 +67,7 @@ Welcome to the Nguyen.go documentation. Nguyen.go is a full-stack Go web framewo
 | I want to... | Go to |
 |--------------|-------|
 | Create a new project | [Getting Started](./getting-started.md) |
-| Understand `.nguyen` files | [Template Syntax](./template-syntax.md) |
+| Understand `.gox` files | [Template Syntax](./template-syntax.md) |
 | Add a new page | [Routing](./routing.md) |
 | Make a page interactive | [Hooks & State](./hooks.md) |
 | Deploy to production | [Deployment](./deployment.md) |

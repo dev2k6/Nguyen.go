@@ -30,7 +30,7 @@ export const geo = {
     <p class="text-[13px] text-blue font-mono uppercase tracking-widest mb-4">Core concepts</p>
     <h1 class="text-[36px] font-semibold tracking-tight text-white mb-4">Routing</h1>
     <p class="text-[17px] text-muted max-w-2xl leading-relaxed mb-12">
-        Every <code class="text-blue font-mono text-[14px]">.nguyen</code> file in <code class="text-blue font-mono text-[14px]">pages/</code> becomes a route. No config, no manifest — the filesystem is the router.
+        Every <code class="text-blue font-mono text-[14px]">.gox</code> file in <code class="text-blue font-mono text-[14px]">pages/</code> becomes a route. No config, no manifest — the filesystem is the router.
     </p>
 
     <div class="space-y-10">
@@ -45,12 +45,12 @@ export const geo = {
                     <span class="ml-3 text-[12px] font-mono text-muted">file → route</span>
                 </div>
                 <pre class="terminal-body text-[#c9d1d9]"><span style="color:#79c0ff">pages/</span>
-├── <span style="color:#7ee787">index.nguyen</span>        <span style="color:#6e7681"># → /</span>
-├── <span style="color:#7ee787">about.nguyen</span>        <span style="color:#6e7681"># → /about</span>
+├── <span style="color:#7ee787">index.gox</span>        <span style="color:#6e7681"># → /</span>
+├── <span style="color:#7ee787">about.gox</span>        <span style="color:#6e7681"># → /about</span>
 ├── <span style="color:#79c0ff">blog/</span>
-│   ├── <span style="color:#7ee787">index.nguyen</span>    <span style="color:#6e7681"># → /blog</span>
-│   └── <span style="color:#7ee787">[slug].nguyen</span>   <span style="color:#6e7681"># → /blog/:slug</span>
-└── <span style="color:#7ee787">404.nguyen</span>          <span style="color:#6e7681"># → catch-all fallback</span></pre>
+│   ├── <span style="color:#7ee787">index.gox</span>    <span style="color:#6e7681"># → /blog</span>
+│   └── <span style="color:#7ee787">[slug].gox</span>   <span style="color:#6e7681"># → /blog/:slug</span>
+└── <span style="color:#7ee787">404.gox</span>          <span style="color:#6e7681"># → catch-all fallback</span></pre>
             </div>
         </div>
 
@@ -70,17 +70,17 @@ export const geo = {
                     </thead>
                     <tbody>
                         <tr>
-                            <td class="font-mono text-blue text-[13px]">[slug].nguyen</td>
+                            <td class="font-mono text-blue text-[13px]">[slug].gox</td>
                             <td class="text-muted-stronger">Single segment</td>
                             <td class="text-muted font-mono text-[13px]">/blog/hello</td>
                         </tr>
                         <tr>
-                            <td class="font-mono text-blue text-[13px]">[...path].nguyen</td>
+                            <td class="font-mono text-blue text-[13px]">[...path].gox</td>
                             <td class="text-muted-stronger">Catch-all (1+ segments)</td>
                             <td class="text-muted font-mono text-[13px]">/a/b/c</td>
                         </tr>
                         <tr>
-                            <td class="font-mono text-blue text-[13px]">[[...lang]].nguyen</td>
+                            <td class="font-mono text-blue text-[13px]">[[...lang]].gox</td>
                             <td class="text-muted-stronger">Optional catch-all</td>
                             <td class="text-muted font-mono text-[13px]">/ or /en/about</td>
                         </tr>
@@ -97,7 +97,7 @@ export const geo = {
             <div class="terminal mb-4">
                 <div class="terminal-bar">
                     <span class="terminal-dot"></span><span class="terminal-dot"></span><span class="terminal-dot"></span>
-                    <span class="ml-3 text-[12px] font-mono text-muted">pages/blog/[slug].nguyen</span>
+                    <span class="ml-3 text-[12px] font-mono text-muted">pages/blog/[slug].gox</span>
                 </div>
                 <pre class="terminal-body text-[#c9d1d9]"><span style="color:#6e7681">---</span>
 <span style="color:#ff7b72">import</span> <span style="color:#a5d6ff">"nguyen.go/pkg/core"</span>
@@ -122,7 +122,7 @@ export const geo = {
                 </div>
                 <div>
                     <h4 class="text-[14px] font-medium text-white mb-2">Nested layouts</h4>
-                    <p class="text-[14px] text-muted leading-relaxed">Place a <code class="text-blue font-mono text-[12px]">layout.nguyen</code> in any directory to wrap all pages in that subtree. Layouts compose from root to leaf.</p>
+                    <p class="text-[14px] text-muted leading-relaxed">Place a <code class="text-blue font-mono text-[12px]">layout.gox</code> in any directory to wrap all pages in that subtree. Layouts compose from root to leaf.</p>
                 </div>
             </div>
         </div>

@@ -179,12 +179,12 @@ export const geo = {
                         <span class="ml-3 text-[12px] font-mono text-muted">file tree</span>
                     </div>
                     <pre class="terminal-body text-[#c9d1d9]"><span style="color:#79c0ff">pages/</span>
-├── <span style="color:#7ee787">index.nguyen</span>        <span style="color:#6e7681"># /</span>
-├── <span style="color:#7ee787">about.nguyen</span>        <span style="color:#6e7681"># /about</span>
+├── <span style="color:#7ee787">index.gox</span>        <span style="color:#6e7681"># /</span>
+├── <span style="color:#7ee787">about.gox</span>        <span style="color:#6e7681"># /about</span>
 ├── <span style="color:#79c0ff">blog/</span>
-│   ├── <span style="color:#7ee787">index.nguyen</span>    <span style="color:#6e7681"># /blog</span>
-│   └── <span style="color:#7ee787">[slug].nguyen</span>   <span style="color:#6e7681"># /blog/:slug</span>
-└── <span style="color:#7ee787">404.nguyen</span>          <span style="color:#6e7681"># catch-all</span></pre>
+│   ├── <span style="color:#7ee787">index.gox</span>    <span style="color:#6e7681"># /blog</span>
+│   └── <span style="color:#7ee787">[slug].gox</span>   <span style="color:#6e7681"># /blog/:slug</span>
+└── <span style="color:#7ee787">404.gox</span>          <span style="color:#6e7681"># catch-all</span></pre>
                 </div>
             </div>
 
@@ -205,17 +205,17 @@ export const geo = {
                         </thead>
                         <tbody>
                             <tr>
-                                <td class="font-mono text-blue text-[13px]">pages/blog/[slug].nguyen</td>
+                                <td class="font-mono text-blue text-[13px]">pages/blog/[slug].gox</td>
                                 <td class="text-muted-stronger">/blog/:slug</td>
                                 <td class="text-muted font-mono text-[13px]">/blog/hello</td>
                             </tr>
                             <tr>
-                                <td class="font-mono text-blue text-[13px]">pages/[...path].nguyen</td>
+                                <td class="font-mono text-blue text-[13px]">pages/[...path].gox</td>
                                 <td class="text-muted-stronger">catch-all</td>
                                 <td class="text-muted font-mono text-[13px]">/a/b/c</td>
                             </tr>
                             <tr>
-                                <td class="font-mono text-blue text-[13px]">pages/[[...lang]].nguyen</td>
+                                <td class="font-mono text-blue text-[13px]">pages/[[...lang]].gox</td>
                                 <td class="text-muted-stronger">optional catch-all</td>
                                 <td class="text-muted font-mono text-[13px]">/ · /en/about</td>
                             </tr>
@@ -235,7 +235,7 @@ export const geo = {
                         <span class="terminal-dot"></span>
                         <span class="terminal-dot"></span>
                         <span class="terminal-dot"></span>
-                        <span class="ml-3 text-[12px] font-mono text-muted">pages/blog/[slug].nguyen</span>
+                        <span class="ml-3 text-[12px] font-mono text-muted">pages/blog/[slug].gox</span>
                     </div>
                     <pre class="terminal-body text-[#c9d1d9]"><span style="color:#6e7681">---</span>
 <span style="color:#ff7b72">import</span> <span style="color:#a5d6ff">"nguyen.go/pkg/core"</span>

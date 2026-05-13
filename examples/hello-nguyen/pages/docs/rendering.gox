@@ -93,7 +93,7 @@ export const geo = {
             <div class="terminal mb-4">
                 <div class="terminal-bar">
                     <span class="terminal-dot"></span><span class="terminal-dot"></span><span class="terminal-dot"></span>
-                    <span class="ml-3 text-[12px] font-mono text-muted">pages/products.nguyen</span>
+                    <span class="ml-3 text-[12px] font-mono text-muted">pages/products.gox</span>
                 </div>
                 <pre class="terminal-body text-[#c9d1d9]"><span style="color:#6e7681">---</span>
 <span style="color:#ff7b72">export const</span> revalidate = <span style="color:#79c0ff">60</span> <span style="color:#6e7681">// regenerate every 60s</span>

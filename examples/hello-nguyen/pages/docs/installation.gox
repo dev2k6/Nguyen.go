@@ -88,9 +88,9 @@ go version go1.22.3 linux/amd64</pre>
                 </div>
                 <pre class="terminal-body text-[#c9d1d9]"><span style="color:#79c0ff">my-app/</span>
 ├── <span style="color:#79c0ff">app/</span>
-│   └── <span style="color:#7ee787">layout.nguyen</span>
+│   └── <span style="color:#7ee787">layout.gox</span>
 ├── <span style="color:#79c0ff">pages/</span>
-│   └── <span style="color:#7ee787">index.nguyen</span>
+│   └── <span style="color:#7ee787">index.gox</span>
 ├── <span style="color:#79c0ff">public/</span>
 ├── <span style="color:#79c0ff">styles/</span>
 │   └── <span style="color:#7ee787">input.css</span>

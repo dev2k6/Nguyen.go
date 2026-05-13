@@ -56,10 +56,10 @@ This additionally downloads the Tailwind CSS standalone CLI (no npm required) an
 ```
 my-app/
 ├── pages/
-│   ├── index.nguyen        # Home page → /
-│   ├── about.nguyen        # About page → /about
-│   ├── 404.nguyen          # Not found fallback
-│   └── layout.nguyen       # Root layout (wraps all pages)
+│   ├── index.gox        # Home page → /
+│   ├── about.gox        # About page → /about
+│   ├── 404.gox          # Not found fallback
+│   └── layout.gox       # Root layout (wraps all pages)
 ├── api/
 │   └── routes.go           # API route handlers
 ├── styles/
@@ -87,7 +87,7 @@ This starts:
 
 ## Your First Page
 
-Create `pages/hello.nguyen`:
+Create `pages/hello.gox`:
 
 ```nguyen
 ---
@@ -107,7 +107,7 @@ Visit `http://localhost:3000/hello` to see it.
 
 ## Adding Interactivity
 
-Create `pages/counter.nguyen`:
+Create `pages/counter.gox`:
 
 ```nguyen
 ---

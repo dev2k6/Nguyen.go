@@ -37,12 +37,12 @@ export const geo = {
         <div>
             <h2 class="text-[22px] font-semibold tracking-tight text-white mb-4">1. Create the file</h2>
             <p class="text-[16px] text-muted leading-[1.75] mb-4">
-                Add a new file at <code class="text-blue font-mono text-[14px]">pages/hello.nguyen</code>:
+                Add a new file at <code class="text-blue font-mono text-[14px]">pages/hello.gox</code>:
             </p>
             <div class="terminal mb-4">
                 <div class="terminal-bar">
                     <span class="terminal-dot"></span><span class="terminal-dot"></span><span class="terminal-dot"></span>
-                    <span class="ml-3 text-[12px] font-mono text-muted">pages/hello.nguyen</span>
+                    <span class="ml-3 text-[12px] font-mono text-muted">pages/hello.gox</span>
                 </div>
                 <pre class="terminal-body text-[#c9d1d9]"><span style="color:#6e7681">---</span>
 <span style="color:#ff7b72">import</span> <span style="color:#a5d6ff">"nguyen.go/pkg/core"</span>

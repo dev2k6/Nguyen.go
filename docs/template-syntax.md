@@ -1,10 +1,10 @@
 # Template Syntax
 
-Nguyen.go uses `.nguyen` files — a single-file format combining Go logic with HTML templates.
+Nguyen.go uses `.gox` files — a single-file format combining Go logic with HTML templates.
 
 ## File Structure
 
-A `.nguyen` file has two sections separated by `---`:
+A `.gox` file has two sections separated by `---`:
 
 ```nguyen
 ---
@@ -233,7 +233,7 @@ In layouts, `<nguyen-slot />` marks where page content is inserted:
 Define multiple insertion points:
 
 ```html
-<!-- layout.nguyen -->
+<!-- layout.gox -->
 <div class="layout">
     <aside><nguyen-slot name="sidebar" /></aside>
     <main><nguyen-slot /></main>
@@ -243,7 +243,7 @@ Define multiple insertion points:
 Fill named slots from pages:
 
 ```html
-<!-- page.nguyen -->
+<!-- page.gox -->
 <nav slot="sidebar">Sidebar content</nav>
 <article>Main content</article>
 ```
@@ -272,7 +272,7 @@ layout = "app/layout"
 ---
 ```
 
-Or rely on auto-discovery: `layout.nguyen` in the same or parent directory applies automatically.
+Or rely on auto-discovery: `layout.gox` in the same or parent directory applies automatically.
 
 ## ISR Revalidation
 
