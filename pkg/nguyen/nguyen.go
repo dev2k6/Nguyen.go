@@ -11,13 +11,21 @@ import (
 	"syscall"
 	"time"
 
+	"github.com/dev2k6/Nguyen.go/internal/auth"
 	"github.com/dev2k6/Nguyen.go/internal/cache"
 	"github.com/dev2k6/Nguyen.go/internal/config"
+	"github.com/dev2k6/Nguyen.go/internal/csrf"
+	"github.com/dev2k6/Nguyen.go/internal/database"
+	"github.com/dev2k6/Nguyen.go/internal/event"
 	"github.com/dev2k6/Nguyen.go/internal/geo"
+	"github.com/dev2k6/Nguyen.go/internal/i18n"
+	"github.com/dev2k6/Nguyen.go/internal/mail"
 	"github.com/dev2k6/Nguyen.go/internal/parser"
 	"github.com/dev2k6/Nguyen.go/internal/render"
 	"github.com/dev2k6/Nguyen.go/internal/router"
 	"github.com/dev2k6/Nguyen.go/internal/server"
+	"github.com/dev2k6/Nguyen.go/internal/upload"
+	"github.com/dev2k6/Nguyen.go/internal/ws"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/compress"
@@ -26,17 +34,32 @@ import (
 )
 
 type App struct {
-	fiber     *fiber.App
-	config    *config.NguyenConfig
-	routes    []router.Route
-	isrCache  *cache.ISR
-	pagesDir  string
-	publicDir string
-	stylesDir string
-	buildDir  string
-	port      int
-	host      string
-	setup     func(*fiber.App)
+	fiber        *fiber.App
+	config       *config.NguyenConfig
+	routes       []router.Route
+	isrCache     *cache.ISR
+	pagesDir     string
+	publicDir    string
+	stylesDir    string
+	buildDir     string
+	port         int
+	host         string
+	setup        func(*fiber.App)
+	dbConfig     *config.DatabaseConfig
+	authConfig   *config.AuthConfig
+	csrfConfig   *config.CSRFConfig
+	uploadConfig *config.UploadConfig
+	wsConfig     *config.WSConfig
+	i18nConfig   *config.I18nConfig
+	mailConfig   *config.MailConfig
+	db           *database.DB
+	auth         *auth.Auth
+	csrf         *csrf.CSRF
+	uploader     *upload.Uploader
+	wsHub        *ws.Hub
+	i18n         *i18n.I18n
+	mailer       *mail.Mailer
+	events       *event.Bus
 }
 
 func New(opts ...Option) *App {
@@ -139,6 +162,10 @@ func (a *App) serve() error {
 	a.fiber.Static("/styles", a.stylesDir)
 	a.fiber.Static("/public", a.publicDir)
 
+	if err := a.initModules(cfg); err != nil {
+		return fmt.Errorf("nguyen: module init failed: %w", err)
+	}
+
 	if a.setup != nil {
 		a.setup(a.fiber)
 	}
@@ -171,6 +198,7 @@ func (a *App) serve() error {
 	case <-quit:
 		fmt.Println()
 		log.Println("  Shutting down gracefully...")
+		a.shutdown()
 		ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 		defer cancel()
 		if err := a.fiber.ShutdownWithContext(ctx); err != nil {
@@ -178,6 +206,7 @@ func (a *App) serve() error {
 		}
 		log.Println("  Server stopped")
 	case err := <-errCh:
+		a.shutdown()
 		msg := err.Error()
 		if strings.Contains(msg, "address already in use") ||
 			strings.Contains(msg, "Only one usage of each socket address") {
@@ -186,6 +215,13 @@ func (a *App) serve() error {
 		return fmt.Errorf("nguyen: %w", err)
 	}
 	return nil
+}
+
+func (a *App) shutdown() {
+	if a.db != nil {
+		a.db.Close()
+		log.Println("  ✓ Database connection closed")
+	}
 }
 
 func (a *App) mountRoutes(pagesAbs string) {
@@ -265,4 +301,235 @@ func (a *App) printBanner(addr string) {
 	fmt.Printf("  ► http://%s\n", addr)
 	fmt.Printf("  ► %d route(s) loaded\n", len(a.routes))
 	fmt.Println()
+}
+
+func (a *App) initModules(cfg *config.NguyenConfig) error {
+	dbCfg := a.resolveDBConfig(cfg)
+	if dbCfg != nil {
+		db, err := database.New(database.Config{
+			Driver:      dbCfg.Driver,
+			DSN:         dbCfg.DSN,
+			MaxOpenConn: dbCfg.MaxOpenConn,
+			MaxIdleConn: dbCfg.MaxIdleConn,
+			MaxLifetime: dbCfg.MaxLifetime,
+		})
+		if err != nil {
+			return fmt.Errorf("database: %w", err)
+		}
+		a.db = db
+		log.Println("  ✓ Database connected")
+	}
+
+	authCfg := a.resolveAuthConfig(cfg)
+	if authCfg != nil {
+		a.auth = auth.New(auth.Config{
+			JWTSecret:      authCfg.JWTSecret,
+			JWTExpiry:      authCfg.JWTExpiry,
+			RefreshExpiry:  authCfg.RefreshExpiry,
+			SessionTTL:     authCfg.SessionTTL,
+			BcryptCost:     authCfg.BcryptCost,
+			TokenHeader:    authCfg.TokenHeader,
+			CookieName:     authCfg.CookieName,
+			CookieSecure:   authCfg.CookieSecure,
+			CookieHTTPOnly: authCfg.CookieHTTPOnly,
+		}, a.db)
+		log.Println("  ✓ Auth initialized")
+	}
+
+	csrfCfg := a.resolveCSRFConfig(cfg)
+	if csrfCfg != nil {
+		a.csrf = csrf.New(csrf.Config{
+			TokenLength: csrfCfg.TokenLength,
+			CookieName:  csrfCfg.CookieName,
+			HeaderName:  csrfCfg.HeaderName,
+			FormField:   csrfCfg.FormField,
+			Expiry:      csrfCfg.Expiry,
+			Secure:      csrfCfg.Secure,
+			SameSite:    csrfCfg.SameSite,
+			SkipPaths:   csrfCfg.SkipPaths,
+		})
+		a.fiber.Use(a.csrf.Middleware())
+		log.Println("  ✓ CSRF protection enabled")
+	}
+
+	uploadCfg := a.resolveUploadConfig(cfg)
+	if uploadCfg != nil {
+		uploader, err := upload.New(upload.Config{
+			MaxSize:      uploadCfg.MaxSize,
+			AllowedTypes: uploadCfg.AllowedTypes,
+			StorageType:  uploadCfg.StorageType,
+			LocalDir:     uploadCfg.LocalDir,
+			S3Bucket:     uploadCfg.S3Bucket,
+			S3Region:     uploadCfg.S3Region,
+			S3Endpoint:   uploadCfg.S3Endpoint,
+			S3AccessKey:  uploadCfg.S3AccessKey,
+			S3SecretKey:  uploadCfg.S3SecretKey,
+			BaseURL:      uploadCfg.BaseURL,
+		})
+		if err != nil {
+			return fmt.Errorf("upload: %w", err)
+		}
+		a.uploader = uploader
+		if uploadCfg.StorageType == "local" {
+			a.fiber.Static("/uploads", uploadCfg.LocalDir)
+		}
+		log.Println("  ✓ File upload ready")
+	}
+
+	wsCfg := a.resolveWSConfig(cfg)
+	if wsCfg != nil {
+		a.wsHub = ws.NewHub(ws.Config{
+			Enabled:        wsCfg.Enabled,
+			Path:           wsCfg.Path,
+			MaxMessageSize: wsCfg.MaxMessageSize,
+			PingInterval:   wsCfg.PingInterval,
+		})
+		a.fiber.Use(wsCfg.Path, a.wsHub.UpgradeMiddleware())
+		a.fiber.Get(wsCfg.Path, a.wsHub.Upgrade())
+		log.Println("  ✓ WebSocket enabled at", wsCfg.Path)
+	}
+
+	i18nCfg := a.resolveI18nConfig(cfg)
+	if i18nCfg != nil {
+		i, err := i18n.New(i18n.Config{
+			DefaultLocale:   i18nCfg.DefaultLocale,
+			Locales:         i18nCfg.Locales,
+			TranslationsDir: i18nCfg.TranslationsDir,
+			URLPrefix:       i18nCfg.URLPrefix,
+			CookieName:      i18nCfg.CookieName,
+			QueryParam:      i18nCfg.QueryParam,
+		})
+		if err != nil {
+			return fmt.Errorf("i18n: %w", err)
+		}
+		a.i18n = i
+		a.fiber.Use(a.i18n.Middleware())
+		log.Println("  ✓ i18n loaded:", i18nCfg.Locales)
+	}
+
+	mailCfg := a.resolveMailConfig(cfg)
+	if mailCfg != nil {
+		m, err := mail.New(mail.Config{
+			Host:         mailCfg.Host,
+			Port:         mailCfg.Port,
+			Username:     mailCfg.Username,
+			Password:     mailCfg.Password,
+			FromName:     mailCfg.FromName,
+			FromAddress:  mailCfg.FromAddress,
+			TLS:          mailCfg.TLS,
+			TemplatesDir: mailCfg.TemplatesDir,
+		})
+		if err != nil {
+			return fmt.Errorf("mail: %w", err)
+		}
+		a.mailer = m
+		log.Println("  ✓ Mail sender ready")
+	}
+
+	a.events = event.NewBus()
+	log.Println("  ✓ Event bus initialized")
+
+	return nil
+}
+
+func (a *App) resolveDBConfig(cfg *config.NguyenConfig) *config.DatabaseConfig {
+	if a.dbConfig != nil {
+		return a.dbConfig
+	}
+	if cfg.Database.Driver != "" {
+		return &cfg.Database
+	}
+	return nil
+}
+
+func (a *App) resolveAuthConfig(cfg *config.NguyenConfig) *config.AuthConfig {
+	if a.authConfig != nil {
+		return a.authConfig
+	}
+	if cfg.Auth.Enabled {
+		return &cfg.Auth
+	}
+	return nil
+}
+
+func (a *App) resolveCSRFConfig(cfg *config.NguyenConfig) *config.CSRFConfig {
+	if a.csrfConfig != nil {
+		return a.csrfConfig
+	}
+	if cfg.CSRF.Enabled {
+		return &cfg.CSRF
+	}
+	return nil
+}
+
+func (a *App) resolveUploadConfig(cfg *config.NguyenConfig) *config.UploadConfig {
+	if a.uploadConfig != nil {
+		return a.uploadConfig
+	}
+	if cfg.Upload.Enabled {
+		return &cfg.Upload
+	}
+	return nil
+}
+
+func (a *App) resolveWSConfig(cfg *config.NguyenConfig) *config.WSConfig {
+	if a.wsConfig != nil {
+		return a.wsConfig
+	}
+	if cfg.WS.Enabled {
+		return &cfg.WS
+	}
+	return nil
+}
+
+func (a *App) resolveI18nConfig(cfg *config.NguyenConfig) *config.I18nConfig {
+	if a.i18nConfig != nil {
+		return a.i18nConfig
+	}
+	if cfg.I18n.Enabled {
+		return &cfg.I18n
+	}
+	return nil
+}
+
+func (a *App) resolveMailConfig(cfg *config.NguyenConfig) *config.MailConfig {
+	if a.mailConfig != nil {
+		return a.mailConfig
+	}
+	if cfg.Mail.Enabled {
+		return &cfg.Mail
+	}
+	return nil
+}
+
+func (a *App) DB() *database.DB {
+	return a.db
+}
+
+func (a *App) Auth() *auth.Auth {
+	return a.auth
+}
+
+func (a *App) CSRF() *csrf.CSRF {
+	return a.csrf
+}
+
+func (a *App) Uploader() *upload.Uploader {
+	return a.uploader
+}
+
+func (a *App) WSHub() *ws.Hub {
+	return a.wsHub
+}
+
+func (a *App) I18n() *i18n.I18n {
+	return a.i18n
+}
+
+func (a *App) Mailer() *mail.Mailer {
+	return a.mailer
+}
+
+func (a *App) Events() *event.Bus {
+	return a.events
 }

@@ -3,20 +3,23 @@ module github.com/dev2k6/Nguyen.go
 go 1.25.0
 
 retract (
-	v1.0.2 // published with incomplete features
-	v1.0.3 // published with incomplete features
 	v1.0.4 // published with incomplete features
+	v1.0.3 // published with incomplete features
+	v1.0.2 // published with incomplete features
 )
 
 require (
 	github.com/gofiber/fiber/v2 v2.52.6
+	github.com/gofiber/websocket/v2 v2.2.1
 	github.com/spf13/cobra v1.9.1
+	golang.org/x/crypto v0.31.0
 	golang.org/x/image v0.40.0
 	gopkg.in/yaml.v3 v3.0.1
 )
 
 require (
 	github.com/andybalholm/brotli v1.1.0 // indirect
+	github.com/fasthttp/websocket v1.5.3 // indirect
 	github.com/google/uuid v1.6.0 // indirect
 	github.com/inconshreveable/mousetrap v1.1.0 // indirect
 	github.com/klauspost/compress v1.17.9 // indirect
@@ -25,6 +28,7 @@ require (
 	github.com/mattn/go-runewidth v0.0.16 // indirect
 	github.com/philhofer/fwd v1.1.3-0.20240916144458-20a13a1f6b7c // indirect
 	github.com/rivo/uniseg v0.2.0 // indirect
+	github.com/savsgio/gotils v0.0.0-20230208104028-c358bd845dee // indirect
 	github.com/spf13/pflag v1.0.6 // indirect
 	github.com/tinylib/msgp v1.2.5 // indirect
 	github.com/valyala/bytebufferpool v1.0.0 // indirect

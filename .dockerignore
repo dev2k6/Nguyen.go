@@ -1,0 +1,9 @@
+.nguyen/
+.git/
+.clone-astro/
+*.wasm
+node_modules/
+tmp/
+uploads/
+.env
+.env.*

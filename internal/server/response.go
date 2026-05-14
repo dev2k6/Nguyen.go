@@ -93,3 +93,27 @@ func Paginated(c *fiber.Ctx, data interface{}, page, perPage, total int) error {
 		},
 	})
 }
+
+// ValidationError sends a 422 response with field-level validation errors.
+func ValidationError(c *fiber.Ctx, errors map[string][]string) error {
+	return c.Status(422).JSON(fiber.Map{
+		"error":  "Validation failed",
+		"fields": errors,
+	})
+}
+
+// Conflict sends a 409 error response.
+func Conflict(c *fiber.Ctx, message string) error {
+	if message == "" {
+		message = "Conflict"
+	}
+	return c.Status(409).JSON(fiber.Map{"error": message})
+}
+
+// TooManyRequests sends a 429 error response.
+func TooManyRequests(c *fiber.Ctx, message string) error {
+	if message == "" {
+		message = "Too Many Requests"
+	}
+	return c.Status(429).JSON(fiber.Map{"error": message})
+}

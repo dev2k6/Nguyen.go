@@ -3,6 +3,7 @@ package config
 import (
 	"fmt"
 	"os"
+	"time"
 
 	"github.com/dev2k6/Nguyen.go/internal/version"
 	"gopkg.in/yaml.v3"
@@ -10,16 +11,23 @@ import (
 
 // NguyenConfig represents the full configuration loaded from nguyen.config.yml
 type NguyenConfig struct {
-	Name    string       `yaml:"name"`
-	Version string       `yaml:"version"`
-	Server  ServerConfig `yaml:"server"`
-	Render  RenderConfig `yaml:"render"`
-	WASM    WASMConfig   `yaml:"wasm"`
-	HMR     HMRConfig    `yaml:"hmr"`
-	Images  ImageConfig  `yaml:"images"`
-	Head    HeadConfig   `yaml:"head"`
-	GEO     GEOConfig    `yaml:"geo"`
-	PWA     PWAConfig    `yaml:"pwa"`
+	Name     string         `yaml:"name"`
+	Version  string         `yaml:"version"`
+	Server   ServerConfig   `yaml:"server"`
+	Render   RenderConfig   `yaml:"render"`
+	WASM     WASMConfig     `yaml:"wasm"`
+	HMR      HMRConfig      `yaml:"hmr"`
+	Images   ImageConfig    `yaml:"images"`
+	Head     HeadConfig     `yaml:"head"`
+	GEO      GEOConfig      `yaml:"geo"`
+	PWA      PWAConfig      `yaml:"pwa"`
+	Database DatabaseConfig `yaml:"database"`
+	Auth     AuthConfig     `yaml:"auth"`
+	CSRF     CSRFConfig     `yaml:"csrf"`
+	Upload   UploadConfig   `yaml:"upload"`
+	WS       WSConfig       `yaml:"websocket"`
+	I18n     I18nConfig     `yaml:"i18n"`
+	Mail     MailConfig     `yaml:"mail"`
 }
 
 // ServerConfig holds HTTP server settings
@@ -138,6 +146,102 @@ type PWAIcon struct {
 	Src   string `yaml:"src"`
 	Sizes string `yaml:"sizes"`
 	Type  string `yaml:"type"`
+}
+
+// DatabaseConfig holds database connection settings
+type DatabaseConfig struct {
+	Driver      string `yaml:"driver"`
+	DSN         string `yaml:"dsn"`
+	MaxOpenConn int    `yaml:"max_open_conn"`
+	MaxIdleConn int    `yaml:"max_idle_conn"`
+	MaxLifetime int    `yaml:"max_lifetime"`
+	Migrations  string `yaml:"migrations"`
+}
+
+// AuthConfig holds authentication settings
+type AuthConfig struct {
+	Enabled        bool                    `yaml:"enabled"`
+	JWTSecret      string                  `yaml:"jwt_secret"`
+	JWTExpiry      time.Duration           `yaml:"jwt_expiry"`
+	RefreshExpiry  time.Duration           `yaml:"refresh_expiry"`
+	SessionTTL     time.Duration           `yaml:"session_ttl"`
+	BcryptCost     int                     `yaml:"bcrypt_cost"`
+	TokenHeader    string                  `yaml:"token_header"`
+	CookieName     string                  `yaml:"cookie_name"`
+	CookieSecure   bool                    `yaml:"cookie_secure"`
+	CookieHTTPOnly bool                    `yaml:"cookie_httponly"`
+	OAuth          map[string]OAuthConfig  `yaml:"oauth"`
+}
+
+// OAuthConfig holds OAuth provider settings
+type OAuthConfig struct {
+	ClientID     string   `yaml:"client_id"`
+	ClientSecret string   `yaml:"client_secret"`
+	RedirectURL  string   `yaml:"redirect_url"`
+	Scopes       []string `yaml:"scopes"`
+	AuthURL      string   `yaml:"auth_url"`
+	TokenURL     string   `yaml:"token_url"`
+	UserInfoURL  string   `yaml:"user_info_url"`
+}
+
+// CSRFConfig holds CSRF protection settings
+type CSRFConfig struct {
+	Enabled     bool          `yaml:"enabled"`
+	TokenLength int           `yaml:"token_length"`
+	CookieName  string        `yaml:"cookie_name"`
+	HeaderName  string        `yaml:"header_name"`
+	FormField   string        `yaml:"form_field"`
+	Expiry      time.Duration `yaml:"expiry"`
+	Secure      bool          `yaml:"secure"`
+	SameSite    string        `yaml:"same_site"`
+	SkipPaths   []string      `yaml:"skip_paths"`
+}
+
+// UploadConfig holds file upload settings
+type UploadConfig struct {
+	Enabled      bool     `yaml:"enabled"`
+	MaxSize      int64    `yaml:"max_size"`
+	AllowedTypes []string `yaml:"allowed_types"`
+	StorageType  string   `yaml:"storage_type"`
+	LocalDir     string   `yaml:"local_dir"`
+	S3Bucket     string   `yaml:"s3_bucket"`
+	S3Region     string   `yaml:"s3_region"`
+	S3Endpoint   string   `yaml:"s3_endpoint"`
+	S3AccessKey  string   `yaml:"s3_access_key"`
+	S3SecretKey  string   `yaml:"s3_secret_key"`
+	BaseURL      string   `yaml:"base_url"`
+}
+
+// WSConfig holds WebSocket settings
+type WSConfig struct {
+	Enabled        bool   `yaml:"enabled"`
+	Path           string `yaml:"path"`
+	MaxMessageSize int64  `yaml:"max_message_size"`
+	PingInterval   int    `yaml:"ping_interval"`
+}
+
+// I18nConfig holds internationalization settings
+type I18nConfig struct {
+	Enabled         bool     `yaml:"enabled"`
+	DefaultLocale   string   `yaml:"default_locale"`
+	Locales         []string `yaml:"locales"`
+	TranslationsDir string   `yaml:"translations_dir"`
+	URLPrefix       bool     `yaml:"url_prefix"`
+	CookieName      string   `yaml:"cookie_name"`
+	QueryParam      string   `yaml:"query_param"`
+}
+
+// MailConfig holds email sending settings
+type MailConfig struct {
+	Enabled      bool   `yaml:"enabled"`
+	Host         string `yaml:"host"`
+	Port         int    `yaml:"port"`
+	Username     string `yaml:"username"`
+	Password     string `yaml:"password"`
+	FromName     string `yaml:"from_name"`
+	FromAddress  string `yaml:"from_address"`
+	TLS          bool   `yaml:"tls"`
+	TemplatesDir string `yaml:"templates_dir"`
 }
 
 // DefaultConfig returns a sensible default configuration
