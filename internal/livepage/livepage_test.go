@@ -6,7 +6,7 @@ import (
 	"strconv"
 	"testing"
 
-	"github.com/dev2k6/Nguyen.go/internal/live"
+	publiclive "github.com/dev2k6/Nguyen.go/pkg/live"
 )
 
 type counterState struct{ Count int }
@@ -22,7 +22,7 @@ func (c *counterPage) Render(_ context.Context, state any) (string, error) {
 	return "<p>count:" + strconv.Itoa(s.Count) + "</p>", nil
 }
 
-func (c *counterPage) Handle(_ context.Context, state any, evt live.Event) (any, error) {
+func (c *counterPage) Handle(_ context.Context, state any, evt publiclive.Event) (any, error) {
 	s := state.(*counterState)
 	switch evt.Name {
 	case "inc":
@@ -83,7 +83,7 @@ func TestAdapterDelegatesToPage(t *testing.T) {
 	if html == "" {
 		t.Fatal("empty html")
 	}
-	state2, err := a.Handle(context.Background(), state, live.Event{Kind: "event", Name: "inc"})
+	state2, err := p.Handle(context.Background(), state, publiclive.Event{Kind: "event", Name: "inc"})
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -101,3 +101,4 @@ func TestRoutesList(t *testing.T) {
 		t.Fatalf("want 2 got %d", len(got))
 	}
 }
+

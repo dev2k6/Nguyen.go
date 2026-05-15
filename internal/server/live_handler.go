@@ -7,7 +7,7 @@ import (
 	"time"
 
 	"github.com/dev2k6/Nguyen.go/internal/live"
-	"github.com/dev2k6/Nguyen.go/internal/livepage"
+	internallivepage "github.com/dev2k6/Nguyen.go/internal/livepage"
 	"github.com/dev2k6/Nguyen.go/pkg/ngctx"
 	"github.com/dev2k6/Nguyen.go/pkg/observe"
 	"github.com/gofiber/fiber/v2"
@@ -57,7 +57,7 @@ type ngctxRequestIDKey struct{}
 // The path captured at "*" decides which page is served. Pages must
 // already be registered in the supplied registry; an unknown route
 // receives a single error frame and the socket closes.
-func LiveHandler(hub *live.Hub, registry *livepage.Registry) fiber.Handler {
+func LiveHandler(hub *live.Hub, registry *internallivepage.Registry) fiber.Handler {
 	return websocket.New(func(c *websocket.Conn) {
 		ctx, cancel := context.WithCancel(context.Background())
 		defer cancel()
@@ -91,7 +91,7 @@ func LiveHandler(hub *live.Hub, registry *livepage.Registry) fiber.Handler {
 			return
 		}
 
-		adapter := livepage.Adapter{Page: page}
+		adapter := internallivepage.Adapter{Page: page}
 		sess, err := hub.Spawn(ctx, ngctx.NewID(), route, state, adapter, adapter)
 		if err != nil {
 			writeFatal(c, "spawn: "+err.Error())

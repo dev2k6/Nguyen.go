@@ -1,0 +1,33 @@
+---
+export const metadata = {
+    title: "Live Counter — Nguyen.go",
+    description: "An interactive page rendered fully on the server with zero client-side WASM.",
+}
+---
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/styles/output.css">
+    <nguyen-head />
+</head>
+<body class="bg-gray-50 min-h-screen">
+    <main class="max-w-2xl mx-auto py-16 px-6">
+        <a href="/" class="text-sm text-indigo-600 hover:underline">← Home</a>
+
+        <div class="mt-6 rounded-2xl bg-white shadow-sm border">
+            <div data-nguyen-live="/counter">
+                <p class="p-8 text-center text-gray-500">Connecting to live session…</p>
+            </div>
+        </div>
+
+        <p class="mt-6 text-center text-sm text-gray-500">
+            Powered by Nguyen.go Live Mode — 0 KB compiled Go in your browser.
+        </p>
+    </main>
+
+    <script src="/_nguyen/live.js" defer></script>
+</body>
+</html>

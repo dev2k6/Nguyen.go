@@ -1,11 +1,7 @@
 // Package livepage bridges Live Mode page definitions to internal/live
-// at runtime. Application code registers a Page (Init/Render/Handle)
-// per route pattern; the WebSocket handler looks the page up by route
-// and constructs a Session against it.
-//
-// Defining a Page directly in Go gives developers full type safety
-// over state and event names while leaving template-driven Live pages
-// to a future codegen pass.
+// at runtime. Application code registers a pkg/livepage.Page per route
+// pattern; the WebSocket handler looks the page up by route and
+// constructs a Session against it.
 package livepage
 
 import (
@@ -14,16 +10,13 @@ import (
 	"sync"
 
 	"github.com/dev2k6/Nguyen.go/internal/live"
+	publiclive "github.com/dev2k6/Nguyen.go/pkg/live"
+	"github.com/dev2k6/Nguyen.go/pkg/livepage"
 )
 
-// Page is the contract every Live route implements. State carries the
-// per-session struct, Init seeds it from request params, Render emits
-// HTML, and Handle reacts to one client event.
-type Page interface {
-	Init(ctx context.Context, params map[string]string) (state any, err error)
-	Render(ctx context.Context, state any) (string, error)
-	Handle(ctx context.Context, state any, evt live.Event) (any, error)
-}
+// Page is an alias of the public livepage.Page so internal callers do
+// not need to import both packages.
+type Page = livepage.Page
 
 // Registry maps route patterns to Pages. A Hub may serve any number of
 // routes by sharing one Registry.
@@ -81,7 +74,10 @@ func (a Adapter) Render(ctx context.Context, state any) (string, error) {
 	return a.Page.Render(ctx, state)
 }
 
-// Handle satisfies live.Handler.
+// Handle satisfies live.Handler. It accepts the internal/live event
+// type and forwards a publicly-typed event to the Page so application
+// code never imports internal/live.
 func (a Adapter) Handle(ctx context.Context, state any, evt live.Event) (any, error) {
-	return a.Page.Handle(ctx, state, evt)
+	return a.Page.Handle(ctx, state, publiclive.Event(evt))
 }
+

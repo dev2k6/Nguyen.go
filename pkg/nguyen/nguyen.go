@@ -20,7 +20,7 @@ import (
 	"github.com/dev2k6/Nguyen.go/internal/geo"
 	"github.com/dev2k6/Nguyen.go/internal/i18n"
 	"github.com/dev2k6/Nguyen.go/internal/live"
-	"github.com/dev2k6/Nguyen.go/internal/livepage"
+	internallivepage "github.com/dev2k6/Nguyen.go/internal/livepage"
 	"github.com/dev2k6/Nguyen.go/internal/mail"
 	"github.com/dev2k6/Nguyen.go/internal/parser"
 	"github.com/dev2k6/Nguyen.go/internal/render"
@@ -28,6 +28,7 @@ import (
 	"github.com/dev2k6/Nguyen.go/internal/server"
 	"github.com/dev2k6/Nguyen.go/internal/upload"
 	"github.com/dev2k6/Nguyen.go/internal/ws"
+	"github.com/dev2k6/Nguyen.go/pkg/livepage"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/compress"
@@ -63,7 +64,7 @@ type App struct {
 	mailer       *mail.Mailer
 	events       *event.Bus
 	liveHub      *live.Hub
-	livePages    *livepage.Registry
+	livePages    *internallivepage.Registry
 }
 
 func New(opts ...Option) *App {
@@ -173,7 +174,7 @@ func (a *App) serve() error {
 	// registry are lazily created so applications that do not register
 	// any live pages pay no overhead.
 	a.liveHub = live.NewHub(live.Options{})
-	a.livePages = livepage.NewRegistry()
+	a.livePages = internallivepage.NewRegistry()
 	a.fiber.Get("/_nguyen/live.js", server.LiveBridgeHandler())
 	a.fiber.Get("/_nguyen/live/+", server.LiveUpgradeMiddleware(), server.LiveHandler(a.liveHub, a.livePages))
 	go func() {
@@ -572,7 +573,7 @@ func (a *App) LiveHub() *live.Hub {
 //	}))
 func (a *App) RegisterLivePage(pattern string, page livepage.Page) error {
 	if a.livePages == nil {
-		a.livePages = livepage.NewRegistry()
+		a.livePages = internallivepage.NewRegistry()
 	}
 	return a.livePages.Register(pattern, page)
 }
