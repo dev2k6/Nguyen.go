@@ -74,6 +74,7 @@ func (a *Auth) OAuthRedirectHandler(provider string) fiber.Handler {
 			Value:    state,
 			HTTPOnly: true,
 			Secure:   a.config.CookieSecure,
+			SameSite: "Lax",
 			MaxAge:   300,
 		})
 

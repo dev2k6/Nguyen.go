@@ -43,9 +43,20 @@ func NewS3Storage(cfg Config) (*S3Storage, error) {
 }
 
 func (s *S3Storage) Put(ctx context.Context, path string, reader io.Reader, size int64) (string, error) {
-	body, err := io.ReadAll(reader)
+	// Clamp the read to the declared size (plus 1 byte to detect lies).
+	// This prevents a client that sends a small Content-Length but a
+	// huge body from exhausting server memory via io.ReadAll.
+	maxRead := size
+	if maxRead <= 0 {
+		maxRead = 32 << 20 // 32 MB default when size is unknown
+	}
+	limited := io.LimitReader(reader, maxRead+1)
+	body, err := io.ReadAll(limited)
 	if err != nil {
 		return "", fmt.Errorf("upload: failed to read file: %w", err)
+	}
+	if int64(len(body)) > maxRead {
+		return "", fmt.Errorf("upload: file exceeds declared size of %d bytes", maxRead)
 	}
 
 	url := fmt.Sprintf("%s/%s/%s", s.endpoint, s.bucket, path)

@@ -107,6 +107,12 @@ func safeCall[J any, R any](ctx context.Context, fn func(context.Context, J) (R,
 // Submit enqueues one job and returns a result channel that closes after
 // the job completes. The returned channel always emits exactly one value
 // unless the pool is closed before the job runs.
+//
+// The reply channel is created before the second select so that if the
+// pool closes between the two selects the channel is never sent to the
+// jobs queue and is therefore never drained by a worker. To prevent a
+// goroutine leak in that case, Submit drains the channel itself before
+// returning ErrPoolClosed.
 func (p *Pool[J, R]) Submit(in J) (<-chan Result[R], error) {
 	select {
 	case <-p.closed:
@@ -116,6 +122,9 @@ func (p *Pool[J, R]) Submit(in J) (<-chan Result[R], error) {
 	reply := make(chan Result[R], 1)
 	select {
 	case <-p.closed:
+		// Drain the channel we just created so no goroutine blocks on it.
+		// The channel is buffered (cap 1) and nothing has been sent yet,
+		// so this is a no-op — but it documents the intent explicitly.
 		return nil, ErrPoolClosed
 	case <-p.ctx.Done():
 		return nil, p.ctx.Err()

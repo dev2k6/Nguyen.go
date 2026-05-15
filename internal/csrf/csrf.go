@@ -105,6 +105,10 @@ func (cs *CSRF) generateAndSet(c *fiber.Ctx) string {
 	token := generateToken(cs.config.TokenLength)
 
 	sameSite := cs.parseSameSite()
+	// HTTPOnly must be false so JS can read the token for the
+	// double-submit pattern. SameSite=Lax (default) limits the
+	// exposure: the cookie is not sent on cross-site sub-resource
+	// requests, only on top-level navigations.
 	c.Cookie(&fiber.Cookie{
 		Name:     cs.config.CookieName,
 		Value:    token,

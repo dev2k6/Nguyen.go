@@ -110,12 +110,38 @@ func EncodeFormatExt(f ImageFormat) string {
 	}
 }
 
+// maxImageDimension is the largest width or height accepted before
+// full decode. A 8192×8192 RGBA image uses 256 MB — large enough for
+// any legitimate use case while blocking decompression bombs.
+const maxImageDimension = 8192
+
 // DecodeImage reads and decodes an image from a reader.
-// Supports JPEG and PNG.
+// Supports JPEG and PNG. Returns an error if either dimension exceeds
+// maxImageDimension to prevent decompression bomb DoS attacks.
 func DecodeImage(r io.Reader) (image.Image, error) {
-	img, _, err := image.Decode(r)
+	// Peek at the config (dimensions only) before full decode.
+	// image.DecodeConfig reads only the header — cheap and safe.
+	buf := &peekReader{}
+	cfg, format, err := image.DecodeConfig(io.TeeReader(r, buf))
+	if err != nil {
+		return nil, fmt.Errorf("image: cannot read header: %w", err)
+	}
+	if cfg.Width > maxImageDimension || cfg.Height > maxImageDimension {
+		return nil, fmt.Errorf("image: dimensions %dx%d exceed maximum %d (format: %s)",
+			cfg.Width, cfg.Height, maxImageDimension, format)
+	}
+	// Replay the already-read bytes followed by the rest of the stream.
+	img, _, err := image.Decode(io.MultiReader(buf, r))
 	return img, err
 }
+
+// peekReader buffers bytes written to it so they can be replayed.
+type peekReader struct {
+	buf bytes.Buffer
+}
+
+func (p *peekReader) Write(b []byte) (int, error) { return p.buf.Write(b) }
+func (p *peekReader) Read(b []byte) (int, error)  { return p.buf.Read(b) }
 
 // GenerateBlurPlaceholder creates a low-quality blur placeholder (LQIP).
 // Downsamples the source image to a tiny size, encodes as JPEG at low quality,

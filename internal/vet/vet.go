@@ -390,8 +390,16 @@ func goStmtBody(g *ast.GoStmt) string {
 }
 
 var secretPatterns = []*regexp.Regexp{
-	regexp.MustCompile(`(?i)(api[_-]?key|secret[_-]?key|password|token)\s*[:=]\s*"[A-Za-z0-9_\-]{12,}"`),
-	regexp.MustCompile(`(?i)(aws|gcp|azure)[_-]?(secret|key)\s*[:=]\s*"[A-Za-z0-9_\-/+]{16,}"`),
+	// API keys, secret keys, passwords, tokens — at least 8 chars
+	regexp.MustCompile(`(?i)(api[_-]?key|secret[_-]?key|password|passwd|token|secret)\s*[:=]\s*"[A-Za-z0-9_\-!@#$%^&*]{8,}"`),
+	// AWS/GCP/Azure credentials
+	regexp.MustCompile(`(?i)(aws|gcp|azure)[_-]?(secret|key|token|password)\s*[:=]\s*"[A-Za-z0-9_\-/+]{8,}"`),
+	// Common service key patterns (Stripe, Twilio, SendGrid, etc.)
+	regexp.MustCompile(`(?i)(sk_live_|sk_test_|rk_live_|AC[a-z0-9]{32}|SG\.|AKIA)[A-Za-z0-9_\-]{8,}`),
+	// Private key headers
+	regexp.MustCompile(`-----BEGIN (RSA |EC |OPENSSH )?PRIVATE KEY-----`),
+	// Empty or short secrets assigned to known key names
+	regexp.MustCompile(`(?i)(jwt[_-]?secret|auth[_-]?secret|signing[_-]?key)\s*[:=]\s*"[^"]{0,31}"`),
 }
 
 func ruleNoHardcodedSecrets() Rule {
