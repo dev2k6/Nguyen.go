@@ -266,13 +266,32 @@ geo:
 ## CLI Commands
 
 ```bash
-nguyen create <name>    # scaffold project
-nguyen dev              # dev server + HMR
-nguyen build            # production build
-nguyen start            # serve build output
-nguyen export           # static HTML export
-nguyen check            # syntax validation
+nguyen create <name>           # scaffold project
+nguyen dev                     # dev server + HMR
+nguyen build                   # production build
+nguyen start                   # serve build output
+nguyen export                  # static HTML export
+nguyen check                   # syntax validation
+nguyen doctor                  # diagnose toolchain + project layout (v1.1.0+)
+nguyen vet                     # static analysis on .gox files (v1.1.0+)
+nguyen generate routes         # typed route accessors (v1.1.0+)
+nguyen dist                    # reproducible cross-compiled binaries (v1.1.0+)
 ```
+
+### `nguyen vet` rules (v1.1.0+)
+
+When generating .gox code, AI assistants should write code that passes
+the default vet rules. These mirror common Go idioms; ignore them only
+when you have a concrete reason.
+
+| Rule | Severity | Fix |
+|---|---|---|
+| `context-first-param` | warning | `Load`, `Action`, `Stream`, `Handle`, `GET`/`POST`/... must take `context.Context` as first parameter |
+| `no-time-sleep` | warning | Replace `time.Sleep(d)` with `select { case <-time.After(d): case <-ctx.Done(): }` |
+| `goroutine-cancellation` | warning | Every spawned goroutine must reference `ctx` so it exits when the request ends |
+| `no-hardcoded-secrets` | error | Load API keys / passwords / tokens from `os.Getenv`, never inline |
+| `no-fmt-print` | warning | Use `observe.Logger(ctx).Info(...)` instead of `fmt.Println` / `fmt.Printf` in handlers |
+| `event-handler-exists` | error | Every `@click="foo()"` requires `func foo()` declared in frontmatter |
 
 ## Common Patterns
 
@@ -369,17 +388,124 @@ func Register(app fiber.Router) {
 ## Module Path
 
 ```
-nguyen.go                    # module name in go.mod
-nguyen.go/pkg/core           # WASM runtime (hooks, VNode, reconciler)
-nguyen.go/pkg/nguyen         # Server library (App, Options)
-nguyen.go/internal/parser    # .gox file parser
-nguyen.go/internal/router    # file-system router
-nguyen.go/internal/render    # SSR engine
-nguyen.go/internal/compiler  # TinyGo WASM compiler
-nguyen.go/internal/server    # Fiber server + HMR
-nguyen.go/internal/config    # YAML config loader
-nguyen.go/internal/cache     # ISR cache
-nguyen.go/internal/geo       # SEO/GEO engine
-nguyen.go/internal/pwa       # PWA manifest/SW generator
-nguyen.go/internal/optimizer # Image optimization
+nguyen.go                       # module name in go.mod
+nguyen.go/pkg/core              # WASM runtime (hooks, VNode, reconciler)
+nguyen.go/pkg/nguyen            # Server library (App, Options)
+nguyen.go/pkg/concurrent        # Pool, Map, Parallel, Race, Deadline, Lifecycle (v1.1.0+)
+nguyen.go/pkg/ngctx             # Standard context keys (v1.1.0+)
+nguyen.go/pkg/observe           # slog logger + Span timing (v1.1.0+)
+nguyen.go/internal/parser       # .gox file parser
+nguyen.go/internal/router       # file-system router
+nguyen.go/internal/render       # SSR engine
+nguyen.go/internal/compiler     # TinyGo WASM compiler
+nguyen.go/internal/server       # Fiber server + HMR + ContextMiddleware
+nguyen.go/internal/config       # YAML config loader
+nguyen.go/internal/cache        # ISR cache
+nguyen.go/internal/geo          # SEO/GEO engine
+nguyen.go/internal/pwa          # PWA manifest/SW generator
+nguyen.go/internal/optimizer    # Image optimization
+nguyen.go/internal/vet          # .gox static analysis (v1.1.0+)
+nguyen.go/internal/routegen     # Typed route codegen (v1.1.0+)
 ```
+
+## Server Handler Conventions (v1.1.0+)
+
+Loaders, actions and streams take `context.Context` as the first
+parameter. The framework's `ContextMiddleware` populates the context
+with trace ID, request ID, locale and authenticated user before any
+handler runs.
+
+```go
+import (
+    "context"
+    "github.com/dev2k6/Nguyen.go/pkg/ngctx"
+    "github.com/dev2k6/Nguyen.go/pkg/observe"
+    "github.com/dev2k6/Nguyen.go/pkg/concurrent"
+)
+
+// Loader pattern — fetch in parallel, log structured events
+func Load(ctx context.Context, p Params) (PageData, error) {
+    log := observe.Logger(ctx)
+    log.Info("page.load", "id", p["id"])
+
+    var user User
+    var posts []Post
+    err := concurrent.Parallel(ctx,
+        func(c context.Context) error { user, _ = loadUser(c, p["id"]); return nil },
+        func(c context.Context) error { posts, _ = loadPosts(c, p["id"]); return nil },
+    )
+    if err != nil {
+        return PageData{}, err
+    }
+    return PageData{User: user, Posts: posts}, nil
+}
+
+// Action pattern — read user from ctx, never trust the form alone
+func Action(ctx context.Context, form FormData) error {
+    u := ngctx.User(ctx)
+    if u == nil || !u.HasRole("editor") {
+        return errForbidden
+    }
+    return savePost(ctx, u.ID, form)
+}
+```
+
+### Anti-patterns (vet will warn)
+
+```go
+// BAD — ignores ctx, blocks goroutine
+time.Sleep(time.Second)
+
+// GOOD
+select {
+case <-time.After(time.Second):
+case <-ctx.Done():
+    return ctx.Err()
+}
+
+// BAD — goroutine outlives request
+go func() {
+    doWork()
+}()
+
+// GOOD
+go func() {
+    select {
+    case <-ctx.Done():
+        return
+    default:
+        doWork(ctx)
+    }
+}()
+
+// BAD — unstructured, bypasses request scope
+fmt.Println("user logged in:", id)
+
+// GOOD
+observe.Logger(ctx).Info("auth.login", "user_id", id)
+
+// BAD — secret in source
+const apiKey = "sk_live_abcdef1234567890"
+
+// GOOD
+apiKey := os.Getenv("STRIPE_SECRET_KEY")
+```
+
+## Type-Safe Routes (v1.1.0+)
+
+After running `nguyen generate routes`, link to pages through the
+generated package instead of building strings by hand.
+
+```go
+import "myapp/routes"
+
+// Static
+href := routes.About()                    // "/about"
+
+// Dynamic
+href := routes.BlogBySlug(post.Slug)      // "/blog/hello-world"
+```
+
+A typo (`routes.BlogBySlugg`) becomes a compile error rather than a
+404 at runtime. Run `nguyen generate routes` whenever you add or
+rename a `.gox` file.
