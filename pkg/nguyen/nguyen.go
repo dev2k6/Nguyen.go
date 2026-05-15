@@ -19,6 +19,8 @@ import (
 	"github.com/dev2k6/Nguyen.go/internal/event"
 	"github.com/dev2k6/Nguyen.go/internal/geo"
 	"github.com/dev2k6/Nguyen.go/internal/i18n"
+	"github.com/dev2k6/Nguyen.go/internal/live"
+	"github.com/dev2k6/Nguyen.go/internal/livepage"
 	"github.com/dev2k6/Nguyen.go/internal/mail"
 	"github.com/dev2k6/Nguyen.go/internal/parser"
 	"github.com/dev2k6/Nguyen.go/internal/render"
@@ -60,6 +62,8 @@ type App struct {
 	i18n         *i18n.I18n
 	mailer       *mail.Mailer
 	events       *event.Bus
+	liveHub      *live.Hub
+	livePages    *livepage.Registry
 }
 
 func New(opts ...Option) *App {
@@ -158,8 +162,23 @@ func (a *App) serve() error {
 
 	a.fiber.Get("/_nguyen/image", server.ImageHandler(cfg))
 	a.fiber.Get("/_nguyen/runtime", func(c *fiber.Ctx) error {
-		return c.JSON(fiber.Map{"version": cfg.Version})
+		return c.JSON(fiber.Map{
+			"version":       cfg.Version,
+			"liveMode":      a.livePages != nil && len(a.livePages.Routes()) > 0,
+			"liveSessionTo": "/_nguyen/live",
+		})
 	})
+
+	// Live Mode wiring — bridge JS + WebSocket endpoint. The hub and
+	// registry are lazily created so applications that do not register
+	// any live pages pay no overhead.
+	a.liveHub = live.NewHub(live.Options{})
+	a.livePages = livepage.NewRegistry()
+	a.fiber.Get("/_nguyen/live.js", server.LiveBridgeHandler())
+	a.fiber.Get("/_nguyen/live/+", server.LiveUpgradeMiddleware(), server.LiveHandler(a.liveHub, a.livePages))
+	go func() {
+		_ = a.liveHub.Run(context.Background())
+	}()
 
 	a.fiber.Static("/styles", a.stylesDir)
 	a.fiber.Static("/public", a.publicDir)
@@ -534,4 +553,26 @@ func (a *App) Mailer() *mail.Mailer {
 
 func (a *App) Events() *event.Bus {
 	return a.events
+}
+
+// LiveHub returns the Live Mode session hub. nil before serve() runs.
+// Useful for tests and for tooling that wants to introspect active
+// sessions.
+func (a *App) LiveHub() *live.Hub {
+	return a.liveHub
+}
+
+// RegisterLivePage binds a Live Mode page to a route pattern. Call it
+// from your WithSetup hook so the page is registered before the server
+// starts handling requests. Routes registered here are reachable at
+// /_nguyen/live<pattern> over WebSocket.
+//
+//	app := nguyen.New(nguyen.WithSetup(func(f *fiber.App) {
+//	    app.RegisterLivePage("/counter", &CounterPage{})
+//	}))
+func (a *App) RegisterLivePage(pattern string, page livepage.Page) error {
+	if a.livePages == nil {
+		a.livePages = livepage.NewRegistry()
+	}
+	return a.livePages.Register(pattern, page)
 }
