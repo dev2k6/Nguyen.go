@@ -18,10 +18,14 @@ Welcome to the Nguyen.go documentation. Nguyen.go is a full-stack Go web framewo
 - [GEO (SEO for AI)](./geo.md) — Sitemap, robots.txt, llms.txt, JSON-LD, structured data
 - [PWA](./pwa.md) — Progressive Web App, manifest, service worker, offline
 - [Image Optimization](./images.md) — On-the-fly conversion, responsive images, caching
+- [Backend Modules](./backend-modules.md) — Auth, DB, CSRF, upload, WebSocket, i18n, mail
+- [Concurrency Primitives](./concurrency.md) — Pool, Map, Parallel, Race, Deadline, Lifecycle
+- [Context & Observability](./observability.md) — Standard ctx keys, structured logging, spans
 
 ### Reference
 - [Configuration](./configuration.md) — Full `nguyen.config.yml` reference
 - [CLI Reference](./cli.md) — All commands and flags
+- [Tooling](./tooling.md) — `doctor`, `vet`, `generate`, `dist`
 - [Deployment](./deployment.md) — Docker, CDN, single binary, reverse proxy
 - [Editor & IDE Setup](./editor-setup.md) — VS Code, JetBrains, Zed, Vim, Helix, Sublime
 - [AI Agent Reference](./agent-reference.md) — Syntax guide for AI coding assistants

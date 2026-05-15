@@ -247,3 +247,77 @@ nguyen check [flags]
 
 - `0` — All files valid
 - `1` — One or more files have errors
+
+## nguyen doctor
+
+Diagnose the local toolchain and project layout. See [Tooling](./tooling.md#nguyen-doctor) for full output.
+
+```bash
+nguyen doctor
+```
+
+Checks Go version, TinyGo binary, Tailwind binary, project directories
+(`pages/`, `public/`, `styles/`), config file presence and git status.
+Exits non-zero only when a hard prerequisite is unmet.
+
+## nguyen vet
+
+Run static analysis on `.gox` files. See [Tooling](./tooling.md#nguyen-vet).
+
+```bash
+nguyen vet [flags]
+```
+
+### Flags
+
+| Flag | Default | Description |
+|------|---------|-------------|
+| `--pages` | `pages` | Pages directory |
+| `--strict` | `false` | Treat warnings as errors |
+
+Errors fail vet (exit 1). Warnings do not unless `--strict`. Built-in
+rules cover context propagation, time.Sleep usage, goroutine
+cancellation, hardcoded secrets, fmt.Print* and event handler bindings.
+
+## nguyen generate
+
+Code generation utilities. Sub-commands:
+
+### nguyen generate routes
+
+```bash
+nguyen generate routes [flags]
+```
+
+| Flag | Default | Description |
+|------|---------|-------------|
+| `--pages` | `pages` | Pages directory |
+| `--out` | `routes/routes.gen.go` | Output path |
+| `--package` | `routes` | Generated package name |
+
+Emits typed accessors so dynamic routes are checked at compile time.
+See [Tooling](./tooling.md#nguyen-generate-routes).
+
+## nguyen dist
+
+Cross-compile reproducible single-binary releases.
+
+```bash
+nguyen dist [flags]
+```
+
+### Flags
+
+| Flag | Default | Description |
+|------|---------|-------------|
+| `--targets` | current GOOS/GOARCH | Comma-separated GOOS/GOARCH pairs |
+| `--output` | `dist` | Output directory |
+| `--name` | `app` | Binary name |
+| `--main` | `./cmd/server` | Path to main package |
+| `--reproducible` | `true` | Strip path/buildid/timestamps |
+| `--ldflags` | `""` | Extra ldflags |
+
+When reproducible is enabled, dist sets `-trimpath`, `-buildvcs=false`,
+strips symbols and the build ID, and disables CGo. Two builds from the
+same source tree on different machines produce byte-identical output.
+See [Tooling](./tooling.md#nguyen-dist).

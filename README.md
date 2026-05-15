@@ -55,6 +55,18 @@ A full-stack Go web framework for building modern web applications. Nguyen.go co
 - **Bundle analyzer** — HTML report of WASM chunk sizes
 - **GEO / SEO** — Sitemap, robots.txt, llms.txt, Open Graph, JSON-LD, FAQ schema, breadcrumbs
 
+### Concurrency & Observability (v1.1.0)
+- **`pkg/concurrent`** — Typed `Pool`, `Map`, `Parallel`, `Race`, `Deadline`, `Lifecycle`
+- **`pkg/ngctx`** — Standard context keys: TraceID, RequestID, Locale, User, Budget
+- **`pkg/observe`** — Structured logging built on `log/slog` + lightweight Spans
+- **Auto-propagated trace + request IDs** on every response
+
+### Tooling (v1.1.0)
+- **`nguyen doctor`** — Environment + project diagnostics
+- **`nguyen vet`** — Static analysis for `.gox` files (ctx propagation, secrets, goroutine cancellation, ...)
+- **`nguyen generate routes`** — Typed route accessors so a typo is a compile error
+- **`nguyen dist`** — Reproducible cross-compiled binaries (`-trimpath`, stripped buildid)
+
 ## Requirements
 
 - **Go** 1.25+
@@ -102,6 +114,10 @@ nguyen dev
 | `nguyen start` | Start production server from build output |
 | `nguyen export` | Pre-render all pages to static HTML for CDN deployment |
 | `nguyen check` | Validate `.gox` file syntax without building |
+| `nguyen doctor` | Diagnose Go/TinyGo/Tailwind toolchain + project layout |
+| `nguyen vet` | Static analysis on `.gox` files (errors fail, warnings advisory) |
+| `nguyen generate routes` | Generate typed route accessors |
+| `nguyen dist` | Reproducible cross-compiled binary releases |
 
 ### Common Flags
 
