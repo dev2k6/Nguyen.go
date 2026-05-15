@@ -143,6 +143,8 @@ func (a *App) serve() error {
 		return c.Next()
 	})
 
+	a.fiber.Use(server.ContextMiddleware())
+	a.fiber.Use(server.AccessLog())
 	a.fiber.Use(compress.New(compress.Config{Level: compress.LevelBestSpeed}))
 	a.fiber.Use(etag.New())
 	a.fiber.Use(limiter.New(limiter.Config{
