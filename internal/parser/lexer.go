@@ -27,6 +27,7 @@ type File struct {
 	RawTemplate  string     // Original HTML template before scoped CSS processing
 	LineOffset   int        // Line offset for accurate error reporting
 	ScopedCSS    *ScopedCSS // Scoped CSS data if <style scoped> was found
+	IsLive       bool       // true when file uses Live Mode (.live.gox suffix or //+nguyen:live directive)
 }
 
 // Parse reads and parses a .gox file, separating frontmatter from template.
@@ -85,6 +86,7 @@ func parseString(content, path string) (*File, error) {
 			RawTemplate:  content,
 			LineOffset:   1,
 			ScopedCSS:    scoped[path],
+			IsLive:       isLivePath(path),
 		}, nil
 	}
 
@@ -109,14 +111,38 @@ func parseString(content, path string) (*File, error) {
 	// Process scoped CSS
 	processed, scoped := ProcessScopedCSS(path, htmlTemplate)
 
+	goCodeTrimmed := strings.TrimSpace(goCode)
+
 	return &File{
 		Path:         path,
-		GoCode:       strings.TrimSpace(goCode),
+		GoCode:       goCodeTrimmed,
 		HTMLTemplate: processed,
 		RawTemplate:  rawTemplate,
 		LineOffset:   secondIdx + 2,
 		ScopedCSS:    scoped[path],
+		IsLive:       isLivePath(path) || hasLiveDirective(goCodeTrimmed),
 	}, nil
+}
+
+// isLivePath reports whether a file path opts into Live Mode by suffix.
+// Pages named "<name>.live.gox" use Live Mode.
+func isLivePath(path string) bool {
+	return strings.HasSuffix(path, ".live.gox")
+}
+
+// hasLiveDirective reports whether a frontmatter Go block opts into
+// Live Mode via a //+nguyen:live comment. The directive may be on its
+// own line or trailing whitespace; matching is whitespace-tolerant.
+func hasLiveDirective(goCode string) bool {
+	for _, line := range strings.Split(goCode, "\n") {
+		line = strings.TrimSpace(line)
+		if line == "//+nguyen:live" || line == "// +nguyen:live" ||
+			strings.HasPrefix(line, "//+nguyen:live ") ||
+			strings.HasPrefix(line, "// +nguyen:live ") {
+			return true
+		}
+	}
+	return false
 }
 
 // Name returns the component name derived from the file path
