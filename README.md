@@ -61,6 +61,12 @@ A full-stack Go web framework for building modern web applications. Nguyen.go co
 - **`pkg/observe`** — Structured logging built on `log/slog` + lightweight Spans
 - **Auto-propagated trace + request IDs** on every response
 
+### Live Mode (v1.2.0)
+- **Server-pushed VDOM diff** over WebSocket — interactive UI with **0 KB compiled Go in the browser**
+- **`livepage.Page` contract** — `Init` / `Render` / `Handle` per route
+- **Bounded session pool** with idle reaping, heartbeat, auto-reconnect bridge (~6 KB JS)
+- Built on goroutines + `context.Context` cancellation — affordable to hold tens of thousands of sessions per process
+
 ### Tooling (v1.1.0)
 - **`nguyen doctor`** — Environment + project diagnostics
 - **`nguyen vet`** — Static analysis for `.gox` files (ctx propagation, secrets, goroutine cancellation, ...)

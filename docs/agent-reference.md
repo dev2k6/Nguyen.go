@@ -385,20 +385,100 @@ func Register(app fiber.Router) {
 - Backend code (`internal/`, `cmd/`) compiles normally for any OS
 - The `.gox` compiler transpiles frontmatter into valid Go for TinyGo
 
+## Live Mode (v1.2.0+)
+
+A Live Mode page renders fully on the server and pushes VDOM diffs to
+the browser over WebSocket. The browser ships **0 KB of compiled Go** —
+no WASM bundle, no client state, just a ~6 KB JS bridge served at
+`/_nguyen/live.js`.
+
+### Detect Live Mode
+
+A `.gox` file opts into Live Mode by either:
+- File name suffix `.live.gox` (e.g. `pages/counter.live.gox`)
+- Frontmatter directive `//+nguyen:live`
+
+The parser sets `File.IsLive = true` for both cases.
+
+### Live page contract
+
+Implement `livepage.Page` (in `internal/livepage`):
+
+```go
+type Page interface {
+    Init(ctx context.Context, params map[string]string) (state any, err error)
+    Render(ctx context.Context, state any) (string, error)
+    Handle(ctx context.Context, state any, evt live.Event) (any, error)
+}
+```
+
+State is private to the session. Init runs once per WebSocket connect,
+Render after every state change, Handle on every inbound event.
+
+### Register a live page
+
+```go
+app := nguyen.New(nguyen.WithPort(3000))
+app.RegisterLivePage("/counter", &CounterPage{})
+app.Listen("")
+```
+
+The mounted host page must contain:
+
+```html
+<div data-nguyen-live="/counter"></div>
+<script src="/_nguyen/live.js" defer></script>
+```
+
+### Wire format
+
+Client → server (one inbound event):
+
+```json
+{"t":"event","name":"increment","target":"0/1","value":null}
+```
+
+Server → client (one of these envelopes):
+
+```json
+{"t":"replace","html":"<...>"}                // initial frame
+{"t":"diff","ops":[{"op":"text","path":"0/1","value":"Count: 4"}]}
+{"t":"ping"}                                   // heartbeat
+{"t":"error","error":"..."}                   // handler/render error
+```
+
+### Patch ops
+
+| Op | Effect |
+|---|---|
+| `text` | replace text content of node at `path` |
+| `attr` | replace attributes of node at `path` |
+| `replace` | replace whole element at `path` with `html` |
+| `insert` | append `html` as child of parent at `path` |
+| `remove` | delete node at `path` |
+| `root` | replace live root's `innerHTML` |
+
+### When to use
+
+Use Live Mode for admin panels, dashboards, form flows and internal
+tooling — anything mostly server-driven where 30-100 ms round-trip per
+interaction is acceptable. Skip it for sub-frame latency UI (drag,
+canvas, animation) or for offline-capable pages.
+
 ## Module Path
 
 ```
 nguyen.go                       # module name in go.mod
 nguyen.go/pkg/core              # WASM runtime (hooks, VNode, reconciler)
-nguyen.go/pkg/nguyen            # Server library (App, Options)
+nguyen.go/pkg/nguyen            # Server library (App, Options, RegisterLivePage)
 nguyen.go/pkg/concurrent        # Pool, Map, Parallel, Race, Deadline, Lifecycle (v1.1.0+)
 nguyen.go/pkg/ngctx             # Standard context keys (v1.1.0+)
 nguyen.go/pkg/observe           # slog logger + Span timing (v1.1.0+)
-nguyen.go/internal/parser       # .gox file parser
+nguyen.go/internal/parser       # .gox file parser (with IsLive detection in v1.2.0)
 nguyen.go/internal/router       # file-system router
 nguyen.go/internal/render       # SSR engine
 nguyen.go/internal/compiler     # TinyGo WASM compiler
-nguyen.go/internal/server       # Fiber server + HMR + ContextMiddleware
+nguyen.go/internal/server       # Fiber server + HMR + ContextMiddleware + LiveHandler
 nguyen.go/internal/config       # YAML config loader
 nguyen.go/internal/cache        # ISR cache
 nguyen.go/internal/geo          # SEO/GEO engine
@@ -406,6 +486,8 @@ nguyen.go/internal/pwa          # PWA manifest/SW generator
 nguyen.go/internal/optimizer    # Image optimization
 nguyen.go/internal/vet          # .gox static analysis (v1.1.0+)
 nguyen.go/internal/routegen     # Typed route codegen (v1.1.0+)
+nguyen.go/internal/live         # Live Mode session, hub, VDOM diff (v1.2.0+)
+nguyen.go/internal/livepage     # Live Mode Page contract + Registry (v1.2.0+)
 ```
 
 ## Server Handler Conventions (v1.1.0+)

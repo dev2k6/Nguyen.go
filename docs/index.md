@@ -21,6 +21,7 @@ Welcome to the Nguyen.go documentation. Nguyen.go is a full-stack Go web framewo
 - [Backend Modules](./backend-modules.md) — Auth, DB, CSRF, upload, WebSocket, i18n, mail
 - [Concurrency Primitives](./concurrency.md) — Pool, Map, Parallel, Race, Deadline, Lifecycle
 - [Context & Observability](./observability.md) — Standard ctx keys, structured logging, spans
+- [Live Mode](./live-mode.md) — Server-pushed VDOM diff over WebSocket, 0 KB JS pages
 
 ### Reference
 - [Configuration](./configuration.md) — Full `nguyen.config.yml` reference
