@@ -36,6 +36,9 @@ type Auth struct {
 }
 
 func New(cfg Config, db *database.DB) *Auth {
+	if len(cfg.JWTSecret) < 32 {
+		panic("auth: JWTSecret must be at least 32 characters — use a random secret in production")
+	}
 	if cfg.JWTExpiry == 0 {
 		cfg.JWTExpiry = 24 * time.Hour
 	}

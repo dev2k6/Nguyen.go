@@ -88,7 +88,6 @@
     switch (msg.t) {
       case 'replace': this.applyReplace(msg.html); break;
       case 'diff':    this.applyDiff(msg.ops); break;
-      case 'ping':    this.send({ t: 'pong' }); break;
       case 'error':   console.warn('[live] server error:', msg.error); break;
       default:        console.warn('[live] unknown frame', msg);
     }

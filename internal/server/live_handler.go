@@ -3,6 +3,7 @@ package server
 import (
 	"context"
 	"log/slog"
+	"net/url"
 	"strings"
 	"time"
 
@@ -14,25 +15,60 @@ import (
 	"github.com/gofiber/websocket/v2"
 )
 
-// LiveUpgradeMiddleware allows the WebSocket upgrade only on requests
-// that target a Live Mode endpoint. Mount it before LiveHandler. It
-// also captures the request's query parameters into c.Locals so the
-// handler can pass them to Page.Init without depending on the
-// websocket-bound Conn.
-func LiveUpgradeMiddleware() fiber.Handler {
+// LiveOptions configures the Live Mode WebSocket endpoint.
+type LiveOptions struct {
+	// AllowedOrigins is the list of origins permitted to open a live
+	// WebSocket. Each entry is matched against the request's Origin
+	// header. An empty list defaults to same-origin only (derived from
+	// the Host header). Pass []string{"*"} to allow all origins — only
+	// do this in development.
+	AllowedOrigins []string
+
+	// AuthFunc is an optional hook called before a session is spawned.
+	// Return a non-nil error to reject the connection with a 403. Use
+	// it to validate JWT cookies, session tokens, or any other
+	// application-level credential. The context carries ngctx values
+	// (TraceID, RequestID) populated by ContextMiddleware.
+	AuthFunc func(c *fiber.Ctx) error
+}
+
+// LiveUpgradeMiddleware validates the WebSocket upgrade request:
+//  1. Rejects non-upgrade requests.
+//  2. Validates the Origin header against opts.AllowedOrigins (CSWSH
+//     protection — CVE class: Cross-Site WebSocket Hijacking).
+//  3. Runs opts.AuthFunc when provided so callers can enforce JWT /
+//     session auth before the socket is opened.
+//  4. Captures query params and tracing IDs into c.Locals for the
+//     downstream LiveHandler.
+func LiveUpgradeMiddleware(opts LiveOptions) fiber.Handler {
 	return func(c *fiber.Ctx) error {
 		if !websocket.IsWebSocketUpgrade(c) {
 			return fiber.ErrUpgradeRequired
 		}
+
+		// --- Origin validation (CSWSH protection) ---
+		origin := c.Get("Origin")
+		if !isOriginAllowed(origin, c.Hostname(), opts.AllowedOrigins) {
+			return c.Status(fiber.StatusForbidden).
+				JSON(fiber.Map{"error": "origin not allowed"})
+		}
+
+		// --- Application-level auth ---
+		if opts.AuthFunc != nil {
+			if err := opts.AuthFunc(c); err != nil {
+				return c.Status(fiber.StatusForbidden).
+					JSON(fiber.Map{"error": "unauthorized"})
+			}
+		}
+
+		// Capture query params before the upgrade so LiveHandler can
+		// pass them to Page.Init without depending on websocket.Conn.
 		queries := map[string]string{}
 		c.Context().QueryArgs().VisitAll(func(k, v []byte) {
 			queries[string(k)] = string(v)
 		})
 		c.Locals("liveAllowed", true)
 		c.Locals("liveQueries", queries)
-		if rid, ok := c.UserContext().Value(ngctxRequestIDKey{}).(string); ok {
-			c.Locals("requestID", rid)
-		}
 		if tid := ngctx.TraceID(c.UserContext()); tid != "" {
 			c.Locals("traceID", tid)
 		}
@@ -43,26 +79,54 @@ func LiveUpgradeMiddleware() fiber.Handler {
 	}
 }
 
-// ngctxRequestIDKey is intentionally unused — kept to document that
-// ngctx exposes typed accessors and we should not look up its private
-// keys directly. The middleware uses the public ngctx.TraceID /
-// RequestID helpers instead.
+// isOriginAllowed reports whether origin is permitted.
+//
+//   - If allowedOrigins is empty, only same-origin requests are allowed
+//     (origin host == serverHost).
+//   - If allowedOrigins contains "*", all origins are allowed (dev only).
+//   - Otherwise the origin's host is matched against each entry.
+func isOriginAllowed(origin, serverHost string, allowed []string) bool {
+	// Requests without an Origin header (e.g. curl, server-to-server)
+	// are allowed — browsers always send Origin on WS upgrades.
+	if origin == "" {
+		return true
+	}
+
+	u, err := url.Parse(origin)
+	if err != nil {
+		return false
+	}
+	originHost := u.Hostname()
+
+	if len(allowed) == 0 {
+		// Default: same-origin only.
+		return strings.EqualFold(originHost, serverHost)
+	}
+
+	for _, a := range allowed {
+		if a == "*" {
+			return true
+		}
+		if strings.EqualFold(originHost, a) {
+			return true
+		}
+	}
+	return false
+}
+
+// ngctxRequestIDKey is intentionally unexported — ngctx exposes typed
+// accessors; we never look up its private keys directly.
 type ngctxRequestIDKey struct{}
 
 // LiveHandler returns a Fiber handler that upgrades the request to a
 // WebSocket and binds it to one Live Mode session. Each connection
 // runs three goroutines (reader, writer, heartbeat) and exits cleanly
 // when any of them detects a closed socket or a cancelled context.
-//
-// The path captured at "*" decides which page is served. Pages must
-// already be registered in the supplied registry; an unknown route
-// receives a single error frame and the socket closes.
 func LiveHandler(hub *live.Hub, registry *internallivepage.Registry) fiber.Handler {
 	return websocket.New(func(c *websocket.Conn) {
 		ctx, cancel := context.WithCancel(context.Background())
 		defer cancel()
 
-		// Carry tracing IDs from the upgraded request when present.
 		if v, ok := c.Locals("traceID").(string); ok && v != "" {
 			ctx = ngctx.WithTraceID(ctx, v)
 		}
@@ -104,7 +168,6 @@ func LiveHandler(hub *live.Hub, registry *internallivepage.Registry) fiber.Handl
 			log.Info("live.session.close")
 		}()
 
-		// Initial render so the client gets a frame immediately.
 		sess.Dispatch(live.Event{Kind: "init"})
 
 		writeDone := make(chan struct{})
@@ -127,6 +190,8 @@ func readLoop(c *websocket.Conn, sess *live.Session, log *slog.Logger) {
 			return
 		default:
 		}
+		// Reset read deadline on every iteration so the connection
+		// stays alive as long as the client is active.
 		_ = c.SetReadDeadline(time.Now().Add(2 * time.Minute))
 		mt, data, err := c.ReadMessage()
 		if err != nil {
@@ -147,15 +212,20 @@ func readLoop(c *websocket.Conn, sess *live.Session, log *slog.Logger) {
 
 func writeLoop(c *websocket.Conn, sess *live.Session, done chan<- struct{}, log *slog.Logger) {
 	defer close(done)
-	ping := time.NewTicker(30 * time.Second)
+	// Use a 25s ticker so the control-frame ping fires before most
+	// proxy idle timeouts (typically 60s). A WebSocket PingMessage
+	// control frame is used — not a JSON text frame — so the browser
+	// and any intermediate proxy reset their idle timers automatically.
+	ping := time.NewTicker(25 * time.Second)
 	defer ping.Stop()
 	for {
 		select {
 		case <-sess.Closed():
 			return
 		case <-ping.C:
-			pingFrame, _ := live.EncodeOutbound(live.Outbound{Kind: "ping"})
-			if err := c.WriteMessage(websocket.TextMessage, pingFrame); err != nil {
+			// Send a WebSocket control-frame ping. The browser responds
+			// with a Pong automatically; proxies reset their idle timer.
+			if err := c.WriteMessage(websocket.PingMessage, nil); err != nil {
 				sess.Close()
 				return
 			}

@@ -151,14 +151,21 @@ func (s *Session) touch() {
 // transition → render → diff → enqueue outbound. Errors during render
 // or handle are surfaced as an "error" outbound message; the session
 // stays open so the client can recover.
+//
+// Dispatch is not concurrent-safe — call it from a single goroutine
+// (the readLoop). The mu lock protects state so that touch() and
+// concurrent reads from other goroutines see a consistent value.
 func (s *Session) Dispatch(evt Event) {
 	s.touch()
+	s.mu.Lock()
 	newState, err := s.handler.Handle(s.ctx, s.state, evt)
 	if err != nil {
+		s.mu.Unlock()
 		s.send(Outbound{Kind: "error", Err: err.Error()})
 		return
 	}
 	s.state = newState
+	s.mu.Unlock()
 
 	html, err := s.renderer.Render(s.ctx, s.state)
 	if err != nil {
@@ -166,13 +173,16 @@ func (s *Session) Dispatch(evt Event) {
 		return
 	}
 
-	if s.lastHTML == "" {
-		s.lastHTML = html
+	s.mu.Lock()
+	prev := s.lastHTML
+	s.lastHTML = html
+	s.mu.Unlock()
+
+	if prev == "" {
 		s.send(Outbound{Kind: "replace", HTML: html})
 		return
 	}
-	ops := Diff(s.lastHTML, html)
-	s.lastHTML = html
+	ops := Diff(prev, html)
 	if len(ops) == 0 {
 		return
 	}
@@ -215,15 +225,23 @@ func NewHub(opts Options) *Hub {
 	}
 }
 
-// Run blocks until ctx is cancelled, periodically reaping sessions
-// that have not received an event within IdleTimeout. Wire it through
-// pkg/concurrent.Lifecycle.
+// Run blocks until ctx is cancelled OR Stop is called, periodically
+// reaping sessions that have not received an event within IdleTimeout.
+// Wire it through pkg/concurrent.Lifecycle.
+//
+// The external ctx and the hub's internal rootCtx are both respected so
+// that either a Lifecycle shutdown or a direct Stop() call terminates
+// the reaper. Sessions spawned after Stop is called will have their
+// context cancelled immediately via rootCtx.
 func (h *Hub) Run(ctx context.Context) error {
 	ticker := time.NewTicker(h.opts.IdleTimeout / 2)
 	defer ticker.Stop()
 	for {
 		select {
 		case <-ctx.Done():
+			// External context cancelled — stop the reaper but do NOT
+			// close sessions; the caller is responsible for calling Stop
+			// if it wants sessions cleaned up.
 			return nil
 		case <-h.rootCtx.Done():
 			return nil
@@ -255,11 +273,18 @@ func (h *Hub) Count() int {
 // Spawn creates a new session bound to the given route, renderer and
 // initial state. The id must be globally unique within the hub —
 // callers usually pass a 16-byte hex string from ngctx.NewID.
+// Returns ErrTooManySessions when the cap is reached, or an error if
+// the hub has already been stopped (rootCtx cancelled).
 func (h *Hub) Spawn(parentCtx context.Context, id, route string, initialState any, renderer Renderer, handler Handler) (*Session, error) {
 	if renderer == nil || handler == nil {
 		return nil, errors.New("live: renderer and handler are required")
 	}
 	h.mu.Lock()
+	// Check rootCtx under the lock to avoid a race with Stop().
+	if h.rootCtx.Err() != nil {
+		h.mu.Unlock()
+		return nil, errors.New("live: hub is stopped")
+	}
 	if len(h.sessions) >= h.opts.MaxSessions {
 		h.mu.Unlock()
 		return nil, ErrTooManySessions

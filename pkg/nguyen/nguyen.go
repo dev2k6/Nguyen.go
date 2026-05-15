@@ -65,6 +65,7 @@ type App struct {
 	events       *event.Bus
 	liveHub      *live.Hub
 	livePages    *internallivepage.Registry
+	liveOpts     server.LiveOptions
 }
 
 func New(opts ...Option) *App {
@@ -176,7 +177,7 @@ func (a *App) serve() error {
 	a.liveHub = live.NewHub(live.Options{})
 	a.livePages = internallivepage.NewRegistry()
 	a.fiber.Get("/_nguyen/live.js", server.LiveBridgeHandler())
-	a.fiber.Get("/_nguyen/live/+", server.LiveUpgradeMiddleware(), server.LiveHandler(a.liveHub, a.livePages))
+	a.fiber.Get("/_nguyen/live/+", server.LiveUpgradeMiddleware(a.liveOpts), server.LiveHandler(a.liveHub, a.livePages))
 	go func() {
 		_ = a.liveHub.Run(context.Background())
 	}()
