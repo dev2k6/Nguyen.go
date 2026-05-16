@@ -94,7 +94,7 @@ func RenderSSR(f *parser.File, version string, layouts ...router.LayoutInfo) *Re
 	html = composeLayout(f, html, layouts)
 
 	// SSR hydration: add event handler markers and inject reactive JS bridge.
-	html = injectHydrationMarkers(html, result.State)
+	html = injectHydrationMarkers(html, result.State, "")
 
 	// Build meta tag block so callers can inject them into <head> themselves.
 	result.HTML = html
@@ -315,8 +315,8 @@ func composeWithLayoutRef(layoutRef string, f *parser.File, pageHTML string) str
 
 // replaceNamedSlots moves content with slot="name" into matching <nguyen-slot name="..." />
 func replaceNamedSlots(f *parser.File, layout *parser.File, pageHTML string) string {
-	// Extract named slot content from page HTML
-	slotContentRx := regexp.MustCompile(`<(\w+)\b[^>]*\bslot="([^"]+)"[^>]*>(.*?)</\1>`)
+	// (?s) makes . match newlines so multi-line slot content is captured correctly.
+	slotContentRx := regexp.MustCompile(`(?s)<(\w+)\b[^>]*\bslot="([^"]+)"[^>]*>(.*?)</\1>`)
 	matches := slotContentRx.FindAllStringSubmatch(pageHTML, -1)
 	slotContents := make(map[string]string)
 	for _, m := range matches {
@@ -351,8 +351,9 @@ func htmlEscape(s string) string {
 
 // injectHydrationMarkers adds event handler attributes and injects the
 // vanilla JS hydration script for SSR mode (no WASM required).
+// nonce is an optional CSP nonce value; pass empty string when not using CSP.
 // State variable spans (data-nguyen-text) are already handled in RenderSSR.
-func injectHydrationMarkers(html string, state map[string]string) string {
+func injectHydrationMarkers(html string, state map[string]string, nonce string) string {
 	// Replace @event="handler()" with data-nguyen-{event} attributes
 	html = eventAttrRx.ReplaceAllStringFunc(html, func(match string) string {
 		m := eventAttrRx.FindStringSubmatch(match)
@@ -367,7 +368,7 @@ func injectHydrationMarkers(html string, state map[string]string) string {
 	})
 
 	// Inject JS hydration script before </body> (after all body content is rendered)
-	hydrationJS := buildHydrationJS()
+	hydrationJS := buildHydrationJS(nonce)
 	if idx := strings.LastIndex(html, "</body>"); idx != -1 {
 		html = html[:idx] + hydrationJS + html[idx:]
 	}
@@ -381,10 +382,13 @@ func injectHydrationMarkers(html string, state map[string]string) string {
 }
 
 // buildHydrationJS generates vanilla JS for reactive state hydration in SSR mode.
-// Transpiles UseGlobalState + handlers from Go code to equivalent JS.
-func buildHydrationJS() string {
-	return `
-<script>
+// nonce is injected into the <script> tag when non-empty for CSP compatibility.
+func buildHydrationJS(nonce string) string {
+	scriptOpen := "<script>"
+	if nonce != "" {
+		scriptOpen = `<script nonce="` + htmlEscape(nonce) + `">`
+	}
+	return scriptOpen + `
 (function() {
   'use strict';
 
@@ -579,11 +583,14 @@ func InjectMetaTags(html string, result *Result) string {
 }
 
 // WrapHTML wraps a body HTML fragment with the standard Nguyen.go HTML shell,
-// injecting meta tags into <head>. Use this when the page content does NOT
-// already have a complete HTML document structure (no layout used).
-func WrapHTML(bodyHTML string, result *Result) string {
+// injecting meta tags into <head>. locale sets the <html lang> attribute;
+// pass an empty string to default to "en".
+func WrapHTML(bodyHTML string, result *Result, locale string) string {
+	if locale == "" {
+		locale = "en"
+	}
 	return `<!DOCTYPE html>
-<html lang="en">
+<html lang="` + htmlEscape(locale) + `">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">

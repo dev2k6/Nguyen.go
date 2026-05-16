@@ -59,7 +59,7 @@ func StreamClose(c *fiber.Ctx, result *Result, closingHTML string) {
 		c.Context().SetBodyStreamWriter(func(w *bufio.Writer) {
 			// Remaining body HTML + closing tags + hydration script
 			w.WriteString(closingHTML)
-			w.WriteString(buildHydrationJS())
+			w.WriteString(buildHydrationJS(""))
 			w.WriteString("\n</body>\n</html>")
 			w.Flush()
 		})
@@ -156,7 +156,7 @@ func RenderSSRStream(c *fiber.Ctx, f *parser.File, version string, layouts ...ro
 		w.Flush()
 
 		// Phase 3: Hydration script + close
-		w.WriteString(buildHydrationJS())
+		w.WriteString(buildHydrationJS(""))
 		w.WriteString("\n</body>\n</html>")
 		w.Flush()
 	})

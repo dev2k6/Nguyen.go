@@ -26,6 +26,21 @@ func (f *fakeHandler) Handle(_ context.Context, state any, evt Event) (any, erro
 	return f.fn(state, evt)
 }
 
+// drainSession discards the initial "session" token message that Spawn
+// enqueues automatically. Call this after Spawn and before asserting on
+// application-level outbound messages.
+func drainSession(t *testing.T, sess *Session) {
+	t.Helper()
+	select {
+	case msg := <-sess.OutboundCh():
+		if msg.Kind != "session" {
+			t.Fatalf("expected initial session message, got %s", msg.Kind)
+		}
+	case <-time.After(200 * time.Millisecond):
+		t.Fatal("no initial session message")
+	}
+}
+
 func TestDispatchInitialReplace(t *testing.T) {
 	hub := NewHub(Options{})
 	defer hub.Stop(context.Background())
@@ -40,6 +55,7 @@ func TestDispatchInitialReplace(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
+	drainSession(t, sess)
 	sess.Dispatch(Event{Kind: "event", Name: "noop"})
 
 	select {
@@ -69,6 +85,7 @@ func TestDispatchEmitsTextDiff(t *testing.T) {
 		return s, nil
 	}}
 	sess, _ := hub.Spawn(context.Background(), "id1", "/", nil, r, h)
+	drainSession(t, sess)
 
 	sess.Dispatch(Event{Kind: "event"})
 	<-sess.OutboundCh() // initial replace
@@ -138,6 +155,7 @@ func TestHandlerErrorBecomesOutboundError(t *testing.T) {
 		return nil, errors.New("boom")
 	}}
 	sess, _ := hub.Spawn(context.Background(), "x", "/", nil, r, h)
+	drainSession(t, sess)
 	sess.Dispatch(Event{Kind: "event"})
 	select {
 	case msg := <-sess.OutboundCh():

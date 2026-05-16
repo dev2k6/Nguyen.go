@@ -437,6 +437,10 @@ type htmlToken struct {
 	selfClose bool
 }
 
+// rawTextTags lists tags whose content must not be re-parsed as HTML.
+// A '<' inside a script or style block is not a tag open.
+var rawTextTags = map[string]bool{"script": true, "style": true}
+
 // tokenizeHTML converts an HTML string into a flat list of tokens (open/close/text).
 func tokenizeHTML(html string) []htmlToken {
 	var tokens []htmlToken
@@ -504,6 +508,28 @@ func tokenizeHTML(html string) []htmlToken {
 				selfClose: selfClose,
 			})
 			remaining = remaining[end+1:]
+
+			// For raw-text tags (script, style), consume everything up to the
+			// matching close tag as a single text token so that any '<' inside
+			// the block is not misinterpreted as a new tag open.
+			if rawTextTags[strings.ToLower(tagName)] && !selfClose {
+				closer := "</" + tagName + ">"
+				closerLower := strings.ToLower(closer)
+				idx := strings.Index(strings.ToLower(remaining), closerLower)
+				if idx == -1 {
+					// No closing tag found — treat rest as text and stop.
+					if remaining != "" {
+						tokens = append(tokens, htmlToken{kind: tokenText, text: remaining})
+					}
+					remaining = ""
+				} else {
+					if idx > 0 {
+						tokens = append(tokens, htmlToken{kind: tokenText, text: remaining[:idx]})
+					}
+					tokens = append(tokens, htmlToken{kind: tokenClose, tag: tagName})
+					remaining = remaining[idx+len(closer):]
+				}
+			}
 
 		} else {
 			// Text content
@@ -691,19 +717,20 @@ func emitNgForExpr(sb *strings.Builder, node *htmlNode, indent string) {
 	if !isSafeIdent(itemVar) {
 		itemVar = "item"
 	}
-	if !isSafeIdent(indexVar) {
-		indexVar = "i"
-	}
 	if !isSafeTagName(wrapTag) {
 		wrapTag = "div"
 	}
 
-	// The generated Go code must account for the fact that in Go,
-	// `range` on a slice produces the same types the slice holds.
-	// The user must declare `items` as a typed slice in frontmatter.
+	// Determine loop variable: use blank identifier when index attr is absent
+	// to avoid "declared and not used" compile errors in generated code.
+	loopIndex := "_"
+	if isSafeIdent(indexVar) {
+		loopIndex = indexVar
+	}
+
 	sb.WriteString("func() *core.VNode {\n")
 	sb.WriteString(indent + "\tvar _ngKids []interface{}\n")
-	sb.WriteString(indent + "\tfor " + indexVar + ", " + itemVar + " := range " + items + " {\n")
+	sb.WriteString(indent + "\tfor " + loopIndex + ", " + itemVar + " := range " + items + " {\n")
 	sb.WriteString(indent + "\t\t_ngKids = append(_ngKids, ")
 	if len(node.children) == 0 {
 		sb.WriteString("nil")

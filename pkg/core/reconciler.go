@@ -439,8 +439,10 @@ func (r *Reconciler) mountToDOM(v *VNode) {
 			} else if key == "htmlFor" {
 				v.domElement.Call("setAttribute", "for", val)
 			} else if len(key) > 2 && key[0] == 'o' && key[1] == 'n' {
-				// onClick, onChange, etc. → event delegation handled at mount
-				continue
+				// onClick, onChange, etc. → set as data-nguyen-{event} so the
+				// event delegation installed by SetupEventDelegation picks it up.
+				eventName := strings.ToLower(key[2:]) // "onClick" → "click"
+				v.domElement.Call("setAttribute", "data-nguyen-"+eventName, val)
 			} else {
 				v.domElement.Call("setAttribute", key, val)
 			}

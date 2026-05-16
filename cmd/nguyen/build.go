@@ -364,7 +364,7 @@ func wrapHTMLShell(result *render.Result, cfg *config.NguyenConfig) string {
 		return injectPWA(html, cfg)
 	}
 	// No layout: wrap with shell
-	html := render.WrapHTML(result.HTML, result)
+	html := render.WrapHTML(result.HTML, result, "")
 	return injectPWA(html, cfg)
 }
 

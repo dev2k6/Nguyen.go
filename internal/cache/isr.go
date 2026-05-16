@@ -1,6 +1,7 @@
 package cache
 
 import (
+	"context"
 	"crypto/sha256"
 	"encoding/json"
 	"fmt"
@@ -43,6 +44,13 @@ type ISR struct {
 // NewISR creates a new ISR cache with optional disk persistence.
 // cacheDir: directory for disk cache (".nguyen/cache/pages"). Empty string disables disk cache.
 func NewISR(cacheDir string) *ISR {
+	return NewISRWithContext(context.Background(), cacheDir)
+}
+
+// NewISRWithContext creates a new ISR cache that respects the given context for
+// graceful shutdown. When ctx is cancelled the cleanup goroutine exits cleanly,
+// integrating with pkg/concurrent.Lifecycle.
+func NewISRWithContext(ctx context.Context, cacheDir string) *ISR {
 	c := &ISR{
 		entries:      make(map[string]*Entry),
 		cacheDir:     cacheDir,
@@ -56,8 +64,8 @@ func NewISR(cacheDir string) *ISR {
 		c.loadFromDisk()
 	}
 
-	// Background cleanup every 30 seconds
-	go c.cleanup(30 * time.Second)
+	// Background cleanup every 30 seconds; exits on stopCh or ctx cancellation.
+	go c.cleanupWithContext(ctx, 30*time.Second)
 	return c
 }
 
@@ -166,7 +174,8 @@ func (c *ISR) RevalidatePath(path string, renderFunc func(path string) (string, 
 	}
 }
 
-// RevalidateTag forces re-render of all pages tagged with `tag`.
+// RevalidateTag schedules background re-render of all pages tagged with `tag`.
+// Uses BackgroundRevalidate so the caller is not blocked while pages re-render.
 func (c *ISR) RevalidateTag(tag string, renderFunc func(path string) (string, int, []string)) {
 	c.mu.RLock()
 	var paths []string
@@ -181,7 +190,7 @@ func (c *ISR) RevalidateTag(tag string, renderFunc func(path string) (string, in
 	c.mu.RUnlock()
 
 	for _, path := range paths {
-		c.RevalidatePath(path, renderFunc)
+		c.BackgroundRevalidate(path, renderFunc)
 	}
 }
 
@@ -219,6 +228,11 @@ func (c *ISR) Size() int {
 
 // cleanup periodically removes expired entries
 func (c *ISR) cleanup(interval time.Duration) {
+	c.cleanupWithContext(context.Background(), interval)
+}
+
+// cleanupWithContext is the real cleanup loop; exits on stopCh or ctx.Done().
+func (c *ISR) cleanupWithContext(ctx context.Context, interval time.Duration) {
 	ticker := time.NewTicker(interval)
 	defer ticker.Stop()
 
@@ -235,6 +249,8 @@ func (c *ISR) cleanup(interval time.Duration) {
 			c.mu.Unlock()
 		case <-c.stopCh:
 			return
+		case <-ctx.Done():
+			return
 		}
 	}
 }
@@ -246,10 +262,12 @@ func (c *ISR) Close() {
 
 // --- Disk persistence ---
 
-// pathToHash creates a safe filename hash from a URL path
+// pathToHash creates a safe filename hash from a URL path.
+// Uses 16 hex chars (64 bits) to keep birthday-collision probability negligible
+// even with tens of thousands of cached paths.
 func pathToHash(path string) string {
 	h := sha256.Sum256([]byte(path))
-	return fmt.Sprintf("%x", h)[:12]
+	return fmt.Sprintf("%x", h)[:16]
 }
 
 // writeToDisk saves an entry to the disk cache using atomic temp+rename so

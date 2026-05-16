@@ -18,8 +18,11 @@ package live
 
 import (
 	"context"
+	"crypto/rand"
+	"encoding/hex"
 	"errors"
 	"sync"
+	"sync/atomic"
 	"time"
 )
 
@@ -29,6 +32,10 @@ var ErrSessionNotFound = errors.New("live: session not found")
 // ErrTooManySessions is returned by Hub.Spawn when the configured limit
 // is reached. Tune via Options.MaxSessions.
 var ErrTooManySessions = errors.New("live: too many sessions")
+
+// ErrTokenExpired is returned by Hub.Reattach when the token is unknown
+// or the session has already been reaped.
+var ErrTokenExpired = errors.New("live: reattach token expired or unknown")
 
 // Options controls a Hub's runtime behaviour.
 type Options struct {
@@ -87,20 +94,22 @@ type Handler interface {
 // Handler pair. State is private to the session and survives across
 // events but not across reconnects (v1.2 is in-memory only).
 type Session struct {
-	id        string
-	route     string
-	state     any
-	renderer  Renderer
-	handler   Handler
-	lastHTML  string
-	outbound  chan Outbound
-	closed    chan struct{}
-	closeOnce sync.Once
-	ctx       context.Context
-	cancel    context.CancelFunc
-	lastSeen  time.Time
-	mu        sync.Mutex
-	opts      Options
+	id              string
+	route           string
+	state           any
+	renderer        Renderer
+	handler         Handler
+	lastHTML        string
+	outbound        chan Outbound
+	closed          chan struct{}
+	closeOnce       sync.Once
+	ctx             context.Context
+	cancel          context.CancelFunc
+	lastSeen        time.Time
+	mu              sync.Mutex
+	opts            Options
+	DroppedMessages atomic.Int64
+	ReattachToken   string
 }
 
 // ID returns the session's stable identifier.
@@ -116,10 +125,11 @@ func (s *Session) Context() context.Context { return s.ctx }
 // Outbound is one message queued for the client. The protocol layer
 // turns it into JSON.
 type Outbound struct {
-	Kind string // "diff", "replace", "ping", "error"
-	Diff []Op
-	HTML string
-	Err  string
+	Kind  string // "diff", "replace", "ping", "error", "session"
+	Diff  []Op
+	HTML  string
+	Err   string
+	Token string // session reattach token (Kind == "session")
 }
 
 // Outbound returns the channel of messages waiting to be flushed to
@@ -190,26 +200,25 @@ func (s *Session) Dispatch(evt Event) {
 }
 
 // send pushes a message onto the outbound channel. If the buffer is
-// full the message is dropped — the client will fall behind and the
-// transport may decide to disconnect. Recording drops here is the
-// responsibility of the transport which observes channel pressure.
+// full the message is dropped and the drop counter is incremented so
+// the health endpoint can surface backpressure to operators.
 func (s *Session) send(o Outbound) {
 	select {
 	case s.outbound <- o:
 	default:
-		// Drop on overflow; transport sees an idle gap and may close
-		// the session. This is preferred over blocking the dispatcher.
+		s.DroppedMessages.Add(1)
 	}
 }
 
 // Hub owns all live sessions for a process. It hands out new sessions,
 // looks them up by id, enforces MaxSessions, and reaps idle ones.
 type Hub struct {
-	opts     Options
-	mu       sync.RWMutex
-	sessions map[string]*Session
-	rootCtx  context.Context
-	cancel   context.CancelFunc
+	opts        Options
+	mu          sync.RWMutex
+	sessions    map[string]*Session
+	tokenIndex  map[string]*Session // reattach token → session
+	rootCtx     context.Context
+	cancel      context.CancelFunc
 }
 
 // NewHub returns a Hub ready for Spawn. Call Run from a Lifecycle to
@@ -218,10 +227,11 @@ func NewHub(opts Options) *Hub {
 	opts = opts.withDefaults()
 	ctx, cancel := context.WithCancel(context.Background())
 	return &Hub{
-		opts:     opts,
-		sessions: make(map[string]*Session),
-		rootCtx:  ctx,
-		cancel:   cancel,
+		opts:       opts,
+		sessions:   make(map[string]*Session),
+		tokenIndex: make(map[string]*Session),
+		rootCtx:    ctx,
+		cancel:     cancel,
 	}
 }
 
@@ -259,6 +269,7 @@ func (h *Hub) Stop(ctx context.Context) error {
 		s.Close()
 	}
 	h.sessions = make(map[string]*Session)
+	h.tokenIndex = make(map[string]*Session)
 	h.mu.Unlock()
 	return nil
 }
@@ -270,17 +281,34 @@ func (h *Hub) Count() int {
 	return len(h.sessions)
 }
 
+// DroppedTotal returns the sum of dropped outbound messages across all
+// currently-live sessions. Exposed via /_nguyen/health for observability.
+func (h *Hub) DroppedTotal() int64 {
+	h.mu.RLock()
+	defer h.mu.RUnlock()
+	var total int64
+	for _, s := range h.sessions {
+		total += s.DroppedMessages.Load()
+	}
+	return total
+}
+
 // Spawn creates a new session bound to the given route, renderer and
 // initial state. The id must be globally unique within the hub —
 // callers usually pass a 16-byte hex string from ngctx.NewID.
 // Returns ErrTooManySessions when the cap is reached, or an error if
 // the hub has already been stopped (rootCtx cancelled).
+// On success the session's ReattachToken is set and a "session" outbound
+// message is queued so the client can persist the token for reconnects.
 func (h *Hub) Spawn(parentCtx context.Context, id, route string, initialState any, renderer Renderer, handler Handler) (*Session, error) {
 	if renderer == nil || handler == nil {
 		return nil, errors.New("live: renderer and handler are required")
 	}
+	token, err := newReattachToken()
+	if err != nil {
+		return nil, err
+	}
 	h.mu.Lock()
-	// Check rootCtx under the lock to avoid a race with Stop().
 	if h.rootCtx.Err() != nil {
 		h.mu.Unlock()
 		return nil, errors.New("live: hub is stopped")
@@ -295,28 +323,66 @@ func (h *Hub) Spawn(parentCtx context.Context, id, route string, initialState an
 	}
 	ctx, cancel := context.WithCancel(parentCtx)
 	s := &Session{
-		id:       id,
-		route:    route,
-		state:    initialState,
-		renderer: renderer,
-		handler:  handler,
-		outbound: make(chan Outbound, h.opts.OutboundBuffer),
-		closed:   make(chan struct{}),
-		ctx:      ctx,
-		cancel:   cancel,
-		lastSeen: time.Now(),
-		opts:     h.opts,
+		id:            id,
+		route:         route,
+		state:         initialState,
+		renderer:      renderer,
+		handler:       handler,
+		outbound:      make(chan Outbound, h.opts.OutboundBuffer),
+		closed:        make(chan struct{}),
+		ctx:           ctx,
+		cancel:        cancel,
+		lastSeen:      time.Now(),
+		opts:          h.opts,
+		ReattachToken: token,
 	}
 	h.sessions[id] = s
+	h.tokenIndex[token] = s
 	h.mu.Unlock()
+
+	// Notify client of its reattach token immediately.
+	s.send(Outbound{Kind: "session", Token: token})
 
 	go func() {
 		<-s.closed
 		h.mu.Lock()
 		delete(h.sessions, id)
+		delete(h.tokenIndex, token)
 		h.mu.Unlock()
 	}()
 	return s, nil
+}
+
+// Reattach looks up a session by its reattach token and resets its context
+// so the new WebSocket transport can take over. Returns ErrTokenExpired when
+// the token is unknown (session was reaped or never existed).
+func (h *Hub) Reattach(parentCtx context.Context, token string) (*Session, error) {
+	h.mu.Lock()
+	s, ok := h.tokenIndex[token]
+	if !ok {
+		h.mu.Unlock()
+		return nil, ErrTokenExpired
+	}
+	// Reset the session's context to the new transport's parent context.
+	s.cancel()
+	newCtx, newCancel := context.WithCancel(parentCtx)
+	s.ctx = newCtx
+	s.cancel = newCancel
+	// Re-open the closed channel so the new transport's read/write loops work.
+	s.closeOnce = sync.Once{}
+	s.closed = make(chan struct{})
+	s.touch()
+	h.mu.Unlock()
+	return s, nil
+}
+
+// newReattachToken generates a cryptographically random 32-hex-char token.
+func newReattachToken() (string, error) {
+	b := make([]byte, 16)
+	if _, err := rand.Read(b); err != nil {
+		return "", err
+	}
+	return hex.EncodeToString(b), nil
 }
 
 // Get returns the session with the given id or ErrSessionNotFound.
@@ -344,6 +410,9 @@ func (h *Hub) reap(now time.Time) {
 	}
 	h.mu.RUnlock()
 	for _, s := range stale {
+		h.mu.Lock()
+		delete(h.tokenIndex, s.ReattachToken)
+		h.mu.Unlock()
 		s.Close()
 	}
 }

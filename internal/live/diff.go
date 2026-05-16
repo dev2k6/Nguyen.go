@@ -81,15 +81,76 @@ func diffNodes(a, b *node, path string, ops *[]Op) {
 	la, lb := len(a.children), len(b.children)
 	if la == lb {
 		for i := 0; i < la; i++ {
-			child := joinPath(path, i)
-			diffNodes(a.children[i], b.children[i], child, ops)
+			diffNodes(a.children[i], b.children[i], joinPath(path, i), ops)
 		}
 		return
 	}
-	// Length differs — emit replace at the parent. A future revision
-	// can do keyed reconciliation; for now this is the predictable
-	// fallback.
+	// Child counts differ — attempt keyed reconciliation when any child
+	// carries a data-key attribute. Fall back to a full replace when no
+	// keys are present (backward compatible with unkeyed lists).
+	if hasKeyedChildren(a.children) || hasKeyedChildren(b.children) {
+		diffKeyedChildren(a.children, b.children, path, ops)
+		return
+	}
 	*ops = append(*ops, Op{Op: "replace", Path: path, HTML: b.render()})
+}
+
+// hasKeyedChildren reports whether any node in the slice has a data-key attr.
+func hasKeyedChildren(nodes []*node) bool {
+	for _, n := range nodes {
+		if n != nil && n.kind == nodeElement && n.attrs["data-key"] != "" {
+			return true
+		}
+	}
+	return false
+}
+
+// diffKeyedChildren performs an O(n) two-pass keyed reconciliation.
+// Pass 1: build old-key map, walk new children and diff matched pairs.
+// Pass 2: emit remove ops for old children not present in new list.
+func diffKeyedChildren(oldKids, newKids []*node, parentPath string, ops *[]Op) {
+	// Build key → old index map.
+	oldKeyMap := make(map[string]int, len(oldKids))
+	for i, n := range oldKids {
+		if n != nil && n.kind == nodeElement {
+			if k := n.attrs["data-key"]; k != "" {
+				oldKeyMap[k] = i
+			}
+		}
+	}
+
+	matched := make(map[int]bool, len(oldKids))
+
+	// Pass 1: walk new children.
+	for newIdx, nb := range newKids {
+		childPath := joinPath(parentPath, newIdx)
+		if nb == nil || nb.kind != nodeElement || nb.attrs["data-key"] == "" {
+			// Unkeyed child — positional diff against old slot.
+			if newIdx < len(oldKids) {
+				diffNodes(oldKids[newIdx], nb, childPath, ops)
+				matched[newIdx] = true
+			} else {
+				if nb != nil {
+					*ops = append(*ops, Op{Op: "insert", Path: childPath, HTML: nb.render()})
+				}
+			}
+			continue
+		}
+		key := nb.attrs["data-key"]
+		if oldIdx, ok := oldKeyMap[key]; ok {
+			matched[oldIdx] = true
+			diffNodes(oldKids[oldIdx], nb, childPath, ops)
+		} else {
+			*ops = append(*ops, Op{Op: "insert", Path: childPath, HTML: nb.render()})
+		}
+	}
+
+	// Pass 2: remove old children not matched by any new child.
+	for oldIdx := range oldKids {
+		if !matched[oldIdx] {
+			*ops = append(*ops, Op{Op: "remove", Path: joinPath(parentPath, oldIdx)})
+		}
+	}
 }
 
 func joinPath(base string, idx int) string {
