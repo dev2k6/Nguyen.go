@@ -2,6 +2,7 @@ package nguyen
 
 import (
 	"github.com/dev2k6/Nguyen.go/internal/config"
+	"github.com/dev2k6/Nguyen.go/internal/live"
 	"github.com/dev2k6/Nguyen.go/internal/server"
 	"github.com/gofiber/fiber/v2"
 )
@@ -84,4 +85,10 @@ func WithMail(cfg config.MailConfig) Option {
 //	)
 func WithLiveOptions(opts server.LiveOptions) Option {
 	return func(a *App) { a.liveOpts = opts }
+}
+
+// WithHubOptions configures the Live Mode session hub (MaxSessions,
+// IdleTimeout, HeartbeatInterval, OutboundBuffer).
+func WithHubOptions(opts live.Options) Option {
+	return func(a *App) { a.hubOpts = opts }
 }

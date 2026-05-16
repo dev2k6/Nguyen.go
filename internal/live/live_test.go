@@ -270,3 +270,63 @@ func TestSessionTouch(t *testing.T) {
 		t.Fatalf("session was reaped while active: %v", err)
 	}
 }
+
+func TestReattach(t *testing.T) {
+	hub := NewHub(Options{})
+	defer hub.Stop(context.Background())
+
+	r := &fakeRenderer{fn: func(s any) string { return "<p>" + s.(string) + "</p>" }}
+	h := &fakeHandler{fn: func(s any, _ Event) (any, error) { return s, nil }}
+
+	sess, err := hub.Spawn(context.Background(), "r1", "/", "mystate", r, h)
+	if err != nil {
+		t.Fatal(err)
+	}
+	drainSession(t, sess)
+	token := sess.ReattachToken
+	if token == "" {
+		t.Fatal("expected non-empty reattach token")
+	}
+
+	// Close the session (simulates disconnect)
+	sess.Close()
+	time.Sleep(20 * time.Millisecond)
+
+	// Reattach with valid token
+	newSess, err := hub.Reattach(context.Background(), token)
+	if err != nil {
+		t.Fatalf("reattach failed: %v", err)
+	}
+	if newSess.ID() != sess.ID() {
+		t.Fatalf("reattached session id mismatch: want %s got %s", sess.ID(), newSess.ID())
+	}
+
+	// Reattach with expired/unknown token
+	_, err = hub.Reattach(context.Background(), "invalid-token")
+	if !errors.Is(err, ErrTokenExpired) {
+		t.Fatalf("want ErrTokenExpired got %v", err)
+	}
+}
+
+func TestDroppedMessagesCounter(t *testing.T) {
+	// OutboundBuffer=1 so the second message overflows
+	hub := NewHub(Options{OutboundBuffer: 1})
+	defer hub.Stop(context.Background())
+
+	r := &fakeRenderer{fn: func(any) string { return "<p/>" }}
+	h := &fakeHandler{fn: func(s any, _ Event) (any, error) { return s, nil }}
+	sess, _ := hub.Spawn(context.Background(), "d1", "/", nil, r, h)
+	// drain the session token message
+	<-sess.OutboundCh()
+
+	// Fill the buffer then overflow it
+	sess.send(Outbound{Kind: "ping"})
+	sess.send(Outbound{Kind: "ping"}) // should be dropped
+
+	if got := sess.DroppedMessages.Load(); got != 1 {
+		t.Fatalf("want 1 dropped message got %d", got)
+	}
+	if got := hub.DroppedTotal(); got != 1 {
+		t.Fatalf("hub DroppedTotal want 1 got %d", got)
+	}
+}

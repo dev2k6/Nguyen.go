@@ -346,8 +346,10 @@ func (h *Hub) Spawn(parentCtx context.Context, id, route string, initialState an
 	go func() {
 		<-s.closed
 		h.mu.Lock()
+		// Only remove from sessions map — tokenIndex is kept so the client
+		// can reattach within IdleTimeout. The reaper removes the token entry
+		// once the session is fully expired.
 		delete(h.sessions, id)
-		delete(h.tokenIndex, token)
 		h.mu.Unlock()
 	}()
 	return s, nil

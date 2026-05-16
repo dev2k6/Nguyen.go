@@ -118,16 +118,32 @@ export const metadata = {
 </html>
 ```
 
-## Defining a Live page in `.gox`
+## Defining a Live page in `.gox` (v1.4+)
 
-A future codegen pass will let you write a Live page as a single
-`.live.gox` file with a struct + methods in the frontmatter and an HTML
-template below. Today the parser already detects the file (via the
-`.live.gox` suffix or a `//+nguyen:live` directive) and exposes
-`File.IsLive`. The runtime side that converts that into a registered
-`livepage.Page` ships in v1.3.
+Write a Live page as a single `.live.gox` file — no manual
+`RegisterLivePage` call needed. The compiler detects the suffix,
+runs `TranspileLive`, and writes a `livepage.Page` implementation
+to `<buildDir>/live/`. The server picks it up automatically on
+startup.
 
-For v1.2.0, register pages in Go.
+```
+---
+var Count int
+
+func inc(state *CounterState) { state.Count++ }
+func dec(state *CounterState) { state.Count-- }
+---
+
+<section>
+  <h1>Count: {Count}</h1>
+  <button @click="dec()">-</button>
+  <button @click="inc()">+</button>
+</section>
+```
+
+Save as `pages/counter.live.gox`. No other wiring required.
+
+For v1.3 and earlier, register pages manually in Go (see above).
 
 ## Event bindings
 
@@ -160,25 +176,38 @@ from a server-driven full reload.
 `path` is a slash-separated chain of child indices from the live root.
 Empty path = root.
 
-The differ today emits `replace` when child counts diverge; keyed
-reconciliation (`<li :key="...">`) is on the v1.3 roadmap.
+The differ today emits `replace` when child counts diverge. Since
+v1.3, keyed reconciliation is supported via `data-key` attributes:
+
+```html
+<ul>
+  <li data-key="{item.ID}">{item.Name}</li>
+</ul>
+```
+
+When children carry `data-key`, the differ performs an O(n) two-pass
+keyed diff — only changed nodes are patched instead of replacing the
+whole list.
 
 ## Tuning the hub
 
-`live.Hub` accepts these options when an application wants more
-control:
+`live.Hub` accepts these options. Pass them via `WithHubOptions`:
 
 ```go
-hub := live.NewHub(live.Options{
-    MaxSessions:       100_000, // soft cap; Spawn returns ErrTooManySessions past this
-    IdleTimeout:       2 * time.Minute,
-    HeartbeatInterval: 30 * time.Second,
-    OutboundBuffer:    32,
-})
-```
-
-Today `pkg/nguyen.App` constructs a hub with defaults. A future
-release exposes a `WithLiveOptions` option for full configurability.
+app := nguyen.New(
+    nguyen.WithHubOptions(live.Options{
+        MaxSessions:       100_000,
+        IdleTimeout:       2 * time.Minute,
+        HeartbeatInterval: 30 * time.Second,
+        OutboundBuffer:    32,
+    }),
+    nguyen.WithLiveOptions(server.LiveOptions{
+        AllowedOrigins: []string{"https://example.com"},
+        AuthFunc: func(c *fiber.Ctx) error {
+            return myAuth.ValidateSession(c)
+        },
+    }),
+)
 
 ## Failure modes
 
@@ -186,9 +215,12 @@ release exposes a `WithLiveOptions` option for full configurability.
   dropped (Session.send falls through). The transport eventually
   observes a write error and closes the session.
 - **Network drop**: the bridge auto-reconnects with exponential
-  backoff (capped at 30s). On reconnect the server treats it as a
-  fresh session — state from the previous session is gone (v1.2 is
-  in-memory only).
+  backoff (capped at 30s). Since v1.3, the server issues a reattach
+  token on first connect (`{t:"session","token":"..."}`) and the
+  bridge sends it on reconnect (`{t:"reattach","token":"..."}`).
+  State survives reconnects within `IdleTimeout`. After that the
+  server returns `ErrTokenExpired` and the bridge falls back to a
+  fresh session.
 - **Server panic in handler**: the `live.Session.Dispatch` path
   recovers and emits `{t:"error", error:"..."}`; the session stays
   open so the client can recover.

@@ -149,7 +149,7 @@ func New(opts Options) (*App, error) {
 	app.Get("/_nguyen/image", ImageHandler(cfg))
 
 	// Health check endpoint
-	app.Get("/_nguyen/health", HealthHandler())
+	app.Get("/_nguyen/health", HealthHandler(nil))
 
 	// Runtime capability discovery (tells bridge.js if per-route chunks exist)
 	// chunkMode is set after construction; use pointer capture

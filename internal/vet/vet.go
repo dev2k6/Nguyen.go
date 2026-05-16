@@ -73,6 +73,8 @@ func DefaultRules() []Rule {
 		ruleNoHardcodedSecrets(),
 		ruleNoFmtPrintInHandlers(),
 		ruleEventHandlerExists(),
+		ruleLiveRenderMustBePure(),
+		ruleLiveHandlerMustReturnState(),
 	}
 }
 
@@ -495,6 +497,112 @@ func ruleEventHandlerExists() Rule {
 						File: p.Path, Line: 1,
 						Rule: "event-handler-exists", Severity: SeverityError,
 						Message: fmt.Sprintf("event handler %q is bound in template but not defined in frontmatter", name),
+					})
+				}
+			}
+			return out
+		},
+	}
+}
+
+// isLivePath reports whether the file is a Live Mode page.
+func isLivePath(path string) bool {
+	return strings.HasSuffix(path, ".live.gox")
+}
+
+// liveEffectBlocklist lists call expressions that must not appear in
+// Render methods of .live.gox files (Effect Wall — first pass).
+var liveEffectBlocklist = []string{
+	"sql.", "db.", "DB.", "Query(", "Exec(", "QueryRow(",
+	"http.Get(", "http.Post(", "http.Do(", "http.NewRequest(",
+	"os.Open(", "os.ReadFile(", "os.WriteFile(", "ioutil.",
+	"exec.Command(", "syscall.", "runtime.",
+}
+
+// ruleLiveRenderMustBePure flags Render functions in .live.gox files
+// that call DB, HTTP, or FS functions — these belong in Init or Handle.
+func ruleLiveRenderMustBePure() Rule {
+	return Rule{
+		Name:        "live-render-pure",
+		Description: "Render in .live.gox must not call DB/HTTP/FS functions; use Init or Handle instead",
+		Run: func(p *ParsedGox) []Issue {
+			if !isLivePath(p.Path) || p.AST == nil {
+				return nil
+			}
+			var out []Issue
+			for _, decl := range p.AST.Decls {
+				fn, ok := decl.(*ast.FuncDecl)
+				if !ok || fn.Name.Name != "Render" || fn.Body == nil {
+					continue
+				}
+				ast.Inspect(fn.Body, func(n ast.Node) bool {
+					call, ok := n.(*ast.CallExpr)
+					if !ok {
+						return true
+					}
+					callStr := fmt.Sprintf("%v", call.Fun)
+					for _, blocked := range liveEffectBlocklist {
+						if strings.Contains(callStr, blocked) {
+							pos := p.FileSet.Position(call.Pos())
+							out = append(out, Issue{
+								File:     p.Path,
+								Line:     pos.Line + p.GoLineBase,
+								Rule:     "live-render-pure",
+								Severity: SeverityError,
+								Message:  fmt.Sprintf("Render calls %q — move side effects to Init or Handle", blocked),
+							})
+						}
+					}
+					return true
+				})
+			}
+			return out
+		},
+	}
+}
+
+// ruleLiveHandlerMustReturnState flags handler functions in .live.gox
+// frontmatter that have no return statement — they must return the
+// (possibly mutated) state so the session can diff the new render.
+func ruleLiveHandlerMustReturnState() Rule {
+	return Rule{
+		Name:        "live-handler-returns-state",
+		Description: "handler functions in .live.gox must return a value (the new state)",
+		Run: func(p *ParsedGox) []Issue {
+			if !isLivePath(p.Path) || p.AST == nil {
+				return nil
+			}
+			// Collect event handler names from template
+			handlers := map[string]bool{}
+			matches := eventBindRx.FindAllStringSubmatch(p.Template, -1)
+			for _, m := range matches {
+				handlers[m[2]] = true
+			}
+			if len(handlers) == 0 {
+				return nil
+			}
+			var out []Issue
+			for _, decl := range p.AST.Decls {
+				fn, ok := decl.(*ast.FuncDecl)
+				if !ok || !handlers[fn.Name.Name] || fn.Body == nil {
+					continue
+				}
+				// Check if function has any return statement
+				hasReturn := false
+				ast.Inspect(fn.Body, func(n ast.Node) bool {
+					if _, ok := n.(*ast.ReturnStmt); ok {
+						hasReturn = true
+					}
+					return !hasReturn
+				})
+				if !hasReturn {
+					pos := p.FileSet.Position(fn.Pos())
+					out = append(out, Issue{
+						File:     p.Path,
+						Line:     pos.Line + p.GoLineBase,
+						Rule:     "live-handler-returns-state",
+						Severity: SeverityError,
+						Message:  fmt.Sprintf("handler %q in .live.gox has no return statement — it must return the new state", fn.Name.Name),
 					})
 				}
 			}

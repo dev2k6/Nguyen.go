@@ -66,6 +66,7 @@ type App struct {
 	liveHub      *live.Hub
 	livePages    *internallivepage.Registry
 	liveOpts     server.LiveOptions
+	hubOpts      live.Options
 }
 
 func New(opts ...Option) *App {
@@ -171,11 +172,10 @@ func (a *App) serve() error {
 		})
 	})
 
-	// Live Mode wiring — bridge JS + WebSocket endpoint. The hub and
-	// registry are lazily created so applications that do not register
-	// any live pages pay no overhead.
-	a.liveHub = live.NewHub(live.Options{})
+	// Live Mode wiring — bridge JS + WebSocket endpoint.
+	a.liveHub = live.NewHub(a.hubOpts)
 	a.livePages = internallivepage.NewRegistry()
+	a.fiber.Get("/_nguyen/health", server.HealthHandler(a.liveHub))
 	a.fiber.Get("/_nguyen/live.js", server.LiveBridgeHandler())
 	a.fiber.Get("/_nguyen/live/+", server.LiveUpgradeMiddleware(a.liveOpts), server.LiveHandler(a.liveHub, a.livePages))
 	go func() {

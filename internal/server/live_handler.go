@@ -172,7 +172,7 @@ func LiveHandler(hub *live.Hub, registry *internallivepage.Registry) fiber.Handl
 
 		writeDone := make(chan struct{})
 		go writeLoop(c, sess, writeDone, log)
-		readLoop(c, sess, log)
+		readLoop(c, sess, hub, ctx, log)
 		<-writeDone
 	})
 }
@@ -183,15 +183,13 @@ func writeFatal(c *websocket.Conn, msg string) {
 	_ = c.Close()
 }
 
-func readLoop(c *websocket.Conn, sess *live.Session, log *slog.Logger) {
+func readLoop(c *websocket.Conn, sess *live.Session, hub *live.Hub, ctx context.Context, log *slog.Logger) {
 	for {
 		select {
 		case <-sess.Closed():
 			return
 		default:
 		}
-		// Reset read deadline on every iteration so the connection
-		// stays alive as long as the client is active.
 		_ = c.SetReadDeadline(time.Now().Add(2 * time.Minute))
 		mt, data, err := c.ReadMessage()
 		if err != nil {
@@ -204,6 +202,18 @@ func readLoop(c *websocket.Conn, sess *live.Session, log *slog.Logger) {
 		evt, err := live.DecodeEvent(data)
 		if err != nil {
 			log.Info("live.decode.error", "error", err.Error())
+			continue
+		}
+		// Handle reattach before dispatching to the page handler.
+		if evt.Kind == "reattach" {
+			newSess, err := hub.Reattach(ctx, evt.Token)
+			if err != nil {
+				out, _ := live.EncodeOutbound(live.Outbound{Kind: "error", Err: "reattach: " + err.Error()})
+				_ = c.WriteMessage(websocket.TextMessage, out)
+				return
+			}
+			sess = newSess
+			log.Info("live.session.reattach", "live_session", sess.ID())
 			continue
 		}
 		sess.Dispatch(evt)

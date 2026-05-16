@@ -69,12 +69,26 @@ func BuildPerRoute(pagesDir, outputDir string) (*BuildPerRouteResult, error) {
 		Manifest:  make(map[string]string),
 	}
 
-	// Step 1: Generate Go source for each page
+// Step 1: Generate Go source for each page
 	var pageGoFiles []string
+	liveDir := filepath.Join(outputDir, "live")
+	os.MkdirAll(liveDir, 0755)
+
 	for _, route := range pageRoutes {
 		ngFile, err := parser.Parse(route.FilePath)
 		if err != nil {
 			result.Errors = append(result.Errors, fmt.Sprintf("%s: parse error: %v", route.Pattern, err))
+			continue
+		}
+
+		// .live.gox files generate a livepage.Page implementation — skip TinyGo.
+		if ngFile.IsLive {
+			liveInfo := parser.TranspileLive(ngFile)
+			goPath := filepath.Join(liveDir, liveInfo.PackageName+".go")
+			if err := os.WriteFile(goPath, []byte(liveInfo.SourceCode), 0644); err != nil {
+				result.Errors = append(result.Errors, fmt.Sprintf("%s: live write error: %v", route.Pattern, err))
+			}
+			// Live pages are not compiled to WASM — no manifest entry needed.
 			continue
 		}
 
